@@ -9,11 +9,9 @@ dependencies {
     implementation project(':vtm-mvt')
     implementation project(':vtm-themes')
     implementation "org.slf4j:slf4j-android:$slf4jVersion"
-
     implementation project(':vtm-android-gdx')
     implementation project(':vtm-gdx')
     implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-
     implementation 'org.mapsforge:mapsforge-poi-android:master-SNAPSHOT'
     implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-armeabi'
     implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-armeabi-v7a'
@@ -21,8 +19,8 @@ dependencies {
 }
 
 android {
-    compileSdkVersion androidCompileSdk()
-    buildToolsVersion "$androidBuildVersionTools"
+    compileSdkVersion 28
+    buildToolsVersion '28.0.1'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
