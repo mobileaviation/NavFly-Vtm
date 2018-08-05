@@ -2,13 +2,16 @@ package com.mobileaviationtools.navfly;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Environment;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.android.cache.TileCache;
+import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.core.MapPosition;
 import org.oscim.layers.GroupLayer;
+import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
@@ -25,6 +28,8 @@ import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
+import java.io.File;
+
 public class MainActivity extends Activity {
     final static boolean USE_CACHE = false;
 
@@ -34,6 +39,7 @@ public class MainActivity extends Activity {
     VectorTileLayer mBaseLayer;
     private TileCache mCache;
     TileSource mTileSource;
+    protected BitmapTileLayer mBitmapLayer;
 
     private DefaultMapScaleBar mapScaleBar;
 
@@ -49,6 +55,23 @@ public class MainActivity extends Activity {
 
         setupMap();
         createLayers();
+        getMBTilesMap();
+    }
+
+    void getMBTilesMap()
+    {
+        // ehaa_256@2x.mbtiles
+        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        String folder = downloadFolder.getAbsolutePath() + "/ehaa_256@2x.mbtiles";
+
+        File f = new File(folder);
+        if (f.exists()) {
+            MBTilesTileSource mbTilesTileSource = new MBTilesTileSource(folder, 5, 18);
+            mbTilesTileSource.open();
+            mBitmapLayer = new BitmapTileLayer(mMap, mbTilesTileSource);
+            mMap.layers().add(mBitmapLayer);
+
+        }
     }
 
     void setupMap()
