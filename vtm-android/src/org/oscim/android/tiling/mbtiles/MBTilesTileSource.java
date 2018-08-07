@@ -18,9 +18,10 @@ public class MBTilesTileSource extends TileSource {
     private String mMbTilesFile;
     private MBTilesProvider mMbTileProvider;
 
-    public MBTilesTileSource(String mbtiles_file, int zoomMin, int zoomMax)
+    public MBTilesTileSource(String mbtiles_file)
     {
-        super(zoomMin, zoomMax);
+        super();
+        //super(zoomMin, zoomMax);
         mMbTilesFile = mbtiles_file;
         mMbTileProvider = new MBTilesProvider(mMbTilesFile);
     }
@@ -32,15 +33,18 @@ public class MBTilesTileSource extends TileSource {
 
     @Override
     public OpenResult open() {
-        if (mMbTileProvider.open())
+        if (mMbTileProvider.open()) {
+            this.mZoomMin = mMbTileProvider.getMinimumZoom();
+            this.mZoomMax = mMbTileProvider.getMaximumZoom();
             return OpenResult.SUCCESS;
+        }
         else
-            return null;
+            return new OpenResult(mMbTileProvider.GetLastErrorMessage());
     }
 
     @Override
     public void close() {
-
+        mMbTileProvider.close();
     }
 
     public class MBTileDecoder implements ITileDecoder {

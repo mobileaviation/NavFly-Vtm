@@ -1,4 +1,4 @@
-package com.mobileaviationtools.navfly;
+package com.mobileaviationtools.nav_fly;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.mobileaviationtools.navfly", appContext.getPackageName());
+        assertEquals("com.mobileaviationtools.nav_fly", appContext.getPackageName());
     }
 }

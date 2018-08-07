@@ -1,4 +1,4 @@
-package com.mobileaviationtools.navfly;
+package com.mobileaviationtools.nav_fly;
 
 import org.junit.Test;
 

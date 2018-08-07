@@ -1,5 +1,5 @@
 rootProject.name = 'vtm-parent'
-include ':vtm', ':navfly'
+include ':vtm', ':navfly', ':nav-fly'
 include ':vtm-android'
 include ':vtm-android-example'
 include ':vtm-android-gdx'

@@ -2,10 +2,21 @@ package org.oscim.android.tiling.mbtiles;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import org.oscim.core.BoundingBox;
+import org.oscim.core.Box;
+import org.oscim.core.PointF;
+
 import java.io.File;
 
 
 public class MBTilesProvider {
+    private String mErrorMessage;
+    public String GetLastErrorMessage()
+    {
+        return mErrorMessage;
+    }
+
     // ------------------------------------------------------------------------
     // Instance Variables
     // ------------------------------------------------------------------------
@@ -14,7 +25,7 @@ public class MBTilesProvider {
 
     private int mMaximumZoom = Integer.MAX_VALUE;
 
-    //private LatLngBounds mBounds;
+    private Box mBounds;
 
     private SQLiteDatabase mDatabase;
 
@@ -29,14 +40,30 @@ public class MBTilesProvider {
 
     public Boolean open()
     {
-        int flags = SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS;
-        this.mDatabase = SQLiteDatabase.openDatabase(mPathToFile, null, flags);
-        //this.calculateBounds();
-        if (this.mDatabase != null) {
-            this.calculateZoomConstraints();
-            return this.mDatabase.isOpen();
+        if (new File(mPathToFile).exists()) {
+            int flags = SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS;
+            try {
+                this.mDatabase = SQLiteDatabase.openDatabase(mPathToFile, null, flags);
+                mErrorMessage = "";
+                if (this.mDatabase != null) {
+                    this.calculateZoomConstraints();
+                    this.calculateBounds();
+                    return this.mDatabase.isOpen();
+                } else {
+                    mErrorMessage = "Error opening database file: " + mPathToFile;
+                    return false;
+                }
+            } catch (Exception ee) {
+                mErrorMessage = "Exception opening database file: " + mPathToFile +
+                        " with message: " + ee.getMessage();
+                return false;
+            }
         }
-        else return false;
+        else
+        {
+            mErrorMessage = "File: " + mPathToFile + " not present or accessible!";
+            return false;
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -92,7 +119,7 @@ public class MBTilesProvider {
     /**
      * The minimum zoom level supported by this provider.
      *
-     * @return the minimum zoom level supported or {@link Integer.MIN_VALUE} if
+     * @return the minimum zoom level supported or {//@link Integer.MIN_VALUE} if
      *         it could not be determined.
      */
     public int getMinimumZoom() {
@@ -102,7 +129,7 @@ public class MBTilesProvider {
     /**
      * The maximum zoom level supported by this provider.
      *
-     * @return the maximum zoom level supported or {@link Integer.MAX_VALUE} if
+     * @return the maximum zoom level supported or {//@link Integer.MAX_VALUE} if
      *         it could not be determined.
      */
     public int getMaximumZoom() {
@@ -115,9 +142,9 @@ public class MBTilesProvider {
      * @return the geographic bounds available or {@link null} if it could not
      *         be determined.
      */
-    //public LatLngBounds getBounds() {
-    //    return this.mBounds;
-    //}
+    public Box getBounds() {
+        return this.mBounds;
+    }
 
     /**
      * Determines if the requested zoom level is supported by this provider.
@@ -168,35 +195,34 @@ public class MBTilesProvider {
         }
     }
 
-//    private void calculateBounds() {
-//        if (this.isDatabaseAvailable()) {
-//            String[] projection = new String[] {
-//                    "value"
-//            };
-//
-//            String[] subArgs = new String[] {
-//                    "bounds"
-//            };
-//
-//            Cursor c = this.mDatabase.query("metadata", projection, "name = ?", subArgs, null, null, null);
-//
-//            c.moveToFirst();
-//            if (!c.isAfterLast()) {
-//                String[] parts = c.getString(0).split(",\\s*");
-//
-//                double w = Double.parseDouble(parts[0]);
-//                double s = Double.parseDouble(parts[1]);
-//                double e = Double.parseDouble(parts[2]);
-//                double n = Double.parseDouble(parts[3]);
-//
-//                LatLng ne = new LatLng(n, e);
-//                LatLng sw = new LatLng(s, w);
-//
-//                this.mBounds = new LatLngBounds(sw, ne);
-//            }
-//            c.close();
-//        }
-//    }
+    private void calculateBounds() {
+        if (this.isDatabaseAvailable()) {
+            String[] projection = new String[] {
+                    "value"
+            };
+
+            String[] subArgs = new String[] {
+                    "bounds"
+            };
+
+            Cursor c = this.mDatabase.query("metadata", projection, "name = ?", subArgs, null, null, null);
+
+            c.moveToFirst();
+            if (!c.isAfterLast()) {
+                String[] parts = c.getString(0).split(",\\s*");
+
+                float w = Float.parseFloat(parts[0]);
+                float s = Float.parseFloat(parts[1]);
+                float e = Float.parseFloat(parts[2]);
+                float n = Float.parseFloat(parts[3]);
+
+                mBounds = new Box();
+                mBounds.add(e, n);
+                mBounds.add(w, s);
+            }
+            c.close();
+        }
+    }
 
     private boolean isDatabaseAvailable() {
         return (this.mDatabase != null) && (this.mDatabase.isOpen());

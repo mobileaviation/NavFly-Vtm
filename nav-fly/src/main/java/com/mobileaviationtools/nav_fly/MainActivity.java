@@ -1,8 +1,8 @@
-package com.mobileaviationtools.navfly;
+package com.mobileaviationtools.nav_fly;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
@@ -30,7 +30,7 @@ import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     final static boolean USE_CACHE = false;
 
     MapView mMapView;
@@ -42,7 +42,6 @@ public class MainActivity extends Activity {
     protected BitmapTileLayer mBitmapLayer;
 
     private DefaultMapScaleBar mapScaleBar;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +59,15 @@ public class MainActivity extends Activity {
 
     void getMBTilesMap()
     {
+        //if (ContextCompat)
+
         // ehaa_256@2x.mbtiles
         File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         String folder = downloadFolder.getAbsolutePath() + "/ehaa_256@2x.mbtiles";
 
         File f = new File(folder);
         if (f.exists()) {
-            MBTilesTileSource mbTilesTileSource = new MBTilesTileSource(folder, 5, 18);
+            MBTilesTileSource mbTilesTileSource = new MBTilesTileSource(folder);
             mbTilesTileSource.open();
             mBitmapLayer = new BitmapTileLayer(mMap, mbTilesTileSource);
             mMap.layers().add(mBitmapLayer);
