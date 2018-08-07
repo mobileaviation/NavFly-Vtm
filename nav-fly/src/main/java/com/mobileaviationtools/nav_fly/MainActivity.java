@@ -1,6 +1,12 @@
 package com.mobileaviationtools.nav_fly;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -32,6 +38,7 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     final static boolean USE_CACHE = false;
+    final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
 
     MapView mMapView;
     Map mMap;
@@ -54,13 +61,36 @@ public class MainActivity extends AppCompatActivity {
 
         setupMap();
         createLayers();
-        getMBTilesMap();
+        getMBTilesMapPerm();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_EXTERNAL_STORAGE_ACCESS: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    getMBTilesMap();
+                }
+            }
+            return;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    void getMBTilesMapPerm()
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
+        }
+        else {
+            getMBTilesMap();
+        }
     }
 
     void getMBTilesMap()
     {
-        //if (ContextCompat)
-
         // ehaa_256@2x.mbtiles
         File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         String folder = downloadFolder.getAbsolutePath() + "/ehaa_256@2x.mbtiles";
