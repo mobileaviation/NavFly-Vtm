@@ -9,18 +9,26 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.android.cache.TileCache;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
+import org.oscim.backend.canvas.Color;
 import org.oscim.core.MapPosition;
+import org.oscim.event.Gesture;
+import org.oscim.event.MotionEvent;
 import org.oscim.layers.GroupLayer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
+import org.oscim.layers.vector.VectorLayer;
+import org.oscim.layers.vector.geometries.LineDrawable;
+import org.oscim.layers.vector.geometries.Style;
+import org.oscim.layers.vector.PathLayer;
 import org.oscim.map.Map;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.GLViewport;
@@ -62,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         setupMap();
         createLayers();
         getMBTilesMapPerm();
+        //setupPathLayer();
+        setupVectorLayer();
     }
 
     @Override
@@ -76,6 +86,77 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    void setupVectorLayer()
+    {
+        Style lineStyle = Style.builder()
+                .strokeColor(Color.BLUE)
+                .strokeWidth(5).build();
+
+        VectorLayer vectorLayer = new VectorLayer(mMap)
+        {
+            @Override
+            public boolean onGesture(Gesture g, MotionEvent e) {
+                if (g instanceof Gesture.Tap) {
+                    if (contains(e.getX(), e.getY())) {
+                        Toast.makeText(MainActivity.this, "PathLayer tap\n" + mMap.viewport().fromScreenPoint(e.getX(), e.getY()), Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+
+        double[] packedCoordinates = new double[4];
+        packedCoordinates[0] = 5.5272;
+        packedCoordinates[1] = 52.4603;
+        packedCoordinates[2] = 4.8336;
+        packedCoordinates[3] = 53.1153;
+        LineDrawable line = new LineDrawable(packedCoordinates, lineStyle);
+
+
+
+        mMap.layers().add(vectorLayer);
+        vectorLayer.add(line);
+        vectorLayer.update();
+
+    }
+
+    void setupPathLayer()
+    {
+        Style lineStyle = Style.builder()
+                .fillColor(Color.BLUE)
+                .strokeColor(Color.BLACK)
+                .strokeWidth(2).build();
+
+        PathLayer pathLayer = new PathLayer(mMap, lineStyle){
+            @Override
+            public boolean onGesture(Gesture g, MotionEvent e) {
+                if (g instanceof Gesture.Tap) {
+                    if (contains(e.getX(), e.getY())) {
+                        Toast.makeText(MainActivity.this, "PathLayer tap\n" + mMap.viewport().fromScreenPoint(e.getX(), e.getY()), Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+        mMap.layers().add(pathLayer);
+
+        drawlineLelystadTexel(pathLayer);
+    }
+
+    void drawlineLelystadTexel(PathLayer layer)
+    {
+        double[] packedCoordinates = new double[4];
+        packedCoordinates[0] = 5.5272;
+        packedCoordinates[1] = 52.4603;
+        packedCoordinates[2] = 4.8336;
+        packedCoordinates[3] = 53.1153;
+
+
+        layer.setLineString(packedCoordinates);
     }
 
     void getMBTilesMapPerm()
