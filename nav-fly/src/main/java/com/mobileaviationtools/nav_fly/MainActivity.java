@@ -4,11 +4,14 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import org.oscim.android.MapPreferences;
@@ -44,6 +47,11 @@ import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
 
+//import androidx.annotation.NonNull;
+//import androidx.appcompat.app.AppCompatActivity;
+//import androidx.core.app.ActivityCompat;
+//import androidx.core.content.ContextCompat;
+
 public class MainActivity extends AppCompatActivity {
     final static boolean USE_CACHE = false;
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
@@ -72,6 +80,18 @@ public class MainActivity extends AppCompatActivity {
         getMBTilesMapPerm();
         //setupPathLayer();
         setupVectorLayer();
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        return true;
     }
 
     @Override
