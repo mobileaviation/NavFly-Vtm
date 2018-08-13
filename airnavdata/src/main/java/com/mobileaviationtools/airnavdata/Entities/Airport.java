@@ -9,7 +9,8 @@ import java.util.ArrayList;
 
 @Entity(tableName = "tbl_Airports",
         indices = {@Index(name = "location_index", value = {"latitude_deg","longitude_deg"}),
-            @Index(name="ident_index", value = {"name","ident"})})
+            @Index(name="ident_index", value = {"name","ident"}),
+            @Index(name="id_index", value = {"id"})})
 public class Airport {
     public Airport()
     {
@@ -25,6 +26,8 @@ public class Airport {
     @Ignore
     public ArrayList<Frequency> frequencies;
 
+//    @PrimaryKey(autoGenerate = true)
+//    public Integer _id;
     @PrimaryKey
     public Integer id;
     public String ident;

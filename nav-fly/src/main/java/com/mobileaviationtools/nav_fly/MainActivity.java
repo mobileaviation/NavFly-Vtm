@@ -9,10 +9,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
+import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
+import com.mobileaviationtools.airnavdata.Models.Statistics;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
@@ -55,6 +60,7 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity {
     final static boolean USE_CACHE = false;
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
+    final String TAG = "MainActivity";
 
     MapView mMapView;
     Map mMap;
@@ -91,6 +97,23 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        int id = item.getItemId();
+
+        if (id == R.id.firebase_test_menuitem)
+        {
+            FBStatistics statistics = new FBStatistics(this);
+            statistics.OnStatisticsEvent = new FBStatistics.StatisticsEventListerner() {
+                @Override
+                public void OnStatistics(Statistics statistics) {
+                    Log.i(TAG, "Statistics :");
+                    AirportsDataSource airportsDataSource = new AirportsDataSource(MainActivity.this);
+                    airportsDataSource.ReadAirportData(statistics.AirportsCount);
+                }
+            };
+
+            statistics.FillStatistics();
+        }
+
         return true;
     }
 
