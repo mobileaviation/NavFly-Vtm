@@ -18,17 +18,23 @@ import android.widget.Toast;
 import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
 import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
 import com.mobileaviationtools.airnavdata.Models.Statistics;
+import com.mobileaviationtools.nav_fly.Layers.AirportMarkersLayer;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.android.cache.TileCache;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
+import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.MapPosition;
+import org.oscim.event.Event;
+import org.oscim.event.EventDispatcher;
 import org.oscim.event.Gesture;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.GroupLayer;
+import org.oscim.layers.MapEventLayer;
+import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
@@ -51,6 +57,8 @@ import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
+
+import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
 //import androidx.annotation.NonNull;
 //import androidx.appcompat.app.AppCompatActivity;
@@ -83,9 +91,20 @@ public class MainActivity extends AppCompatActivity {
 
         setupMap();
         createLayers();
-        getMBTilesMapPerm();
+        //getMBTilesMapPerm();
         //setupPathLayer();
-        setupVectorLayer();
+        //setupVectorLayer();
+        testMarkerLayerGestures();
+    }
+
+    public void testMarkerLayerGestures()
+    {
+        Bitmap bitmapPoi = drawableToBitmap(getResources().getDrawable(R.drawable.marker_poi));
+        MarkerSymbol symbol;
+        symbol = new MarkerSymbol(bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
+        AirportMarkersLayer airportMarkersLayer = new AirportMarkersLayer(mMap, symbol, this);
+
+        mMap.layers().add(airportMarkersLayer);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -246,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
         MapPosition pos = new MapPosition();
         mMap.getMapPosition(pos);
         if (pos.x == 0.5 && pos.y == 0.5)
-            mMap.setMapPosition(53.08, 8.83, Math.pow(2, 16));
+            mMap.setMapPosition(52.4603, 5.5272, Math.pow(2, 14));
     }
 
     void createLayers() {

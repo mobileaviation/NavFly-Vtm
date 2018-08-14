@@ -6,7 +6,8 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 //        foreignKeys = @ForeignKey(entity = Airport.class, parentColumns = "id", childColumns = "airport_ref"),
 @Entity(tableName = "tbl_Frequencies",
-        indices = @Index(name = "airport_ident_index", value = "airport_ident"))
+        foreignKeys = @ForeignKey(entity = Airport.class, parentColumns = "id", childColumns = "airport_ref"),
+        indices = @Index(name = "frequency_airport_ident_index", value = "airport_ident"))
 public class Frequency {
     @PrimaryKey
     public Integer id;

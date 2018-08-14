@@ -1,23 +1,17 @@
 package com.mobileaviationtools.airnavdata.Firebase;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Runway;
-
-import java.util.ArrayList;
-import java.util.concurrent.Executors;
 
 public class AirportsDataSource {
     public AirportsDataSource(Context context)
@@ -37,7 +31,7 @@ public class AirportsDataSource {
     AirnavDatabase db;
 
     public void ReadAirportData(final Integer airportCount) {
-        mDatabase = FirebaseConnection.getNavigationFirebaseReference(context, "airports");
+        mDatabase = FirebaseConnection.getNavFlyFirebaseReference(context, "airports");
         db = AirnavDatabase.getInstance(context);
 
         start = 0;
@@ -57,13 +51,12 @@ public class AirportsDataSource {
 
                         if (airport.runways != null) {
                             for (Runway runway : airport.runways) {
-
+                                db.getRunways().insertRunway(runway);
                             }
                         }
-
                         if (airport.frequencies != null) {
                             for (Frequency frequency : airport.frequencies) {
-
+                                db.getFrequency().insertFrequency(frequency);
                             }
                         }
                     }
@@ -74,21 +67,7 @@ public class AirportsDataSource {
                 }
                 db.setTransactionSuccessful();
                 db.endTransaction();
-
                 Log.i(TAG, "Read 1000 airports, get the next from: " + start.toString());
-
-
-//                    class DatabaseTask extends AsyncTask<ArrayList<Airport>, Void, Boolean>
-//                    {
-//                        @Override
-//                        protected Boolean doInBackground(ArrayList<Airport>... arrayLists) {
-//                            AirnavDatabase.getInstance(context).getAirport().insertAirports(arrayLists[0]);
-//                            return true;
-//                        }
-//                    }
-//                    new DatabaseTask().execute(airports);
-                    //AirnavDatabase.getInstance(context).getAirport().insertAirports(airports);
-
                 Log.i(TAG, "Inserted 1000 airports into the database.");
 
                 start = start + count;
@@ -101,7 +80,6 @@ public class AirportsDataSource {
                     query.addListenerForSingleValueEvent(dataListener);
                 else {
                     //if (progress != null) progress.OnFinished(FBTableType.airports);
-
                     Log.i(TAG, "Finished reading airports");
                     return;
                 }

@@ -10,6 +10,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.mobileaviationtools.airnavdata.DAOs.AirportsDao;
+import com.mobileaviationtools.airnavdata.DAOs.FrequenciesDao;
 import com.mobileaviationtools.airnavdata.DAOs.RunwaysDao;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Frequency;
@@ -17,7 +18,7 @@ import com.mobileaviationtools.airnavdata.Entities.Runway;
 
 import java.io.FileReader;
 
-@Database(entities = {Airport.class, Runway.class},
+@Database(entities = {Airport.class, Runway.class, Frequency.class},
         version = 1)
 public abstract class AirnavDatabase extends RoomDatabase {
     private static  final String DB_NAME = "room_airnav.db";
@@ -41,6 +42,6 @@ public abstract class AirnavDatabase extends RoomDatabase {
 
     public abstract AirportsDao getAirport();
     public abstract RunwaysDao getRunways();
-//    public abstract Runtime getRunway();
+    public abstract FrequenciesDao getFrequency();
 
 }

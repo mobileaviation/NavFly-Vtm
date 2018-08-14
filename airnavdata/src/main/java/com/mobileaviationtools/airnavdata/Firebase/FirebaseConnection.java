@@ -29,4 +29,15 @@ public class FirebaseConnection {
         FirebaseApp fixesApp = FirebaseApp.initializeApp(context, fbOptions, entity);
         return FirebaseDatabase.getInstance(fixesApp).getReference();
     }
+
+    public static DatabaseReference getNavFlyFirebaseReference(Context context, String entity)
+    {
+        FirebaseOptions fbOptions = new FirebaseOptions.Builder()
+                .setApiKey("AIzaSyAbAjzyrIg8pRu-5I1fvHGNm-IAOtkCqV0")
+                .setApplicationId("1:840311200834:android:d1260cec504d2818")
+                .setDatabaseUrl("https://navfly-72068.firebaseio.com")
+                .build();
+        FirebaseApp fixesApp = FirebaseApp.initializeApp(context, fbOptions, entity);
+        return FirebaseDatabase.getInstance(fixesApp).getReference();
+    }
 }

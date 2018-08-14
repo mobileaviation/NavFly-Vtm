@@ -10,5 +10,8 @@ import java.util.List;
 @Dao
 public interface FrequenciesDao {
     @Insert
-    public void insertRunways(List<Frequency> airportList);
+    public void insertFrequencies(List<Frequency> airportList);
+
+    @Insert
+    public void insertFrequency(Frequency frequency);
 }

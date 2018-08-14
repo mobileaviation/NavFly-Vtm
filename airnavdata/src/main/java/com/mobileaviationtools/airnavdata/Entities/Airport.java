@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 import java.util.ArrayList;
 
 @Entity(tableName = "tbl_Airports",
-        indices = {@Index(name = "location_index", value = {"latitude_deg","longitude_deg"}),
+        indices = {@Index(name = "airport_location_index", value = {"latitude_deg","longitude_deg"}),
             @Index(name="ident_index", value = {"name","ident"}),
             @Index(name="id_index", value = {"id"})})
 public class Airport {

@@ -74,6 +74,9 @@ dependencies {
     implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-armeabi-v7a'
     implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-x86'
 
+    implementation "android.arch.persistence.room:runtime:1.1.1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
+
     //implementation 'com.google.firebase:firebase-core:16.0.1'
 }
 

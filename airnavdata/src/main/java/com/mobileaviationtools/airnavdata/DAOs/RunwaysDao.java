@@ -11,4 +11,7 @@ import java.util.List;
 public interface RunwaysDao {
     @Insert
     public void insertRunways(List<Runway> airportList);
+
+    @Insert
+    public void insertRunway(Runway runway);
 }

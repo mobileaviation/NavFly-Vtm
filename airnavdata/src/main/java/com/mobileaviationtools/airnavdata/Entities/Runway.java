@@ -7,9 +7,10 @@ import android.arch.persistence.room.PrimaryKey;
 
 //        foreignKeys = @ForeignKey(entity = Airport.class, parentColumns = "id", childColumns = "airport_ref"),
 @Entity(tableName = "tbl_Runways",
-        indices = {@Index(name = "le_location_index", value = {"le_latitude_deg", "le_longitude_deg"}),
-                @Index(name = "he_location_index", value = {"he_latitude_deg", "he_longitude_deg"}),
-                    @Index(name = "airport_ident_index", value = "airport_ident")})
+        foreignKeys = @ForeignKey(entity = Airport.class, parentColumns = "id", childColumns = "airport_ref"),
+        indices = {@Index(name = "runway_le_location_index", value = {"le_latitude_deg", "le_longitude_deg"}),
+                @Index(name = "runway_he_location_index", value = {"he_latitude_deg", "he_longitude_deg"}),
+                    @Index(name = "runway_airport_ident_index", value = "airport_ident")})
 public class Runway {
     @PrimaryKey
     public Integer id;
