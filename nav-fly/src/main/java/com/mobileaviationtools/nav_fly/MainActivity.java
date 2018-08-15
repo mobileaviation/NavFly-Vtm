@@ -18,11 +18,13 @@ import android.widget.Toast;
 import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
 import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
 import com.mobileaviationtools.airnavdata.Models.Statistics;
+import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Layers.AirportMarkersLayer;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.android.cache.TileCache;
+import org.oscim.android.input.AndroidMotionEvent;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
@@ -34,6 +36,7 @@ import org.oscim.event.Gesture;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.GroupLayer;
 import org.oscim.layers.MapEventLayer;
+import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
@@ -72,8 +75,10 @@ public class MainActivity extends AppCompatActivity {
 
     MapView mMapView;
     Map mMap;
+    CheckMap checkMap;
     MapPreferences mPrefs;
     VectorTileLayer mBaseLayer;
+    AirportMarkersLayer mAirportMarkersLayer;
     private TileCache mCache;
     TileSource mTileSource;
     protected BitmapTileLayer mBitmapLayer;
@@ -87,7 +92,12 @@ public class MainActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
+
+
+
         mPrefs = new MapPreferences(MainActivity.class.getName(), this);
+
+
 
         setupMap();
         createLayers();
@@ -95,16 +105,27 @@ public class MainActivity extends AppCompatActivity {
         //setupPathLayer();
         //setupVectorLayer();
         testMarkerLayerGestures();
+
+//        android.view.MotionEvent e = android.view.MotionEvent.obtain(0,0, android.view.MotionEvent.ACTION_MOVE,0,0,0);
+//        mMap.input.fire(null, new AndroidMotionEvent().wrap(e));
+        mMap.events.bind(new Map.UpdateListener() {
+            @Override
+            public void onMapEvent(Event e, MapPosition mapPosition) {
+                Log.i(TAG, "OnMapEvent + " + e.toString());
+                if (checkMap == null) checkMap = new CheckMap(mMap);
+                if(checkMap.Changed())
+                    mAirportMarkersLayer.UpdateAirports();
+            }
+        });
     }
 
-    public void testMarkerLayerGestures()
-    {
+    public void testMarkerLayerGestures() {
         Bitmap bitmapPoi = drawableToBitmap(getResources().getDrawable(R.drawable.marker_poi));
         MarkerSymbol symbol;
         symbol = new MarkerSymbol(bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
-        AirportMarkersLayer airportMarkersLayer = new AirportMarkersLayer(mMap, symbol, this);
+        mAirportMarkersLayer = new AirportMarkersLayer(mMap, symbol, this);
 
-        mMap.layers().add(airportMarkersLayer);
+        mMap.layers().add(mAirportMarkersLayer);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -259,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
             mCache.setCacheSize(512 * (1 << 10));
             mTileSource.setCache(mCache);
         }
+
         mBaseLayer = mMap.setBaseMap(mTileSource);
 
         /* set initial position on first run */
