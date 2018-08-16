@@ -2,7 +2,6 @@ package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,25 +18,19 @@ import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
 import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
 import com.mobileaviationtools.airnavdata.Models.Statistics;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
-import com.mobileaviationtools.nav_fly.Layers.AirportMarkersLayer;
+import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.android.cache.TileCache;
-import org.oscim.android.input.AndroidMotionEvent;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
-import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
-import org.oscim.event.EventDispatcher;
 import org.oscim.event.Gesture;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.GroupLayer;
-import org.oscim.layers.MapEventLayer;
-import org.oscim.layers.marker.MarkerItem;
-import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
@@ -111,19 +104,18 @@ public class MainActivity extends AppCompatActivity {
         mMap.events.bind(new Map.UpdateListener() {
             @Override
             public void onMapEvent(Event e, MapPosition mapPosition) {
-                Log.i(TAG, "OnMapEvent + " + e.toString());
+                //Log.i(TAG, "OnMapEvent + " + e.toString());
                 if (checkMap == null) checkMap = new CheckMap(mMap);
-                if(checkMap.Changed())
+                if(checkMap.Changed()) {
+                    Log.i(TAG, "Update Airport markers");
                     mAirportMarkersLayer.UpdateAirports();
+                }
             }
         });
     }
 
     public void testMarkerLayerGestures() {
-        Bitmap bitmapPoi = drawableToBitmap(getResources().getDrawable(R.drawable.marker_poi));
-        MarkerSymbol symbol;
-        symbol = new MarkerSymbol(bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
-        mAirportMarkersLayer = new AirportMarkersLayer(mMap, symbol, this);
+        mAirportMarkersLayer = new AirportMarkersLayer(mMap, null, this);
 
         mMap.layers().add(mAirportMarkersLayer);
     }

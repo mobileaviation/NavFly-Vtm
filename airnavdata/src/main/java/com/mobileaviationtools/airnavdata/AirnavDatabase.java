@@ -6,9 +6,12 @@ import android.arch.persistence.room.DatabaseConfiguration;
 import android.arch.persistence.room.InvalidationTracker;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.mobileaviationtools.airnavdata.Classes.AirportTypeConverter;
 import com.mobileaviationtools.airnavdata.DAOs.AirportsDao;
 import com.mobileaviationtools.airnavdata.DAOs.FrequenciesDao;
 import com.mobileaviationtools.airnavdata.DAOs.RunwaysDao;

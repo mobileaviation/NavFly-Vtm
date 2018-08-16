@@ -4,6 +4,10 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
+
+import com.mobileaviationtools.airnavdata.Classes.AirportType;
+import com.mobileaviationtools.airnavdata.Classes.AirportTypeConverter;
 
 import java.util.ArrayList;
 
@@ -14,24 +18,24 @@ import java.util.ArrayList;
 public class Airport {
     public Airport()
     {
-        runways = new ArrayList<>();
-        frequencies = new ArrayList<>();
+
     }
 
     @Ignore
     public Integer index;
 
     @Ignore
-    public ArrayList<Runway> runways;
+    public Runway[] runways;
     @Ignore
-    public ArrayList<Frequency> frequencies;
+    public Frequency[] frequencies;
 
 //    @PrimaryKey(autoGenerate = true)
 //    public Integer _id;
     @PrimaryKey
     public Integer id;
     public String ident;
-    public String type;
+    @TypeConverters({AirportTypeConverter.class})
+    public AirportType type;
     public String name;
     public Double latitude_deg;
     public Double longitude_deg;

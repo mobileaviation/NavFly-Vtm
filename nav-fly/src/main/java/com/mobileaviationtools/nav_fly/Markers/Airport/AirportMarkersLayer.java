@@ -1,4 +1,4 @@
-package com.mobileaviationtools.nav_fly.Layers;
+package com.mobileaviationtools.nav_fly.Markers.Airport;
 
 import android.content.Context;
 import android.util.Log;
@@ -7,17 +7,14 @@ import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 
 import org.oscim.core.BoundingBox;
-import org.oscim.core.MapPosition;
-import org.oscim.event.Event;
-import org.oscim.event.Gesture;
-import org.oscim.event.MotionEvent;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.map.Map;
 
-import java.util.ArrayList;
 import java.util.List;
+
+//import org.locationtech.jts.geom.
 
 public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.InputListener {
     private final String TAG = "AirportMarkersLayer";
