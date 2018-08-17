@@ -7,6 +7,7 @@ import android.graphics.Paint;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Runway;
 import com.mobileaviationtools.nav_fly.Classes.BitmapHelpers;
 
 import org.oscim.android.canvas.AndroidBitmap;
@@ -20,13 +21,13 @@ public class AirportSymbolMedium extends MarkerSymbol {
 
     public static AirportSymbolMedium GetAirportSymbol(Airport airport, Context context)
     {
-        AirnavDatabase db = AirnavDatabase.getInstance(context);
-        airport.runways = db.getRunways().getRunwaysByAirport(airport.id);
         return new AirportSymbolMedium(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER);
     }
 
     private static android.graphics.Bitmap draw(Airport airport)
     {
+        RunwayHelpers runwayHelpers = new RunwayHelpers(airport);
+
         int size = 30;
         int radius = 15;
 
@@ -41,6 +42,19 @@ public class AirportSymbolMedium extends MarkerSymbol {
         p.setColor(Color.argb(255,168,103,148));
 
         baseCanvas.drawCircle(size/2,size/2,radius,p);
+
+        baseCanvas.drawCircle(size/2,size/2,radius,p);
+
+        p.setColor(Color.argb(255,240,240,240));
+        p.setStrokeWidth(3);
+        if (airport.runways != null)
+        {
+            if (airport.runways.length>0){
+                for (Runway runway: airport.runways) {
+                    runwayHelpers.DrawRunwayLine(runway, baseCanvas, p);
+                }
+            }
+        }
 
         return BitmapHelpers.getScaledBitmap(baseBitmap);
     }

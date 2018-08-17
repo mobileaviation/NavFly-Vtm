@@ -24,9 +24,11 @@ public class AirportMarkerItem extends MarkerItem{
         this(airport.ident, airport.name, new GeoPoint(airport.latitude_deg, airport.longitude_deg));
         this.airport = airport;
         this.context = context;
+    }
 
-        //Bitmap bitmapPoi = null;//drawableToBitmap(context.getResources().getDrawable(R.drawable.marker_poi));
-        MarkerSymbol symbol = null;// new MarkerSymbol(bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
+    public void InitMarker()
+    {
+        MarkerSymbol symbol = null;
         switch (airport.type){
             case small_airport: { symbol = AirportSymbolSmall.GetAirportSymbol(airport, this.context);  break;}
             case medium_airport: { symbol = AirportSymbolMedium.GetAirportSymbol(airport, this.context); break;}
@@ -37,7 +39,6 @@ public class AirportMarkerItem extends MarkerItem{
             case closed: { symbol = AirportSymbolClosed.GetAirportSymbol(airport, this.context); break;}
         }
 
-        //MarkerSymbol symbol = new MarkerSymbol(bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
         this.setMarker(symbol);
     }
 

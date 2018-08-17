@@ -64,8 +64,15 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
 
     private void placeMarker(Airport airport)
     {
+        // Create an empty MarkerItem with the correspoding airport
         AirportMarkerItem markerItem = new AirportMarkerItem(airport, context);
+        // Check if this airport(Marker) is already added to the list of markers
         if (!mItemList.contains(markerItem)) {
+            // If new marker, get the runways (and frequencies)
+            // Initiate the Symbol
+            // Add it to the Layer
+            getRunways(airport);
+            markerItem.InitMarker();
             this.addItem(markerItem);
         }
     }
@@ -78,6 +85,11 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
                 box.getMaxLatitude(),
                 box.getMinLatitude()
         );
+    }
+
+    private void getRunways (Airport airport)
+    {
+        airport.runways = db.getRunways().getRunwaysByAirport(airport.id);
     }
 
     public void UpdateAirports()

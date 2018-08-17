@@ -23,8 +23,6 @@ public class AirportSymbolSmall extends MarkerSymbol {
 
     public static AirportSymbolSmall GetAirportSymbol(Airport airport, Context context)
     {
-        AirnavDatabase db = AirnavDatabase.getInstance(context);
-        airport.runways = db.getRunways().getRunwaysByAirport(airport.id);
         return new AirportSymbolSmall(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER);
     }
 
