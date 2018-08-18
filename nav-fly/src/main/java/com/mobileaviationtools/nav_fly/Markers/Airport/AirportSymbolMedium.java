@@ -15,13 +15,13 @@ import org.oscim.backend.canvas.Bitmap;
 import org.oscim.layers.marker.MarkerSymbol;
 
 public class AirportSymbolMedium extends MarkerSymbol {
-    public AirportSymbolMedium(Bitmap bitmap, HotspotPlace hotspot) {
-        super(bitmap, hotspot);
+    public AirportSymbolMedium(Bitmap bitmap, HotspotPlace hotspot, Boolean billboard) {
+        super(bitmap, hotspot, billboard);
     }
 
     public static AirportSymbolMedium GetAirportSymbol(Airport airport, Context context)
     {
-        return new AirportSymbolMedium(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER);
+        return new AirportSymbolMedium(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER, false);
     }
 
     private static android.graphics.Bitmap draw(Airport airport)
@@ -49,9 +49,9 @@ public class AirportSymbolMedium extends MarkerSymbol {
         p.setStrokeWidth(3);
         if (airport.runways != null)
         {
-            if (airport.runways.length>0){
+            if (airport.runways.size()>0){
                 for (Runway runway: airport.runways) {
-                    runwayHelpers.DrawRunwayLine(runway, baseCanvas, p);
+                    runwayHelpers.DrawRunwayLine2(runway, baseCanvas, p);
                 }
             }
         }

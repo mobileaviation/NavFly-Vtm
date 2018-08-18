@@ -1,17 +1,21 @@
 package com.mobileaviationtools.nav_fly.Markers.Airport;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.AirportType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 
 import org.oscim.core.BoundingBox;
+import org.oscim.core.MapPosition;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.map.Map;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //import org.locationtech.jts.geom.
@@ -20,7 +24,8 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     private final String TAG = "AirportMarkersLayer";
     private Context context;
     private AirnavDatabase db;
-    private List<AirportMarkerItem>  items;
+    private List<AirportMarkerItem>  all_items;
+    private List<String> visibleTypes;
 
     private OnItemGestureListener<MarkerItem> onItemGestureListener;
     private void setOnItemGestureListener()
@@ -42,7 +47,7 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     }
 
 
-    public AirportMarkersLayer(Map map, MarkerSymbol defaultMarker) {
+    private AirportMarkersLayer(Map map, MarkerSymbol defaultMarker) {
         super(map, defaultMarker);
     }
 
@@ -50,8 +55,21 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     {
         this(map, defaultMarker);
         this.context = context;
+        all_items = new ArrayList<>();
         setOnItemGestureListener();
         db = AirnavDatabase.getInstance(context);
+    }
+
+    private void initVisibleTypes(int zoomlevel)
+    {
+        visibleTypes = new ArrayList<>();
+        visibleTypes.add(AirportType.large_airport.toString());
+        if (zoomlevel>7) visibleTypes.add(AirportType.medium_airport.toString());
+        if (zoomlevel>8) visibleTypes.add(AirportType.small_airport.toString());
+        //visibleTypes.add(AirportType.balloonport);
+        //visibleTypes.add(AirportType.heliport);
+        //visibleTypes.add(AirportType.seaplane_base);
+        //visibleTypes.add(AirportType.closed);
     }
 
     private void placeMarkers(Airport[] airports)
@@ -67,23 +85,25 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
         // Create an empty MarkerItem with the correspoding airport
         AirportMarkerItem markerItem = new AirportMarkerItem(airport, context);
         // Check if this airport(Marker) is already added to the list of markers
-        if (!mItemList.contains(markerItem)) {
+        if (!all_items.contains(markerItem)) {
             // If new marker, get the runways (and frequencies)
             // Initiate the Symbol
             // Add it to the Layer
             getRunways(airport);
             markerItem.InitMarker();
-            this.addItem(markerItem);
+            //this.addItem(markerItem);
+            this.all_items.add(markerItem);
         }
     }
 
     private Airport[] getAirports()
     {
         BoundingBox box = mMap.getBoundingBox(0);
-        return db.getAirport().getAirportsWithinBounds(box.getMinLongitude(),
+        return db.getAirport().getAirportsWithinBoundsByTypes(box.getMinLongitude(),
                 box.getMaxLongitude(),
                 box.getMaxLatitude(),
-                box.getMinLatitude()
+                box.getMinLatitude(),
+                visibleTypes
         );
     }
 
@@ -92,10 +112,56 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
         airport.runways = db.getRunways().getRunwaysByAirport(airport.id);
     }
 
+    private void updateLayer()
+    {
+        // zoom check =>10 add text marker
+        // zoom check =9 small,medium, large
+        // zoom level check =8 medium,arge
+        // zoom lever check =<7 large
+
+        BoundingBox mapBox = mMap.getBoundingBox(0);
+        MapPosition mapPos = mMap.getMapPosition();
+        Log.i(TAG, "Zoom: " + mapPos.getZoomScale());
+        for (AirportMarkerItem item : all_items)
+        {
+            if (item.WithinBounds(mapBox))
+            {
+                if (!this.mItemList.contains(item))
+                {
+                    switch (item.getAirportType())
+                    {
+                        case small_airport: if (mapPos.zoomLevel > 8) this.addItem(item); break;
+                        case medium_airport: if (mapPos.zoomLevel > 7) this.addItem(item); break;
+                        case large_airport: this.addItem(item); break;
+                    }
+                }
+                else
+                {
+                    switch (item.getAirportType())
+                    {
+                        case small_airport: if (mapPos.zoomLevel < 9) this.removeItem(item); break;
+                        case medium_airport: if (mapPos.zoomLevel < 8) this.removeItem(item); break;
+                    }
+                }
+            }
+        }
+    }
+
     public void UpdateAirports()
     {
-        placeMarkers(getAirports());
-        update();
+        class UpdateMapAsync extends AsyncTask<Void, Void, Void>
+        {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                initVisibleTypes(mMap.getMapPosition().zoomLevel);
+                placeMarkers(getAirports());
+                updateLayer();
+                update();
+                return null;
+            }
+        }
+
+        new UpdateMapAsync().execute();
     }
 
 //    @Override

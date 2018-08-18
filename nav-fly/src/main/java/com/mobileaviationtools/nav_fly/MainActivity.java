@@ -107,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 //Log.i(TAG, "OnMapEvent + " + e.toString());
                 if (checkMap == null) checkMap = new CheckMap(mMap);
                 if(checkMap.Changed()) {
-                    Log.i(TAG, "Update Airport markers");
                     mAirportMarkersLayer.UpdateAirports();
                 }
             }

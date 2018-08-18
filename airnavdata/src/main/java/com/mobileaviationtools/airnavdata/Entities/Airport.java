@@ -10,6 +10,7 @@ import com.mobileaviationtools.airnavdata.Classes.AirportType;
 import com.mobileaviationtools.airnavdata.Classes.AirportTypeConverter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity(tableName = "tbl_Airports",
         indices = {@Index(name = "airport_location_index", value = {"latitude_deg","longitude_deg"}),
@@ -25,9 +26,9 @@ public class Airport {
     public Integer index;
 
     @Ignore
-    public Runway[] runways;
+    public List<Runway> runways;
     @Ignore
-    public Frequency[] frequencies;
+    public List<Frequency> frequencies;
 
 //    @PrimaryKey(autoGenerate = true)
 //    public Integer _id;
