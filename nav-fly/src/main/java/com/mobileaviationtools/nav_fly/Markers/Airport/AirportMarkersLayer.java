@@ -24,7 +24,28 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     private final String TAG = "AirportMarkersLayer";
     private Context context;
     private AirnavDatabase db;
-    private List<AirportMarkerItem>  all_items;
+
+    class CombinedMarkerItem
+    {
+        public CombinedMarkerItem(AirportMarkerItem item, AirportInfoMarkerItem infoItem)
+        {
+            this.item = item;
+            this.infoItem = infoItem;
+        }
+        public AirportMarkerItem item;
+        public AirportInfoMarkerItem infoItem;
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof CombinedMarkerItem) {
+                return (((CombinedMarkerItem)obj).item.getAirport().ident.equals(this.item.getAirport().ident));
+            }
+            else
+                return false;
+        }
+    }
+
+    private List<CombinedMarkerItem>  all_items;
     private List<String> visibleTypes;
 
     private OnItemGestureListener<MarkerItem> onItemGestureListener;
@@ -84,15 +105,18 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     {
         // Create an empty MarkerItem with the correspoding airport
         AirportMarkerItem markerItem = new AirportMarkerItem(airport, context);
+        AirportInfoMarkerItem markerInfoItem = new AirportInfoMarkerItem(airport, context);
+        CombinedMarkerItem combinedMarkerItem = new CombinedMarkerItem(markerItem, markerInfoItem);
         // Check if this airport(Marker) is already added to the list of markers
-        if (!all_items.contains(markerItem)) {
+        if (!all_items.contains(combinedMarkerItem)) {
             // If new marker, get the runways (and frequencies)
             // Initiate the Symbol
             // Add it to the Layer
             getRunways(airport);
             markerItem.InitMarker();
+            markerInfoItem.InitMarker();
             //this.addItem(markerItem);
-            this.all_items.add(markerItem);
+            this.all_items.add(combinedMarkerItem);
         }
     }
 
@@ -121,30 +145,51 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
 
         BoundingBox mapBox = mMap.getBoundingBox(0);
         MapPosition mapPos = mMap.getMapPosition();
-        Log.i(TAG, "Zoom: " + mapPos.getZoomScale());
-        for (AirportMarkerItem item : all_items)
+
+        for (CombinedMarkerItem combinedItem : all_items)
         {
-            if (item.WithinBounds(mapBox))
+            if (combinedItem.item.WithinBounds(mapBox))
             {
-                if (!this.mItemList.contains(item))
+                if (!this.mItemList.contains(combinedItem.item))
                 {
-                    switch (item.getAirportType())
+                    boolean text = (mapPos.zoomLevel > 8);
+                    switch (combinedItem.item.getAirportType())
                     {
-                        case small_airport: if (mapPos.zoomLevel > 8) this.addItem(item); break;
-                        case medium_airport: if (mapPos.zoomLevel > 7) this.addItem(item); break;
-                        case large_airport: this.addItem(item); break;
+                        case small_airport: if (mapPos.zoomLevel > 8) AddMarkerItem(combinedItem, text); break;
+                        case medium_airport: if (mapPos.zoomLevel > 7) AddMarkerItem(combinedItem, text); break;
+                        case large_airport: AddMarkerItem(combinedItem, text); break;
                     }
                 }
                 else
                 {
-                    switch (item.getAirportType())
+                    switch (combinedItem.item.getAirportType())
                     {
-                        case small_airport: if (mapPos.zoomLevel < 9) this.removeItem(item); break;
-                        case medium_airport: if (mapPos.zoomLevel < 8) this.removeItem(item); break;
+                        case small_airport: if (mapPos.zoomLevel < 9) RemoveMarkerItem(combinedItem); break;
+                        case medium_airport: if (mapPos.zoomLevel < 8) RemoveMarkerItem(combinedItem); break;
                     }
+
+                    boolean text = (mapPos.zoomLevel > 8);
+                    if (!this.mItemList.contains(combinedItem.infoItem))
+                    {
+                        if (text) this.addItem(combinedItem.infoItem);
+                    }
+
                 }
             }
         }
+    }
+
+    private void AddMarkerItem(CombinedMarkerItem combinedMarkerItem, boolean text)
+    {
+        this.addItem(combinedMarkerItem.item);
+        if (text) this.addItem(combinedMarkerItem.infoItem);
+        else this.removeItem(combinedMarkerItem.infoItem);
+    }
+
+    private void RemoveMarkerItem(CombinedMarkerItem combinedMarkerItem)
+    {
+        this.removeItem(combinedMarkerItem.item);
+        this.removeItem(combinedMarkerItem.infoItem);
     }
 
     public void UpdateAirports()

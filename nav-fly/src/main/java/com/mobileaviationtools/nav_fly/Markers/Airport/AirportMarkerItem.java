@@ -69,4 +69,9 @@ public class AirportMarkerItem extends MarkerItem{
     {
         return airport.type;
     }
+
+    public Airport getAirport()
+    {
+        return airport;
+    }
 }
