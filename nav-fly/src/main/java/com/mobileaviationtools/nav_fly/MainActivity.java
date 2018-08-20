@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
 import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
+import com.mobileaviationtools.airnavdata.Firebase.NavaidDataSource;
 import com.mobileaviationtools.airnavdata.Models.Statistics;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
@@ -139,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, "Statistics :");
                     AirportsDataSource airportsDataSource = new AirportsDataSource(MainActivity.this);
                     airportsDataSource.ReadAirportData(statistics.AirportsCount);
+
+                    NavaidDataSource navaidDataSource = new NavaidDataSource(MainActivity.this);
+                    navaidDataSource.ReadNavaidData(statistics.NavaidsCount);
                 }
             };
 

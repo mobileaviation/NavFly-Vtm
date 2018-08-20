@@ -114,6 +114,7 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
             // Add it to the Layer
             getRunways(airport);
             markerItem.InitMarker();
+            getFrequencies(airport);
             markerInfoItem.InitMarker();
             //this.addItem(markerItem);
             this.all_items.add(combinedMarkerItem);
@@ -136,6 +137,11 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
         airport.runways = db.getRunways().getRunwaysByAirport(airport.id);
     }
 
+    private void getFrequencies(Airport airport)
+    {
+        airport.frequencies = db.getFrequency().getFrequenciesByAirport(airport.id);
+    }
+
     private void updateLayer()
     {
         // zoom check =>10 add text marker
@@ -152,12 +158,11 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
             {
                 if (!this.mItemList.contains(combinedItem.item))
                 {
-                    boolean text = (mapPos.zoomLevel > 8);
                     switch (combinedItem.item.getAirportType())
                     {
-                        case small_airport: if (mapPos.zoomLevel > 8) AddMarkerItem(combinedItem, text); break;
-                        case medium_airport: if (mapPos.zoomLevel > 7) AddMarkerItem(combinedItem, text); break;
-                        case large_airport: AddMarkerItem(combinedItem, text); break;
+                        case small_airport: if (mapPos.zoomLevel > 8) AddMarkerItem(combinedItem); break;
+                        case medium_airport: if (mapPos.zoomLevel > 7) AddMarkerItem(combinedItem); break;
+                        case large_airport: AddMarkerItem(combinedItem); break;
                     }
                 }
                 else
@@ -167,23 +172,16 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
                         case small_airport: if (mapPos.zoomLevel < 9) RemoveMarkerItem(combinedItem); break;
                         case medium_airport: if (mapPos.zoomLevel < 8) RemoveMarkerItem(combinedItem); break;
                     }
-
-                    boolean text = (mapPos.zoomLevel > 8);
-                    if (!this.mItemList.contains(combinedItem.infoItem))
-                    {
-                        if (text) this.addItem(combinedItem.infoItem);
-                    }
-
                 }
             }
         }
     }
 
-    private void AddMarkerItem(CombinedMarkerItem combinedMarkerItem, boolean text)
+    private void AddMarkerItem(CombinedMarkerItem combinedMarkerItem)
     {
         this.addItem(combinedMarkerItem.item);
-        if (text) this.addItem(combinedMarkerItem.infoItem);
-        else this.removeItem(combinedMarkerItem.infoItem);
+        this.addItem(combinedMarkerItem.infoItem);
+        //else this.removeItem(combinedMarkerItem.infoItem);
     }
 
     private void RemoveMarkerItem(CombinedMarkerItem combinedMarkerItem)
@@ -207,6 +205,7 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
         }
 
         new UpdateMapAsync().execute();
+        //new UpdateMapAsync().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
     }
 
 //    @Override

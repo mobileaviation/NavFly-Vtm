@@ -15,6 +15,7 @@ public class CheckMap {
     {
         mMap = map;
         currentMapPosition = mMap.getMapPosition();
+        currentMapBoundingBox = mMap.getBoundingBox(0);
         firstCheck = true;
     }
 
@@ -23,12 +24,15 @@ public class CheckMap {
 
     private Map mMap;
     private MapPosition currentMapPosition;
-    //private BoundingBox currentMapBoundingBox;
+    private BoundingBox currentMapBoundingBox;
     private Boolean firstCheck;
 
     public Boolean Changed()
     {
-        double distance = currentMapPosition.getGeoPoint().sphericalDistance(mMap.getMapPosition().getGeoPoint());
+        double new_distance = currentMapPosition.getGeoPoint().sphericalDistance(mMap.getMapPosition().getGeoPoint());
+
+        double current_diagonal_distance = new GeoPoint(currentMapBoundingBox.minLatitudeE6, currentMapBoundingBox.minLongitudeE6).sphericalDistance(
+                new GeoPoint(currentMapBoundingBox.maxLatitudeE6, currentMapBoundingBox.maxLongitudeE6));
         //Log.i(TAG,"Checked Distance: " + distance + " meter");
 
         BoundingBox box = mMap.getBoundingBox(0);
@@ -36,8 +40,15 @@ public class CheckMap {
                 new GeoPoint(box.maxLatitudeE6, box.maxLongitudeE6));
 
         // When the moved distance is more that 5% of the diagonal distance of the display
-        Boolean _changed = ((distance/display_diagonal_distance)*100 > 5);
-        if (_changed) currentMapPosition = mMap.getMapPosition();
+        Boolean _changed = ((new_distance/display_diagonal_distance)*100 > 5);
+        // When the diagonal distance has changed (smaller or larger) with more than 5% of the previous
+        double dif_diagonal = Math.abs(current_diagonal_distance - display_diagonal_distance);
+        _changed = _changed || ((dif_diagonal / current_diagonal_distance)*100 > 5);
+
+        if (_changed) {
+            currentMapPosition = mMap.getMapPosition();
+            currentMapBoundingBox = mMap.getBoundingBox(0);
+        }
 
         Boolean changed = (firstCheck) ? true : _changed;
         firstCheck = false;

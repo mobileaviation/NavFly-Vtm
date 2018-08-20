@@ -14,8 +14,8 @@ import java.util.List;
 
 @Entity(tableName = "tbl_Airports",
         indices = {@Index(name = "airport_location_index", value = {"latitude_deg","longitude_deg"}),
-            @Index(name="ident_index", value = {"name","ident"}),
-            @Index(name="id_index", value = {"id"})})
+            @Index(name="airport_ident_index", value = {"name","ident"}),
+            @Index(name="airport_id_index", value = {"id"})})
 public class Airport {
     public Airport()
     {
