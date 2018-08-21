@@ -1,6 +1,7 @@
 package com.mobileaviationtools.airnavdata.Firebase;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -28,9 +29,10 @@ public class AirportsDataSource {
     Query query;
     ValueEventListener dataListener;
 
-    AirnavDatabase db;
+    AirnavDatabase db;;
 
-    public void ReadAirportData(final Integer airportCount) {
+    public void ReadAirportData(final Integer airportCount)
+    {
         mDatabase = FirebaseConnection.getNavFlyFirebaseReference(context, "airports");
         db = AirnavDatabase.getInstance(context);
 
@@ -38,11 +40,11 @@ public class AirportsDataSource {
         count = 1000;
 
         query = mDatabase.child("airports").orderByChild("index").startAt(start).endAt(start + (count-1));
+        db.beginTransaction();
 
         dataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                db.beginTransaction();
                 for (DataSnapshot airportSnapshow: dataSnapshot.getChildren()){
 
                     Airport airport = airportSnapshow.getValue(Airport.class);
@@ -65,8 +67,7 @@ public class AirportsDataSource {
                         Log.e(TAG, "Insert airport: " + airport.ident + " Problem: " + ee.getMessage());
                     }
                 }
-                db.setTransactionSuccessful();
-                db.endTransaction();
+
                 Log.i(TAG, "Read 1000 airports, get the next from: " + start.toString());
                 Log.i(TAG, "Inserted 1000 airports into the database.");
 
@@ -81,6 +82,8 @@ public class AirportsDataSource {
                 else {
                     //if (progress != null) progress.OnFinished(FBTableType.airports);
                     Log.i(TAG, "Finished reading airports");
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
                     return;
                 }
             }
@@ -93,4 +96,5 @@ public class AirportsDataSource {
 
         query.addListenerForSingleValueEvent(dataListener);
     }
+
 }

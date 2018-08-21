@@ -1,6 +1,7 @@
 package com.mobileaviationtools.airnavdata.Firebase;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +32,8 @@ public class NavaidDataSource {
 
     AirnavDatabase db;
 
-    public void ReadNavaidData(final Integer navaidsCount) {
+    public void ReadNavaidData(final Integer navaidsCount)
+    {
         mDatabase = FirebaseConnection.getNavFlyFirebaseReference(context, "navaids");
         db = AirnavDatabase.getInstance(context);
 
@@ -39,11 +41,12 @@ public class NavaidDataSource {
         count = 1000;
 
         query = mDatabase.child("navaids").orderByChild("index").startAt(start).endAt(start + (count-1));
+        db.beginTransaction();
 
         dataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                db.beginTransaction();
+
                 for (DataSnapshot navaidSnapshow: dataSnapshot.getChildren()){
 
                     Navaid navaid = navaidSnapshow.getValue(Navaid.class);
@@ -55,8 +58,7 @@ public class NavaidDataSource {
                         Log.e(TAG, "Insert navaid: " + navaid.ident + " Problem: " + ee.getMessage());
                     }
                 }
-                db.setTransactionSuccessful();
-                db.endTransaction();
+
                 Log.i(TAG, "Read 1000 navaids, get the next from: " + start.toString());
                 Log.i(TAG, "Inserted 1000 navaids into the database.");
 
@@ -71,6 +73,8 @@ public class NavaidDataSource {
                 else {
                     //if (progress != null) progress.OnFinished(FBTableType.airports);
                     Log.i(TAG, "Finished reading navaids");
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
                     return;
                 }
             }
@@ -82,5 +86,7 @@ public class NavaidDataSource {
         };
 
         query.addListenerForSingleValueEvent(dataListener);
+
     }
+
 }
