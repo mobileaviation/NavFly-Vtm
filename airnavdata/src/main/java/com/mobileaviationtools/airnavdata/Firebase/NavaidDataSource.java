@@ -41,7 +41,7 @@ public class NavaidDataSource {
         count = 1000;
 
         query = mDatabase.child("navaids").orderByChild("index").startAt(start).endAt(start + (count-1));
-        db.beginTransaction();
+        //db.beginTransaction();
 
         dataListener = new ValueEventListener() {
             @Override
@@ -73,8 +73,8 @@ public class NavaidDataSource {
                 else {
                     //if (progress != null) progress.OnFinished(FBTableType.airports);
                     Log.i(TAG, "Finished reading navaids");
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     return;
                 }
             }

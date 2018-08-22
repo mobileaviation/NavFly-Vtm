@@ -14,6 +14,8 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Runway;
 
+import java.util.ArrayList;
+
 public class AirportsDataSource {
     public AirportsDataSource(Context context)
     {
@@ -40,34 +42,47 @@ public class AirportsDataSource {
         count = 1000;
 
         query = mDatabase.child("airports").orderByChild("index").startAt(start).endAt(start + (count-1));
-        db.beginTransaction();
+
 
         dataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot airportSnapshow: dataSnapshot.getChildren()){
+                try {
+                    ArrayList<Airport> airports = new ArrayList<>();
+                    ArrayList<Runway> runways = new ArrayList<>();
+                    ArrayList<Frequency> frequencies = new ArrayList<>();
+                    for (DataSnapshot airportSnapshow : dataSnapshot.getChildren()) {
 
-                    Airport airport = airportSnapshow.getValue(Airport.class);
-                    try {
-                        db.getAirport().insertAirport(airport);
+                        Airport airport = airportSnapshow.getValue(Airport.class);
+                        airports.add(airport);
+
+                        //db.getAirport().insertAirport(airport);
 
                         if (airport.runways != null) {
                             for (Runway runway : airport.runways) {
-                                db.getRunways().insertRunway(runway);
+                                //db.getRunways().insertRunway(runway);
+                                runways.add(runway);
                             }
                         }
                         if (airport.frequencies != null) {
                             for (Frequency frequency : airport.frequencies) {
-                                db.getFrequency().insertFrequency(frequency);
+                                //db.getFrequency().insertFrequency(frequency);
+                                frequencies.add(frequency);
                             }
                         }
                     }
-                    catch (Exception ee)
-                    {
-                        Log.e(TAG, "Insert airport: " + airport.ident + " Problem: " + ee.getMessage());
-                    }
-                }
 
+                    //db.beginTransaction();
+                    db.getAirport().insertAirportTransaction(airports);
+                    db.getFrequency().insertFrequenciesTransaction(frequencies);
+                    db.getRunways().insertRunwaysTransaction(runways);
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
+                }
+                catch (Exception ee)
+                {
+                    Log.e(TAG, "Insert airports Problem: " + ee.getMessage());
+                }
                 Log.i(TAG, "Read 1000 airports, get the next from: " + start.toString());
                 Log.i(TAG, "Inserted 1000 airports into the database.");
 
@@ -82,8 +97,7 @@ public class AirportsDataSource {
                 else {
                     //if (progress != null) progress.OnFinished(FBTableType.airports);
                     Log.i(TAG, "Finished reading airports");
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+
                     return;
                 }
             }

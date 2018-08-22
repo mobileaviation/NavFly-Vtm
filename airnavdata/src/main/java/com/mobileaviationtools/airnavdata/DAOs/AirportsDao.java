@@ -3,6 +3,7 @@ package com.mobileaviationtools.airnavdata.DAOs;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Transaction;
 
 import com.mobileaviationtools.airnavdata.Classes.AirportType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -10,19 +11,25 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import java.util.List;
 
 @Dao
-public interface AirportsDao {
+public abstract class AirportsDao {
     @Insert
-    public void insertAirports(List<Airport> airportList);
+    public abstract void insertAirports(List<Airport> airportList);
 
     @Insert
-    public void insertAirport(Airport airport);
+    public abstract void insertAirport(Airport airport);
+
+    @Transaction
+    public void insertAirportTransaction(List<Airport> airportList)
+    {
+        insertAirports(airportList);
+    }
 
     @Query("SELECT * FROM tbl_Airports WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat)")
-    public Airport[] getAirportsWithinBounds(double Wlon, double Elon, double Nlat, double Slat);
+    public abstract Airport[] getAirportsWithinBounds(double Wlon, double Elon, double Nlat, double Slat);
 
     @Query("SELECT * FROM tbl_Airports WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat) AND type IN(:types)")
-    public Airport[] getAirportsWithinBoundsByTypes(double Wlon, double Elon, double Nlat, double Slat, List<String> types);
+    public abstract Airport[] getAirportsWithinBoundsByTypes(double Wlon, double Elon, double Nlat, double Slat, List<String> types);
 
     @Query("SELECT * FROM tbl_Airports WHERE ident='EHLE'")
-    public Airport getLelystad();
+    public abstract Airport getLelystad();
 }

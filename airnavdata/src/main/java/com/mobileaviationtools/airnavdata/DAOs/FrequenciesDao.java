@@ -3,6 +3,7 @@ package com.mobileaviationtools.airnavdata.DAOs;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Transaction;
 
 import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Runway;
@@ -10,13 +11,19 @@ import com.mobileaviationtools.airnavdata.Entities.Runway;
 import java.util.List;
 
 @Dao
-public interface FrequenciesDao {
+public abstract class FrequenciesDao {
     @Insert
-    public void insertFrequencies(List<Frequency> airportList);
+    public abstract void insertFrequencies(List<Frequency> frequencies);
+
+    @Transaction
+    public void insertFrequenciesTransaction(List<Frequency> frequencies)
+    {
+        insertFrequencies(frequencies);
+    }
 
     @Insert
-    public void insertFrequency(Frequency frequency);
+    public abstract void insertFrequency(Frequency frequency);
 
     @Query("SELECT * FROM tbl_Frequencies WHERE airport_ref=:airport_ref")
-    public List<Frequency> getFrequenciesByAirport(Integer airport_ref);
+    public abstract List<Frequency> getFrequenciesByAirport(Integer airport_ref);
 }
