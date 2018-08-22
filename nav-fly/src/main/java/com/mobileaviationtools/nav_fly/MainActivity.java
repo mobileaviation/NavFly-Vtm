@@ -20,6 +20,7 @@ import com.mobileaviationtools.airnavdata.Firebase.NavaidDataSource;
 import com.mobileaviationtools.airnavdata.Models.Statistics;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
+import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
@@ -73,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
     MapPreferences mPrefs;
     VectorTileLayer mBaseLayer;
     AirportMarkersLayer mAirportMarkersLayer;
+    NaviadMarkersLayer mNavaidsMarkersLayer;
+
     private TileCache mCache;
     TileSource mTileSource;
     protected BitmapTileLayer mBitmapLayer;
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 if (checkMap == null) checkMap = new CheckMap(mMap);
                 if(checkMap.Changed()) {
                     mAirportMarkersLayer.UpdateAirports();
+                    mNavaidsMarkersLayer.UpdateNavaids();
                 }
             }
         });
@@ -116,8 +120,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void testMarkerLayerGestures() {
         mAirportMarkersLayer = new AirportMarkersLayer(mMap, null, this);
-
         mMap.layers().add(mAirportMarkersLayer);
+        mNavaidsMarkersLayer = new NaviadMarkersLayer(mMap, null, this);
+        mMap.layers().add(mNavaidsMarkersLayer);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)

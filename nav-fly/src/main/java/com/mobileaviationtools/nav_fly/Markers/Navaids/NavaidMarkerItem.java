@@ -33,6 +33,9 @@ public class NavaidMarkerItem extends MarkerItem {
 
     public void InitMarker() {
         MarkerSymbol symbol = null;
+
+        symbol = NavaidSymbolVOR.GetVORSymbol(navaid, context);
+
         this.setMarker(symbol);
     }
 

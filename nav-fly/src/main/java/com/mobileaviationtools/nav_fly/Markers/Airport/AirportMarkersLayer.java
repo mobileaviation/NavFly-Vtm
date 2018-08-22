@@ -27,13 +27,13 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
 
     class CombinedMarkerItem
     {
-        public CombinedMarkerItem(AirportMarkerItem item, AirportInfoMarkerItem infoItem)
+        public CombinedMarkerItem(AirportMarkerItem item, AirportNameMarkerItem nameItem)
         {
             this.item = item;
-            this.infoItem = infoItem;
+            this.nameItem = nameItem;
         }
         public AirportMarkerItem item;
-        public AirportInfoMarkerItem infoItem;
+        public AirportNameMarkerItem nameItem;
 
         @Override
         public boolean equals(Object obj) {
@@ -105,8 +105,8 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     {
         // Create an empty MarkerItem with the correspoding airport
         AirportMarkerItem markerItem = new AirportMarkerItem(airport, context);
-        AirportInfoMarkerItem markerInfoItem = new AirportInfoMarkerItem(airport, context);
-        CombinedMarkerItem combinedMarkerItem = new CombinedMarkerItem(markerItem, markerInfoItem);
+        AirportNameMarkerItem markerNameItem = new AirportNameMarkerItem(airport, context);
+        CombinedMarkerItem combinedMarkerItem = new CombinedMarkerItem(markerItem, markerNameItem);
         // Check if this airport(Marker) is already added to the list of markers
         if (!all_items.contains(combinedMarkerItem)) {
             // If new marker, get the runways (and frequencies)
@@ -115,7 +115,7 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
             getRunways(airport);
             markerItem.InitMarker();
             getFrequencies(airport);
-            markerInfoItem.InitMarker();
+            markerNameItem.InitMarker();
             //this.addItem(markerItem);
             this.all_items.add(combinedMarkerItem);
         }
@@ -180,14 +180,13 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     private void AddMarkerItem(CombinedMarkerItem combinedMarkerItem)
     {
         this.addItem(combinedMarkerItem.item);
-        this.addItem(combinedMarkerItem.infoItem);
-        //else this.removeItem(combinedMarkerItem.infoItem);
+        this.addItem(combinedMarkerItem.nameItem);
     }
 
     private void RemoveMarkerItem(CombinedMarkerItem combinedMarkerItem)
     {
         this.removeItem(combinedMarkerItem.item);
-        this.removeItem(combinedMarkerItem.infoItem);
+        this.removeItem(combinedMarkerItem.nameItem);
     }
 
     public void UpdateAirports()
