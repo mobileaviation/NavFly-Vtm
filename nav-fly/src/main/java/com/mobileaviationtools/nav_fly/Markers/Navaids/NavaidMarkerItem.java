@@ -34,7 +34,16 @@ public class NavaidMarkerItem extends MarkerItem {
     public void InitMarker() {
         MarkerSymbol symbol = null;
 
-        symbol = NavaidSymbolVOR.GetVORSymbol(navaid, context);
+        switch (navaid.type)
+        {
+            case DME: symbol = NavaidSymbolDME.GetDMESymbol(navaid, context); break;
+            case NDB: symbol = NavaidSymbolNDB.GetNDBSymbol(navaid, context); break;
+            case VOR: symbol = NavaidSymbolVOR.GetVORSymbol(navaid, context); break;
+            case TACAN: symbol = NavaidSymbolTACAN.GetTACANSymbol(navaid, context); break;
+            case VORTAC: symbol = NavaidSymbolVORTAC.GetVORTACSymbol(navaid, context); break;
+            case NDB_DME: symbol = NavaidSymbolNDBDME.GetNDBDMESymbol(navaid, context); break;
+            case VOR_DME: symbol = NavaidSymbolVORDME.GetVORDMESymbol(navaid, context); break;
+        }
 
         this.setMarker(symbol);
     }
