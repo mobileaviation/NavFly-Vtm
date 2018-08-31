@@ -2,6 +2,7 @@ package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.mobileaviationtools.airnavdata.Api.AirnavClient;
+import com.mobileaviationtools.airnavdata.Api.AirportsAPIDataSource;
+import com.mobileaviationtools.airnavdata.Api.NavaidAPIDataSource;
+import com.mobileaviationtools.airnavdata.Api.RetrofitTest;
 import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
 import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
 import com.mobileaviationtools.airnavdata.Firebase.NavaidDataSource;
@@ -152,6 +157,14 @@ public class MainActivity extends AppCompatActivity {
             };
 
             statistics.FillStatistics();
+        }
+
+        if (id == R.id.api_test_menuitem)
+        {
+
+            AirnavClient client = new AirnavClient(this);
+            client.StartDownload();
+
         }
 
         return true;

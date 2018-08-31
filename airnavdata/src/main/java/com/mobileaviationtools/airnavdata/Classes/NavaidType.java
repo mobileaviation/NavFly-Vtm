@@ -1,11 +1,14 @@
 package com.mobileaviationtools.airnavdata.Classes;
 
+import com.google.gson.annotations.SerializedName;
+
 public enum NavaidType {
     DME,
     NDB,
-    NDB_DME,
+    @SerializedName("NDB-DME") NDB_DME,
     TACAN,
     VOR,
-    VOR_DME,
+    @SerializedName("VOR-DME") VOR_DME,
     VORTAC
+
 }
