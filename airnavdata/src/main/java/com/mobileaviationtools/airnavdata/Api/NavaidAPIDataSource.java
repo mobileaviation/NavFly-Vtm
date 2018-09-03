@@ -1,18 +1,17 @@
 package com.mobileaviationtools.airnavdata.Api;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 
-import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
@@ -41,55 +40,54 @@ public class NavaidAPIDataSource {
         Call<List<Navaid>> getNavaids(@Path("start") int start, @Path("count") int count);
     }
 
-    public void loadNavaids(int totalCount)
+    public void loadNavaids(int totalCount) {
+        this.totalCount = totalCount;
+        this.position= 0;
+        db.beginTransaction();
+        doCall();
+    }
+
+    private int totalCount;
+    private int position;
+
+    private void doCall()
     {
-        //int totalcount = 11117;
-
-        class GetNavaidsAsync extends AsyncTask {
-            public GetNavaidsAsync(int totalCount) {
-                this.totalCount = totalCount;
+        NavaidsService service = retrofit.create(NavaidsService.class);
+        Call<List<Navaid>> navaidsCall = service.getNavaids(position, 500);
+        navaidsCall.enqueue(new Callback<List<Navaid>>() {
+            @Override
+            public void onResponse(Call<List<Navaid>> call, Response<List<Navaid>> response) {
+                if (response.isSuccessful())
+                {
+                    if (insertNaviads(response.body()))
+                        doCall();
+                    else {
+                        Log.i(TAG, "Finished reading Navaids");
+                        db.setTransactionSuccessful();
+                        db.endTransaction();
+                    }
+                }
+                else
+                {
+                    Log.e(TAG, "Error recieving Navaid results");
+                }
             }
-
-            private int totalCount;
-
 
             @Override
-            protected Object doInBackground(Object[] objects) {
-                try {
-                    int position = 0;
-                    db.beginTransaction();
-
-                    while (position < totalCount) {
-                        NavaidsService service = retrofit.create(NavaidsService.class);
-                        Call<List<Navaid>> navaidsCall = service.getNavaids(position, 500);
-                        List<Navaid> navaids = navaidsCall.execute().body();
-                        
-
-                        db.getNavaids().insertNavaids(navaids);
-
-                        position = position + navaids.size();
-                        Log.i(TAG, "Navaids Position: " + position);
-
-                        int i = 0;
-                    }
-
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
-
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
+            public void onFailure(Call<List<Navaid>> call, Throwable t) {
+                Log.e(TAG, "Failure recieving Navaid results: " + t.getMessage());
             }
-        }
+        });
 
-            GetNavaidsAsync getNavaids = new GetNavaidsAsync(totalCount);
-            getNavaids.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
 
+    public boolean insertNaviads(List<Navaid> navaids)
+    {
+        db.getNavaids().insertNavaids(navaids);
+        position = position + navaids.size();
+        Log.i(TAG, "Navaids Position: " + position);
 
-
+        return (position < totalCount);
     }
 
 }
