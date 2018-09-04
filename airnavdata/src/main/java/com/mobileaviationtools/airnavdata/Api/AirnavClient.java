@@ -36,5 +36,17 @@ public class AirnavClient {
 
         AirportsAPIDataSource airportsAPIDataSource= new AirportsAPIDataSource(context, retrofit);
         airportsAPIDataSource.loadAirports(54523);
+
+        CountriesAPIDataSource countriesAPIDataSource= new CountriesAPIDataSource(context, retrofit);
+        countriesAPIDataSource.loadcountries(247);
+
+        RegionsAPIDataSource regionsAPIDataSource= new RegionsAPIDataSource(context, retrofit);
+        regionsAPIDataSource.loadRegions(3999);
+
+        FirsAPIDataSource firsAPIDataSource= new FirsAPIDataSource(context, retrofit);
+        firsAPIDataSource.loadfirs(275);
+
+        FixesAPIDataSource fixesAPIDataSource= new FixesAPIDataSource(context, retrofit);
+        fixesAPIDataSource.loadfixes(261601);
     }
 }

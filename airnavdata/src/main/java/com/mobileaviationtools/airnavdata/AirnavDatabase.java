@@ -13,17 +13,26 @@ import android.support.annotation.NonNull;
 
 import com.mobileaviationtools.airnavdata.Classes.AirportTypeConverter;
 import com.mobileaviationtools.airnavdata.DAOs.AirportsDao;
+import com.mobileaviationtools.airnavdata.DAOs.CountriesDao;
+import com.mobileaviationtools.airnavdata.DAOs.FirsDao;
+import com.mobileaviationtools.airnavdata.DAOs.FixesDao;
 import com.mobileaviationtools.airnavdata.DAOs.FrequenciesDao;
 import com.mobileaviationtools.airnavdata.DAOs.NavaidsDao;
+import com.mobileaviationtools.airnavdata.DAOs.RegionsDao;
 import com.mobileaviationtools.airnavdata.DAOs.RunwaysDao;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Country;
+import com.mobileaviationtools.airnavdata.Entities.Fir;
+import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
+import com.mobileaviationtools.airnavdata.Entities.Region;
 import com.mobileaviationtools.airnavdata.Entities.Runway;
 
 import java.io.FileReader;
 
-@Database(entities = {Airport.class, Runway.class, Frequency.class, Navaid.class},
+@Database(entities = {Airport.class, Runway.class, Frequency.class, Navaid.class,
+        Country.class, Region.class, Fix.class, Fir.class},
         version = 1)
 public abstract class AirnavDatabase extends RoomDatabase {
     private static  final String DB_NAME = "room_airnav.db";
@@ -49,5 +58,9 @@ public abstract class AirnavDatabase extends RoomDatabase {
     public abstract RunwaysDao getRunways();
     public abstract FrequenciesDao getFrequency();
     public abstract NavaidsDao getNavaids();
+    public abstract CountriesDao getCountries();
+    public abstract RegionsDao getRegions();
+    public abstract FirsDao getFirs();
+    public abstract FixesDao getFixes();
 
 }
