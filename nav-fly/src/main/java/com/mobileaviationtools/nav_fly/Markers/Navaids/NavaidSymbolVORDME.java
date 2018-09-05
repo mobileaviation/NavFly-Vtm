@@ -43,7 +43,7 @@ public class NavaidSymbolVORDME extends MarkerSymbol {
         baseCanvas.drawLine(7,29,1,15, p);
         baseCanvas.drawLine(1,15,7,1, p);
 
-        baseCanvas.drawLine(1,11,29,1, p);
+        baseCanvas.drawLine(1,1,29,1, p);
         baseCanvas.drawLine(29,1,29,29, p);
         baseCanvas.drawLine(29,29,1,29, p);
         baseCanvas.drawLine(1,29,1,1, p);

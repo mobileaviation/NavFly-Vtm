@@ -36,7 +36,7 @@ public class NavaidSymbolDME extends MarkerSymbol {
         p.setStyle(Paint.Style.STROKE);
         p.setColor(Color.argb(255,0,136,186));
 
-        baseCanvas.drawLine(1,11,29,1, p);
+        baseCanvas.drawLine(1,1,29,1, p);
         baseCanvas.drawLine(29,1,29,29, p);
         baseCanvas.drawLine(29,29,1,29, p);
         baseCanvas.drawLine(1,29,1,1, p);
