@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Api.AirportsAPIDataSource;
 import com.mobileaviationtools.airnavdata.Api.NavaidAPIDataSource;
@@ -91,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
@@ -194,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
         packedCoordinates[2] = 4.8336;
         packedCoordinates[3] = 53.1153;
         LineDrawable line = new LineDrawable(packedCoordinates, lineStyle);
+
 
 
 
