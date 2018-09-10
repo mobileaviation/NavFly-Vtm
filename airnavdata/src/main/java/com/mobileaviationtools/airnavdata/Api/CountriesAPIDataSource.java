@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
+import com.mobileaviationtools.airnavdata.Classes.TableType;
 import com.mobileaviationtools.airnavdata.Entities.Country;
 
 import java.util.List;
@@ -32,6 +34,12 @@ public class CountriesAPIDataSource {
     public CountriesAPIDataSource(Context context) {
         this.context = context;
         db = AirnavDatabase.getInstance(context);
+    }
+
+    private DataDownloadStatusEvent statusEvent;
+    public void SetStatusEvent(DataDownloadStatusEvent statusEvent)
+    {
+        this.statusEvent = statusEvent;
     }
 
     public interface CountriesService
@@ -65,17 +73,20 @@ public class CountriesAPIDataSource {
                         Log.i(TAG, "Finished reading Countries");
                         db.setTransactionSuccessful();
                         db.endTransaction();
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.countries);
                     }
                 }
                 else
                 {
                     Log.e(TAG, "Error recieving Countries results");
+                    if (statusEvent != null) statusEvent.OnError(response.message(), TableType.countries);
                 }
             }
 
             @Override
             public void onFailure(Call<List<Country>> call, Throwable t) {
                 Log.e(TAG, "Failure recieving Countries results: " + t.getMessage());
+                if (statusEvent != null) statusEvent.OnError(t.getMessage(), TableType.countries);
             }
         });
 
@@ -86,6 +97,8 @@ public class CountriesAPIDataSource {
         db.getCountries().insertCountries(countries);
         position = position + countries.size();
         Log.i(TAG, "Countries Position: " + position);
+
+        if (statusEvent != null) statusEvent.onProgress(totalCount, position, TableType.countries);
 
         return (position < totalCount);
     }

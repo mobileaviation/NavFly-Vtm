@@ -2,6 +2,10 @@ package com.mobileaviationtools.airnavdata.Api;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
+import com.mobileaviationtools.airnavdata.Classes.TableType;
 
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
@@ -25,28 +29,74 @@ public class AirnavClient {
                 .build();
 
         this.context = context;
+
+        setClientDownloadStatus();
     }
 
     private Retrofit retrofit;
     private Context context;
+    private DataDownloadStatusEvent clientStatus;
+    private DataDownloadStatusEvent responseStatus;
+
+    public void SetProgressStatus(DataDownloadStatusEvent progressStatus)
+    {
+        this.responseStatus = progressStatus;
+    }
+
+    private String TAG = "AirnavClient";
 
     public void StartDownload(){
         NavaidAPIDataSource navaidAPIDataSource = new NavaidAPIDataSource(context, retrofit);
+        navaidAPIDataSource.SetStatusEvent(clientStatus);
         navaidAPIDataSource.loadNavaids(11117);
 
         AirportsAPIDataSource airportsAPIDataSource= new AirportsAPIDataSource(context, retrofit);
+        airportsAPIDataSource.SetStatusEvent(clientStatus);
         airportsAPIDataSource.loadAirports(54523);
 
         CountriesAPIDataSource countriesAPIDataSource= new CountriesAPIDataSource(context, retrofit);
+        countriesAPIDataSource.SetStatusEvent(clientStatus);
         countriesAPIDataSource.loadcountries(247);
 
         RegionsAPIDataSource regionsAPIDataSource= new RegionsAPIDataSource(context, retrofit);
+        regionsAPIDataSource.SetStatusEvent(clientStatus);
         regionsAPIDataSource.loadRegions(3999);
 
         FirsAPIDataSource firsAPIDataSource= new FirsAPIDataSource(context, retrofit);
+        firsAPIDataSource.SetStatusEvent(clientStatus);
         firsAPIDataSource.loadfirs(275);
 
         FixesAPIDataSource fixesAPIDataSource= new FixesAPIDataSource(context, retrofit);
+        fixesAPIDataSource.SetStatusEvent(clientStatus);
         fixesAPIDataSource.loadfixes(261601);
+
+        AirspaceAPIDataSource airspaceAPIDataSource= new AirspaceAPIDataSource(context, retrofit);
+        airspaceAPIDataSource.SetStatusEvent(clientStatus);
+        airspaceAPIDataSource.loadAirspaces(17960);
+    }
+
+    private void setClientDownloadStatus()
+    {
+        clientStatus = new DataDownloadStatusEvent() {
+            @Override
+            public void onProgress(Integer count, Integer downloaded, TableType tableType) {
+
+                float percentage = ((float)downloaded * 100) / (float)count;
+                Log.i(TAG, "onProgress: " + tableType.toString() + " : " + Math.round(percentage) + "%");
+                if (responseStatus!= null) responseStatus.onProgress(count, downloaded, tableType);
+            }
+
+            @Override
+            public void OnFinished(TableType tableType) {
+                Log.i(TAG, "OnFinished: " + tableType.toString());
+                if (responseStatus!= null) responseStatus.OnFinished(tableType);
+            }
+
+            @Override
+            public void OnError(String message, TableType tableType) {
+                Log.i(TAG, "OnError: " + message + " : " + tableType.toString());
+                if (responseStatus!= null) responseStatus.OnError(message, tableType);
+            }
+        };
     }
 }

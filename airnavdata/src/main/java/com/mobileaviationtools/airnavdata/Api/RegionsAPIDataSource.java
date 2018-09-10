@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
+import com.mobileaviationtools.airnavdata.Classes.TableType;
 import com.mobileaviationtools.airnavdata.Entities.Region;
 
 import java.util.List;
@@ -32,6 +34,12 @@ public class RegionsAPIDataSource {
     public RegionsAPIDataSource(Context context) {
         this.context = context;
         db = AirnavDatabase.getInstance(context);
+    }
+
+    private DataDownloadStatusEvent statusEvent;
+    public void SetStatusEvent(DataDownloadStatusEvent statusEvent)
+    {
+        this.statusEvent = statusEvent;
     }
 
     public interface RegionsService
@@ -65,17 +73,20 @@ public class RegionsAPIDataSource {
                         Log.i(TAG, "Finished reading Regions");
                         db.setTransactionSuccessful();
                         db.endTransaction();
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.regions);
                     }
                 }
                 else
                 {
-                    Log.e(TAG, "Error recieving Regions results");
+                    Log.e(TAG, "Error recieving Regions results: " + response.message());
+                    if (statusEvent != null) statusEvent.OnError(response.message(), TableType.regions);
                 }
             }
 
             @Override
             public void onFailure(Call<List<Region>> call, Throwable t) {
                 Log.e(TAG, "Failure recieving Regions results: " + t.getMessage());
+                if (statusEvent != null) statusEvent.OnError(t.getMessage(), TableType.regions);
             }
         });
 
@@ -86,6 +97,8 @@ public class RegionsAPIDataSource {
         db.getRegions().insertRegions(regions);
         position = position + regions.size();
         Log.i(TAG, "Regions Position: " + position);
+
+        if (statusEvent != null) statusEvent.onProgress(totalCount, position, TableType.regions);
 
         return (position < totalCount);
     }

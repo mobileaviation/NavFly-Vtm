@@ -5,6 +5,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
+import com.mobileaviationtools.airnavdata.Classes.TableType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Runway;
@@ -31,6 +33,12 @@ public class AirportsAPIDataSource {
     {
         this(context);
         this.retrofit = retrofit;
+    }
+
+    private DataDownloadStatusEvent statusEvent;
+    public void SetStatusEvent(DataDownloadStatusEvent statusEvent)
+    {
+        this.statusEvent = statusEvent;
     }
 
     public AirportsAPIDataSource(Context context) {
@@ -69,17 +77,20 @@ public class AirportsAPIDataSource {
                         Log.i(TAG, "Finished reading Airports");
                         db.setTransactionSuccessful();
                         db.endTransaction();
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.airports);
                     }
                 }
                 else
                 {
                     Log.e(TAG, "Error recieving results");
+                    if (statusEvent != null) statusEvent.OnError(response.message(), TableType.airports);
                 }
             }
 
             @Override
             public void onFailure(Call<List<Airport>> call, Throwable t) {
                 Log.e(TAG, "Failure recieving results: " + t.getMessage());
+                if (statusEvent != null) statusEvent.OnError(t.getMessage(), TableType.airports);
             }
         });
     }
@@ -101,6 +112,8 @@ public class AirportsAPIDataSource {
 
         position = position + airports.size();
         Log.i(TAG, "Airports Position: " + position);
+
+        if (statusEvent != null) statusEvent.onProgress(totalCount, position, TableType.airports);
 
         return (position < totalCount);
     }

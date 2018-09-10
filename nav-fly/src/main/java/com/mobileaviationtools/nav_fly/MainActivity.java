@@ -141,26 +141,10 @@ public class MainActivity extends AppCompatActivity {
     {
         int id = item.getItemId();
 
-        if (id == R.id.firebase_test_menuitem)
+        if (id == R.id.download_database_menuitem)
         {
-            FBStatistics statistics = new FBStatistics(this);
-            statistics.OnStatisticsEvent = new FBStatistics.StatisticsEventListerner() {
-                @Override
-                public void OnStatistics(Statistics statistics) {
-                    Log.i(TAG, "Statistics :");
-                    AirportsDataSource airportsDataSource = new AirportsDataSource(MainActivity.this);
-                    airportsDataSource.ReadAirportData(statistics.AirportsCount);
 
-                    NavaidDataSource navaidDataSource = new NavaidDataSource(MainActivity.this);
-                    navaidDataSource.ReadNavaidData(statistics.NavaidsCount);
-                }
-            };
-
-            statistics.FillStatistics();
-        }
-
-        if (id == R.id.api_test_menuitem)
-        {
+            
 
             AirnavClient client = new AirnavClient(this);
             client.StartDownload();

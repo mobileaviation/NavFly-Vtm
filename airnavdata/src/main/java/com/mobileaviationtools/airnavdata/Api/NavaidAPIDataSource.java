@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
+import com.mobileaviationtools.airnavdata.Classes.TableType;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 
 import java.util.List;
@@ -32,6 +34,12 @@ public class NavaidAPIDataSource {
     public NavaidAPIDataSource(Context context) {
         this.context = context;
         db = AirnavDatabase.getInstance(context);
+    }
+
+    private DataDownloadStatusEvent statusEvent;
+    public void SetStatusEvent(DataDownloadStatusEvent statusEvent)
+    {
+        this.statusEvent = statusEvent;
     }
 
     public interface NavaidsService
@@ -65,17 +73,20 @@ public class NavaidAPIDataSource {
                         Log.i(TAG, "Finished reading Navaids");
                         db.setTransactionSuccessful();
                         db.endTransaction();
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.navaids);
                     }
                 }
                 else
                 {
                     Log.e(TAG, "Error recieving Navaid results");
+                    if (statusEvent != null) statusEvent.OnError(response.message(), TableType.navaids);
                 }
             }
 
             @Override
             public void onFailure(Call<List<Navaid>> call, Throwable t) {
                 Log.e(TAG, "Failure recieving Navaid results: " + t.getMessage());
+                if (statusEvent != null) statusEvent.OnError(t.getMessage(), TableType.navaids);
             }
         });
 
@@ -86,6 +97,8 @@ public class NavaidAPIDataSource {
         db.getNavaids().insertNavaids(navaids);
         position = position + navaids.size();
         Log.i(TAG, "Navaids Position: " + position);
+
+        if (statusEvent != null) statusEvent.onProgress(totalCount, position, TableType.navaids);
 
         return (position < totalCount);
     }

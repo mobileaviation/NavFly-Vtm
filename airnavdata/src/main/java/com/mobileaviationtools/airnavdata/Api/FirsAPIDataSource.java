@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
+import com.mobileaviationtools.airnavdata.Classes.TableType;
 import com.mobileaviationtools.airnavdata.Entities.Fir;
 
 import java.util.List;
@@ -32,6 +34,12 @@ public class FirsAPIDataSource {
     public FirsAPIDataSource(Context context) {
         this.context = context;
         db = AirnavDatabase.getInstance(context);
+    }
+
+    private DataDownloadStatusEvent statusEvent;
+    public void SetStatusEvent(DataDownloadStatusEvent statusEvent)
+    {
+        this.statusEvent = statusEvent;
     }
 
     public interface FirsService
@@ -65,17 +73,20 @@ public class FirsAPIDataSource {
                         Log.i(TAG, "Finished reading Firs");
                         db.setTransactionSuccessful();
                         db.endTransaction();
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.firs);
                     }
                 }
                 else
                 {
                     Log.e(TAG, "Error recieving Firs results");
+                    if (statusEvent != null) statusEvent.OnError(response.message(), TableType.firs);
                 }
             }
 
             @Override
             public void onFailure(Call<List<Fir>> call, Throwable t) {
                 Log.e(TAG, "Failure recieving Firs results: " + t.getMessage());
+                if (statusEvent != null) statusEvent.OnError(t.getMessage(), TableType.firs);
             }
         });
 
@@ -86,6 +97,8 @@ public class FirsAPIDataSource {
         db.getFirs().insertFirs(firs);
         position = position + firs.size();
         Log.i(TAG, "Firs Position: " + position);
+
+        if (statusEvent != null) statusEvent.onProgress(totalCount, position, TableType.firs);
 
         return (position < totalCount);
     }
