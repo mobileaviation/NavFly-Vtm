@@ -48,29 +48,29 @@ public class AirnavClient {
     private String TAG = "AirnavClient";
 
     public void StartDownload(){
-        NavaidAPIDataSource navaidAPIDataSource = new NavaidAPIDataSource(context, retrofit);
-        navaidAPIDataSource.SetStatusEvent(clientStatus);
-        navaidAPIDataSource.loadNavaids(11117);
-
-        AirportsAPIDataSource airportsAPIDataSource= new AirportsAPIDataSource(context, retrofit);
-        airportsAPIDataSource.SetStatusEvent(clientStatus);
-        airportsAPIDataSource.loadAirports(54523);
-
-        CountriesAPIDataSource countriesAPIDataSource= new CountriesAPIDataSource(context, retrofit);
-        countriesAPIDataSource.SetStatusEvent(clientStatus);
-        countriesAPIDataSource.loadcountries(247);
-
-        RegionsAPIDataSource regionsAPIDataSource= new RegionsAPIDataSource(context, retrofit);
-        regionsAPIDataSource.SetStatusEvent(clientStatus);
-        regionsAPIDataSource.loadRegions(3999);
-
-        FirsAPIDataSource firsAPIDataSource= new FirsAPIDataSource(context, retrofit);
-        firsAPIDataSource.SetStatusEvent(clientStatus);
-        firsAPIDataSource.loadfirs(275);
-
-        FixesAPIDataSource fixesAPIDataSource= new FixesAPIDataSource(context, retrofit);
-        fixesAPIDataSource.SetStatusEvent(clientStatus);
-        fixesAPIDataSource.loadfixes(261601);
+//        NavaidAPIDataSource navaidAPIDataSource = new NavaidAPIDataSource(context, retrofit);
+//        navaidAPIDataSource.SetStatusEvent(clientStatus);
+//        navaidAPIDataSource.loadNavaids(11117);
+//
+//        AirportsAPIDataSource airportsAPIDataSource= new AirportsAPIDataSource(context, retrofit);
+//        airportsAPIDataSource.SetStatusEvent(clientStatus);
+//        airportsAPIDataSource.loadAirports(54523);
+//
+//        CountriesAPIDataSource countriesAPIDataSource= new CountriesAPIDataSource(context, retrofit);
+//        countriesAPIDataSource.SetStatusEvent(clientStatus);
+//        countriesAPIDataSource.loadcountries(247);
+//
+//        RegionsAPIDataSource regionsAPIDataSource= new RegionsAPIDataSource(context, retrofit);
+//        regionsAPIDataSource.SetStatusEvent(clientStatus);
+//        regionsAPIDataSource.loadRegions(3999);
+//
+//        FirsAPIDataSource firsAPIDataSource= new FirsAPIDataSource(context, retrofit);
+//        firsAPIDataSource.SetStatusEvent(clientStatus);
+//        firsAPIDataSource.loadfirs(275);
+//
+//        FixesAPIDataSource fixesAPIDataSource= new FixesAPIDataSource(context, retrofit);
+//        fixesAPIDataSource.SetStatusEvent(clientStatus);
+//        fixesAPIDataSource.loadfixes(261601);
 
         AirspaceAPIDataSource airspaceAPIDataSource= new AirspaceAPIDataSource(context, retrofit);
         airspaceAPIDataSource.SetStatusEvent(clientStatus);

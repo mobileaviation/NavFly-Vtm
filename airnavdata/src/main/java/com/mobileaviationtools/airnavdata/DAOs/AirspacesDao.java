@@ -2,8 +2,10 @@ package com.mobileaviationtools.airnavdata.DAOs;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
+import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 
 import java.util.List;
@@ -21,4 +23,7 @@ public abstract class AirspacesDao {
     {
         insertAirspaces(airspaceList);
     }
+
+    @Query("SELECT * FROM tbl_Airspaces WHERE country==:country")
+    public abstract Airspace getAirspacesByCountry(String country);
 }

@@ -1,7 +1,20 @@
 package com.mobileaviationtools.airnavdata.Entities;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
+
+import com.mobileaviationtools.airnavdata.Classes.AirspaceCategory;
+import com.mobileaviationtools.airnavdata.Classes.AirspaceCategoryConverter;
+import com.mobileaviationtools.airnavdata.Classes.AltitudeReference;
+import com.mobileaviationtools.airnavdata.Classes.AltitudeReferenceConverter;
+import com.mobileaviationtools.airnavdata.Classes.AltitudeUnit;
+import com.mobileaviationtools.airnavdata.Classes.AltitudeUnitConverter;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
 
 @Entity(tableName = "tbl_Airspaces")
 public class Airspace {
@@ -9,14 +22,48 @@ public class Airspace {
     public long id;
     public String name;
     public String version;
-    public String category;
+    @TypeConverters({AirspaceCategoryConverter.class})
+    public AirspaceCategory category;
     public long airspace_id;
     public String country;
     public long altLimit_top;
-    public String altLimit_top_unit;
-    public String altLimit_top_ref;
+    @TypeConverters({AltitudeUnitConverter.class})
+    public AltitudeUnit altLimit_top_unit;
+    @TypeConverters({AltitudeReferenceConverter.class})
+    public AltitudeReference altLimit_top_ref;
     public long altLimit_bottom;
-    public String altLimit_bottom_unit;
-    public String altLimit_bottom_ref;
-    public String geometry;
+    @TypeConverters({AltitudeUnitConverter.class})
+    public AltitudeUnit altLimit_bottom_unit;
+    @TypeConverters({AltitudeReferenceConverter.class})
+    public AltitudeReference altLimit_bottom_ref;
+    private String geometry;
+    public double lat_top_left;
+    public double lon_top_left;
+    public double lat_bottom_right;
+    public double lot_bottom_right;
+
+    public void setGeometry(String geometry) {
+        this.geometry = geometry;
+        WKTReader reader = new WKTReader();
+        try {
+            airspaceGeometry = reader.read(geometry);
+            Coordinate[] env = airspaceGeometry.getEnvelope().getCoordinates();
+            lat_top_left = env[1].y;
+            lon_top_left = env[1].x;
+            lat_bottom_right = env[3].y;
+            lot_bottom_right = env[3].x;
+        }
+        catch (Exception ee)
+        {
+            airspaceGeometry = null;
+        }
+    }
+
+    public String getGeometry() {
+        return geometry;
+    }
+
+
+    @Ignore
+    public Geometry airspaceGeometry;
 }
