@@ -93,7 +93,11 @@ public class AirspaceAPIDataSource {
 
     private boolean insertAirspaces(List<Airspace> airspaces)
     {
-        db.getAirpaces().insertAirspaces(airspaces);
+        for (Airspace a: airspaces)
+        {
+            a.processGeometry();
+            db.getAirpaces().insertAirspace(a);
+        }
 
         position = position + airspaces.size();
         Log.i(TAG, "Airspaces Position: " + position);

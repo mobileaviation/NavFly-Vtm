@@ -25,5 +25,5 @@ public abstract class AirspacesDao {
     }
 
     @Query("SELECT * FROM tbl_Airspaces WHERE country==:country")
-    public abstract Airspace getAirspacesByCountry(String country);
+    public abstract List<Airspace> getAirspacesByCountry(String country);
 }

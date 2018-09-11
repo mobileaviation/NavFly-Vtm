@@ -33,7 +33,8 @@ public enum AirspaceCategory {
     RMZ (Color.BLACK, 0, 0xFFC06E8E,4, Color.TRANSPARENT, true),
     Z (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, false),
     ZP (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, false),
-    UKN (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, false);
+    UKN (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, false),
+    IGA (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, false);
 
     private Integer outlineColor;
     private Integer outlineWidth;

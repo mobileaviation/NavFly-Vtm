@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Api.AirportsAPIDataSource;
+import com.mobileaviationtools.airnavdata.Api.DatabaseTest;
 import com.mobileaviationtools.airnavdata.Api.NavaidAPIDataSource;
 import com.mobileaviationtools.airnavdata.Api.RetrofitTest;
 import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
@@ -90,10 +92,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
+//        DatabaseTest databaseTest = new DatabaseTest();
+//        databaseTest.Test(this);
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
@@ -146,11 +151,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.download_database_menuitem)
         {
-
-            
-
-            AirnavClient client = new AirnavClient(this);
-            client.StartDownload();
+            Intent dbDonwloadIntent = new Intent(MainActivity.this, DatabaseDownloadActivity.class);
+            MainActivity.this.startActivity(dbDonwloadIntent);
 
         }
 

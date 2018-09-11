@@ -46,14 +46,27 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 AirnavClient airnavClient = new AirnavClient(DatabaseDownloadActivity.this);
+
                 airnavClient.SetProgressStatus(new DataDownloadStatusEvent() {
                     @Override
                     public void onProgress(Integer count, Integer downloaded, TableType tableType) {
                         ProgressBar bar = null;
                         switch (tableType)
                         {
-                            case airports : bar = airportsProgressBar; break;
+                            case airports: bar = airportsProgressBar; break;
+                            case airspaces: bar = airspacesProgressBar; break;
+                            case firs: bar = firsProgressBar; break;
+                            case fixes: bar = fixesProgressBar; break;
+                            case navaids: bar = navaidsProgressBar; break;
+                            case countries: bar = countriesProgressBar; break;
+                            case regions: bar = regionsProgressBar; break;
+                            case mbtiles: bar = chartsProgressBar; break;
+                        }
 
+                        if (bar != null)
+                        {
+                            bar.setMax(count);
+                            bar.setProgress(downloaded);
                         }
                     }
 
@@ -66,6 +79,8 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
                     public void OnError(String message, TableType tableType) {
 
                     }
+
+
                 });
 
                 airnavClient.StartDownload();

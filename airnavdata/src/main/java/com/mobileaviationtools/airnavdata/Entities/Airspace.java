@@ -36,17 +36,19 @@ public class Airspace {
     public AltitudeUnit altLimit_bottom_unit;
     @TypeConverters({AltitudeReferenceConverter.class})
     public AltitudeReference altLimit_bottom_ref;
-    private String geometry;
+
     public double lat_top_left;
     public double lon_top_left;
     public double lat_bottom_right;
     public double lot_bottom_right;
 
-    public void setGeometry(String geometry) {
-        this.geometry = geometry;
+    public String geometry;
+
+    @Ignore
+    public void processGeometry() {
         WKTReader reader = new WKTReader();
         try {
-            airspaceGeometry = reader.read(geometry);
+            Geometry airspaceGeometry = reader.read(geometry);
             Coordinate[] env = airspaceGeometry.getEnvelope().getCoordinates();
             lat_top_left = env[1].y;
             lon_top_left = env[1].x;
@@ -55,15 +57,21 @@ public class Airspace {
         }
         catch (Exception ee)
         {
-            airspaceGeometry = null;
+
         }
     }
 
-    public String getGeometry() {
-        return geometry;
-    }
-
-
     @Ignore
-    public Geometry airspaceGeometry;
+    public Geometry getAirspaceGeometry()
+    {
+        WKTReader reader = new WKTReader();
+        try {
+            return reader.read(geometry);
+        }
+        catch (Exception ee)
+        {
+            return null;
+        }
+
+    }
 }
