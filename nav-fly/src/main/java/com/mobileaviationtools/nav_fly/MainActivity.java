@@ -92,13 +92,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
+        //AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        DatabaseTest databaseTest = new DatabaseTest();
-//        databaseTest.Test(this);
+        DatabaseTest databaseTest = new DatabaseTest();
+        databaseTest.Test(this);
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
