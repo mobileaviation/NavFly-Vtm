@@ -26,4 +26,10 @@ public abstract class AirspacesDao {
 
     @Query("SELECT * FROM tbl_Airspaces WHERE country==:country")
     public abstract List<Airspace> getAirspacesByCountry(String country);
+
+    @Query("SELECT * FROM tbl_Airspaces A " +
+            "WHERE ((A.lat_top_left>=:min_lat AND A.lat_top_left<=:max_lat AND A.lon_top_left>=:min_lon AND A.lon_top_left<=:max_lon) " +
+            "OR (A.lat_bottom_right>=:min_lat AND A.lat_bottom_right<=:max_lat AND A.lot_bottom_right>=:min_lon AND A.lot_bottom_right<=:max_lon)) " +
+            "AND category = :category")
+    public abstract Airspace[] getAirspacesByPosition(double min_lon, double max_lon, double min_lat, double max_lat, String category);
 }

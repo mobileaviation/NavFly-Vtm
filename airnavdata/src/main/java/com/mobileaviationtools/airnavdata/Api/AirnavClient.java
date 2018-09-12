@@ -5,7 +5,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
+import com.mobileaviationtools.airnavdata.Classes.StatisticsEvent;
 import com.mobileaviationtools.airnavdata.Classes.TableType;
+import com.mobileaviationtools.airnavdata.Models.Statistics;
 
 import java.io.File;
 
@@ -47,34 +49,57 @@ public class AirnavClient {
 
     private String TAG = "AirnavClient";
 
-    public void StartDownload(){
-//        NavaidAPIDataSource navaidAPIDataSource = new NavaidAPIDataSource(context, retrofit);
-//        navaidAPIDataSource.SetStatusEvent(clientStatus);
-//        navaidAPIDataSource.loadNavaids(11117);
-//
-//        AirportsAPIDataSource airportsAPIDataSource= new AirportsAPIDataSource(context, retrofit);
-//        airportsAPIDataSource.SetStatusEvent(clientStatus);
-//        airportsAPIDataSource.loadAirports(54523);
-//
-//        CountriesAPIDataSource countriesAPIDataSource= new CountriesAPIDataSource(context, retrofit);
-//        countriesAPIDataSource.SetStatusEvent(clientStatus);
-//        countriesAPIDataSource.loadcountries(247);
-//
-//        RegionsAPIDataSource regionsAPIDataSource= new RegionsAPIDataSource(context, retrofit);
-//        regionsAPIDataSource.SetStatusEvent(clientStatus);
-//        regionsAPIDataSource.loadRegions(3999);
-//
-//        FirsAPIDataSource firsAPIDataSource= new FirsAPIDataSource(context, retrofit);
-//        firsAPIDataSource.SetStatusEvent(clientStatus);
-//        firsAPIDataSource.loadfirs(275);
-//
-//        FixesAPIDataSource fixesAPIDataSource= new FixesAPIDataSource(context, retrofit);
-//        fixesAPIDataSource.SetStatusEvent(clientStatus);
-//        fixesAPIDataSource.loadfixes(261601);
+    public void StartDownload()
+    {
+        StatisticsAPIDataSource statisticsAPIDataSource = new StatisticsAPIDataSource(context, retrofit);
+        statisticsAPIDataSource.SetStatusEvent(new StatisticsEvent() {
+            @Override
+            public void OnFinished(Statistics statistics) {
+                if (responseStatus!= null) responseStatus.OnStatistics(statistics);
+                retrieveDatabases(statistics);
+            }
+
+            @Override
+            public void OnError(String message) {
+                Log.i(TAG, "OnError: " + message);
+            }
+        });
+
+        statisticsAPIDataSource.GetStatistics();
+    }
+
+    private void retrieveDatabases(Statistics statistics){
+        NavaidAPIDataSource navaidAPIDataSource = new NavaidAPIDataSource(context, retrofit);
+        navaidAPIDataSource.SetStatusEvent(clientStatus);
+        navaidAPIDataSource.loadNavaids(statistics.NavaidsCount);
+
+        AirportsAPIDataSource airportsAPIDataSource= new AirportsAPIDataSource(context, retrofit);
+        airportsAPIDataSource.SetStatusEvent(clientStatus);
+        airportsAPIDataSource.loadAirports(statistics.AirportsCount);
+
+        CountriesAPIDataSource countriesAPIDataSource= new CountriesAPIDataSource(context, retrofit);
+        countriesAPIDataSource.SetStatusEvent(clientStatus);
+        countriesAPIDataSource.loadcountries(statistics.CountriesCount);
+
+        RegionsAPIDataSource regionsAPIDataSource= new RegionsAPIDataSource(context, retrofit);
+        regionsAPIDataSource.SetStatusEvent(clientStatus);
+        regionsAPIDataSource.loadRegions(statistics.RegionsCount);
+
+        FirsAPIDataSource firsAPIDataSource= new FirsAPIDataSource(context, retrofit);
+        firsAPIDataSource.SetStatusEvent(clientStatus);
+        firsAPIDataSource.loadfirs(statistics.FirsCount);
+
+        FixesAPIDataSource fixesAPIDataSource= new FixesAPIDataSource(context, retrofit);
+        fixesAPIDataSource.SetStatusEvent(clientStatus);
+        fixesAPIDataSource.loadfixes(statistics.FixesCount);
 
         AirspaceAPIDataSource airspaceAPIDataSource= new AirspaceAPIDataSource(context, retrofit);
         airspaceAPIDataSource.SetStatusEvent(clientStatus);
-        airspaceAPIDataSource.loadAirspaces(17960);
+        airspaceAPIDataSource.loadAirspaces(statistics.AirspacesCount);
+
+        MBTilesAPIDataSource mbTilesAPIDataSource= new MBTilesAPIDataSource(context, retrofit);
+        mbTilesAPIDataSource.SetStatusEvent(clientStatus);
+        mbTilesAPIDataSource.loadTiles(statistics.MBTilesCount);
     }
 
     private void setClientDownloadStatus()
@@ -98,6 +123,12 @@ public class AirnavClient {
             public void OnError(String message, TableType tableType) {
                 Log.i(TAG, "OnError: " + message + " : " + tableType.toString());
                 if (responseStatus!= null) responseStatus.OnError(message, tableType);
+            }
+
+            @Override
+            public void OnStatistics(Statistics statistics)
+            {
+
             }
         };
     }

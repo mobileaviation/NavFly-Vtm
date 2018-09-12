@@ -2,6 +2,7 @@ package com.mobileaviationtools.airnavdata.Entities;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
@@ -15,8 +16,10 @@ import com.mobileaviationtools.airnavdata.Classes.AltitudeUnitConverter;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTReader;
+import org.oscim.layers.vector.geometries.PolygonDrawable;
 
-@Entity(tableName = "tbl_Airspaces")
+@Entity(tableName = "tbl_Airspaces",
+        indices = {@Index(name = "airspace_location_index", value = {"lat_top_left","lon_top_left","lat_bottom_right", "lot_bottom_right"})})
 public class Airspace {
     @PrimaryKey
     public long id;
@@ -43,6 +46,9 @@ public class Airspace {
     public double lot_bottom_right;
 
     public String geometry;
+
+    @Ignore
+    public PolygonDrawable airspacePolygon;
 
     @Ignore
     public void processGeometry() {
@@ -73,5 +79,14 @@ public class Airspace {
             return null;
         }
 
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Airspace) {
+            return (((Airspace)obj).id == this.id);
+        }
+        else
+            return false;
     }
 }

@@ -8,5 +8,6 @@ public enum TableType {
     regions,
     mbtiles,
     firs,
-    airspaces
+    airspaces,
+    statistics
 }

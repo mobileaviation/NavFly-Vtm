@@ -27,6 +27,7 @@ import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
 import com.mobileaviationtools.airnavdata.Firebase.NavaidDataSource;
 import com.mobileaviationtools.airnavdata.Models.Statistics;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
+import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
 
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     VectorTileLayer mBaseLayer;
     AirportMarkersLayer mAirportMarkersLayer;
     NaviadMarkersLayer mNavaidsMarkersLayer;
+    AirspaceLayer mAirspaceLayer;
 
     private TileCache mCache;
     TileSource mTileSource;
@@ -97,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DatabaseTest databaseTest = new DatabaseTest();
-        databaseTest.Test(this);
+//        DatabaseTest databaseTest = new DatabaseTest();
+//        databaseTest.Test(this);
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
@@ -115,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         //setupPathLayer();
         //setupVectorLayer();
         testMarkerLayerGestures();
+        setupAirspacesLayer();
 
 //        android.view.MotionEvent e = android.view.MotionEvent.obtain(0,0, android.view.MotionEvent.ACTION_MOVE,0,0,0);
 //        mMap.input.fire(null, new AndroidMotionEvent().wrap(e));
@@ -126,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 if(checkMap.Changed()) {
                     mAirportMarkersLayer.UpdateAirports();
                     mNavaidsMarkersLayer.UpdateNavaids();
+                    mAirspaceLayer.UpdateAirspaces();
                 }
             }
         });
@@ -171,6 +175,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    void setupAirspacesLayer()
+    {
+        mAirspaceLayer = new AirspaceLayer(mMap, this);
     }
 
     void setupVectorLayer()

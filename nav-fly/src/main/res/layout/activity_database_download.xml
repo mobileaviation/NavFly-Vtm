@@ -47,7 +47,7 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
-                    android:layout_weight="1"
+                    android:layout_weight="6"
                     android:text="Airports:" />
 
                 <ProgressBar
@@ -56,9 +56,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="3"
+                    android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
+                <TextView
+                    android:id="@+id/airportCountTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Unknown"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -74,7 +84,7 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
-                    android:layout_weight="1"
+                    android:layout_weight="6"
                     android:text="Navaids:" />
 
                 <ProgressBar
@@ -83,9 +93,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="3"
+                    android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+                <TextView
+                    android:id="@+id/navaidsCountTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Unknown"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -101,7 +120,7 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
-                    android:layout_weight="1"
+                    android:layout_weight="6"
                     android:text="Fixes:" />
 
                 <ProgressBar
@@ -110,9 +129,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="3"
+                    android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
+                <TextView
+                    android:id="@+id/fixesCountTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Unknown"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -128,7 +157,7 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
-                    android:layout_weight="1"
+                    android:layout_weight="6"
                     android:text="Countries:" />
 
                 <ProgressBar
@@ -137,9 +166,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="3"
+                    android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
+                <TextView
+                    android:id="@+id/countriesCountTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Unknown"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -155,7 +194,7 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
-                    android:layout_weight="1"
+                    android:layout_weight="6"
                     android:text="Regions:" />
 
                 <ProgressBar
@@ -164,9 +203,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="3"
+                    android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+                <TextView
+                    android:id="@+id/regionsCountTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Unknown"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -182,7 +230,7 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
-                    android:layout_weight="1"
+                    android:layout_weight="6"
                     android:text="Firs:" />
 
                 <ProgressBar
@@ -191,9 +239,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="3"
+                    android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+                <TextView
+                    android:id="@+id/firsCountTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Unknown"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -209,7 +266,7 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
-                    android:layout_weight="1"
+                    android:layout_weight="6"
                     android:text="Charts:" />
 
                 <ProgressBar
@@ -218,9 +275,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="3"
+                    android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+                <TextView
+                    android:id="@+id/chartsCountTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Unknown"
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -236,7 +302,7 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
-                    android:layout_weight="1"
+                    android:layout_weight="6"
                     android:text="Airspaces:" />
 
                 <ProgressBar
@@ -245,9 +311,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="3"
+                    android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+                <TextView
+                    android:id="@+id/airspacesCountTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="Unknown"
+                    android:textSize="10sp" />
 
             </LinearLayout>
 

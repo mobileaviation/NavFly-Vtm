@@ -9,10 +9,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
 import com.mobileaviationtools.airnavdata.Classes.TableType;
+import com.mobileaviationtools.airnavdata.Models.Statistics;
 
 public class DatabaseDownloadActivity extends AppCompatActivity {
 
@@ -26,12 +28,15 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
     private ProgressBar airspacesProgressBar;
     private ProgressBar chartsProgressBar;
 
+    private Integer finishedCount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_database_download);
 
         actionBtn = (Button)this.findViewById(R.id.downloadDatabasesBtn);
+        actionBtn.setTag(false);
 
         airportsProgressBar = (ProgressBar)this.findViewById(R.id.airportsProgress);
         navaidsProgressBar = (ProgressBar)this.findViewById(R.id.navaidsProgress);
@@ -45,45 +50,85 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
         actionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AirnavClient airnavClient = new AirnavClient(DatabaseDownloadActivity.this);
+                if (!(Boolean)actionBtn.getTag()) {
+                    AirnavClient airnavClient = new AirnavClient(DatabaseDownloadActivity.this);
+                    actionBtn.setEnabled(false);
+                    finishedCount = 0;
 
-                airnavClient.SetProgressStatus(new DataDownloadStatusEvent() {
-                    @Override
-                    public void onProgress(Integer count, Integer downloaded, TableType tableType) {
-                        ProgressBar bar = null;
-                        switch (tableType)
-                        {
-                            case airports: bar = airportsProgressBar; break;
-                            case airspaces: bar = airspacesProgressBar; break;
-                            case firs: bar = firsProgressBar; break;
-                            case fixes: bar = fixesProgressBar; break;
-                            case navaids: bar = navaidsProgressBar; break;
-                            case countries: bar = countriesProgressBar; break;
-                            case regions: bar = regionsProgressBar; break;
-                            case mbtiles: bar = chartsProgressBar; break;
+                    airnavClient.SetProgressStatus(new DataDownloadStatusEvent() {
+                        @Override
+                        public void onProgress(Integer count, Integer downloaded, TableType tableType) {
+                            ProgressBar bar = null;
+                            switch (tableType) {
+                                case airports:
+                                    bar = airportsProgressBar;
+                                    break;
+                                case airspaces:
+                                    bar = airspacesProgressBar;
+                                    break;
+                                case firs:
+                                    bar = firsProgressBar;
+                                    break;
+                                case fixes:
+                                    bar = fixesProgressBar;
+                                    break;
+                                case navaids:
+                                    bar = navaidsProgressBar;
+                                    break;
+                                case countries:
+                                    bar = countriesProgressBar;
+                                    break;
+                                case regions:
+                                    bar = regionsProgressBar;
+                                    break;
+                                case mbtiles:
+                                    bar = chartsProgressBar;
+                                    break;
+                            }
+
+                            if (bar != null) {
+                                bar.setMax(count);
+                                bar.setProgress(downloaded);
+                            }
                         }
 
-                        if (bar != null)
-                        {
-                            bar.setMax(count);
-                            bar.setProgress(downloaded);
+                        @Override
+                        public void OnFinished(TableType tableType) {
+                            finishedCount++;
+                            if (finishedCount == 8) {
+                                actionBtn.setText("Close");
+                                actionBtn.setTag(true);
+                                actionBtn.setEnabled(true);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void OnFinished(TableType tableType) {
+                        @Override
+                        public void OnError(String message, TableType tableType) {
 
-                    }
+                        }
 
-                    @Override
-                    public void OnError(String message, TableType tableType) {
+                        @Override
+                        public void OnStatistics(Statistics statistics) {
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.airportCountTxt)).setText(statistics.AirportsCount.toString());
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.airspacesCountTxt)).setText(statistics.AirspacesCount.toString());
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.regionsCountTxt)).setText(statistics.RegionsCount.toString());
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.countriesCountTxt)).setText(statistics.CountriesCount.toString());
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.firsCountTxt)).setText(statistics.FirsCount.toString());
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.fixesCountTxt)).setText(statistics.FixesCount.toString());
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.navaidsCountTxt)).setText(statistics.NavaidsCount.toString());
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.chartsCountTxt)).setText(statistics.MBTilesCount.toString());
 
-                    }
+                        }
 
 
-                });
+                    });
 
-                airnavClient.StartDownload();
+                    airnavClient.StartDownload();
+                }
+                else
+                {
+                    DatabaseDownloadActivity.this.finish();
+                }
             }
         });
     }
