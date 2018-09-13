@@ -5,6 +5,8 @@ import android.content.Context;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.BoundingBox;
 import org.oscim.layers.vector.VectorLayer;
@@ -42,23 +44,43 @@ public class AirspaceLayer{
     private Airspace[] GetVisibleAirspaces()
     {
         BoundingBox box = mMap.getBoundingBox(0);
-        return db.getAirpaces().getAirspacesByPosition(box.getMinLongitude(),
+//        return db.getAirpaces().getAirspacesByPosition(box.getMinLongitude(),
+//                box.getMaxLongitude(), box.getMinLatitude(), box.getMaxLatitude());
+
+        return db.getAirpaces().getAirspacesByPositionAndCategory(box.getMinLongitude(),
                 box.getMaxLongitude(), box.getMinLatitude(), box.getMaxLatitude(), "CTR");
     }
 
     private void drawAirspaces(Airspace[] airspaces)
     {
-        Style lineStyle = Style.builder()
-                .strokeColor(Color.BLACK)
-                .strokeWidth(2).build();
-
         Boolean added = false;
 
         for (Airspace a : airspaces){
             if (a.category.getVisible()) {
                 if (!this.airspaces.contains(a)) {
-                    a.airspacePolygon = new PolygonDrawable(a.getAirspaceGeometry(), lineStyle);
-                    vectorLayer.add(a.airspacePolygon);
+
+                    Style lineStyle = Style.builder()
+                            .strokeColor(a.category.getStrokeColor())
+                            .strokeWidth(a.category.getStrokeWidth())
+                            .fillColor(a.category.getFillColor())
+                            .fillAlpha(Color.aToFloat(a.category.getFillColor()))
+                            .build();
+                    a.airspacePolygon1 = new PolygonDrawable(a.getAirspaceGeometry(), lineStyle);
+
+
+                    Style lineStyle1 = Style.builder()
+                            .strokeColor(a.category.getOutlineColor())
+                            .strokeWidth(a.category.getOutlineWidth())
+                            .stipple(10).stippleWidth(10).stippleColor(Color.WHITE)
+                            .fillColor(a.category.getFillColor())
+                            .fillAlpha(0)
+                            .build();
+                    a.airspacePolygon2 = new PolygonDrawable(a.getAirspaceGeometry(), lineStyle1);
+
+                    vectorLayer.add(a.airspacePolygon2);
+                    vectorLayer.add(a.airspacePolygon1);
+
+
                     this.airspaces.add(a);
                     added = true;
                 }

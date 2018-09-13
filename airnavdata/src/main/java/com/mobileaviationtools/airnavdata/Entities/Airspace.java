@@ -48,7 +48,9 @@ public class Airspace {
     public String geometry;
 
     @Ignore
-    public PolygonDrawable airspacePolygon;
+    public PolygonDrawable airspacePolygon1;
+    @Ignore
+    public PolygonDrawable airspacePolygon2;
 
     @Ignore
     public void processGeometry() {
