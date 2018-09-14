@@ -8,7 +8,7 @@ public enum AirspaceCategory {
     AWY (Color.GREEN, 2, Color.YELLOW,4, Color.TRANSPARENT, 0, false),
     B (Color.BLACK, 0, 0xBF000000,2, Color.TRANSPARENT, 0, true),
     C (0xFFE4A19E, 1, 0x60E4A19E,2, Color.TRANSPARENT, 0, true),
-    CTR (Color.BLACK, 2, 0xFFE4A19E ,8, 0x30E4A19E, 0, true),
+    CTR (Color.BLACK, 2, 0xA0E4A19E ,6, 0x30E4A19E, 0, true),
     D (Color.BLACK, 0, 0xFFE4A19E ,4, 0x30E4A19, 0, true),
     DANGER (Color.BLACK, 0, 0xFFFBA642,2, 0x10FBA642, 0, true),
     Q (Color.BLACK, 0, 0xFFC06E8E,4, 0x50C06E8E, 0, true),

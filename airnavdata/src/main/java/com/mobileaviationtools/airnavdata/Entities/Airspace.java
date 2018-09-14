@@ -16,7 +16,11 @@ import com.mobileaviationtools.airnavdata.Classes.AltitudeUnitConverter;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTReader;
+import org.oscim.core.GeoPoint;
 import org.oscim.layers.vector.geometries.PolygonDrawable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(tableName = "tbl_Airspaces",
         indices = {@Index(name = "airspace_location_index", value = {"lat_top_left","lon_top_left","lat_bottom_right", "lot_bottom_right"})})
@@ -80,8 +84,8 @@ public class Airspace {
         {
             return null;
         }
-
     }
+
 
     @Override
     public boolean equals(Object obj) {
