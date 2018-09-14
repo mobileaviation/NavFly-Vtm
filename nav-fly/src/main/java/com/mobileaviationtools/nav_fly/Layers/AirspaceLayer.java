@@ -74,7 +74,7 @@ public class AirspaceLayer{
     {
         Geometry outerGeomety = a.getAirspaceGeometry();
         if (!outerGeomety.isEmpty()) {
-            if (a.category.getOutlineWidth()>0) {
+            if (a.category.getBufferWidth()!=0) {
 
                 Style lineStyle = Style.builder()
                         .strokeColor(a.category.getStrokeColor())
