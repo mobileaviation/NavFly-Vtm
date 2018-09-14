@@ -90,7 +90,7 @@ public class AirspaceLayer{
                         .fillAlpha(Color.aToFloat(a.category.getFillColor()))
                         .build();
 
-                Geometry innerBuffer = outerGeomety.buffer(-0.005);
+                Geometry innerBuffer = outerGeomety.buffer(a.category.getBufferWidth());
 
                 a.airspacePolygon1 = new PolygonDrawable(outerGeomety, lineStyle1);
                 if (!innerBuffer.isEmpty()) {
