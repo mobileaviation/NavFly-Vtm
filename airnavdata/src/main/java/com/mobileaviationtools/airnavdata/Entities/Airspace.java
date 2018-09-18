@@ -17,6 +17,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTReader;
 import org.oscim.core.GeoPoint;
+import org.oscim.layers.vector.geometries.LineDrawable;
 import org.oscim.layers.vector.geometries.PolygonDrawable;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class Airspace {
     @Ignore
     public PolygonDrawable airspacePolygon1;
     @Ignore
-    public PolygonDrawable airspacePolygon2;
+    public LineDrawable airspacePolygon2;
 
     @Ignore
     public void processGeometry() {
