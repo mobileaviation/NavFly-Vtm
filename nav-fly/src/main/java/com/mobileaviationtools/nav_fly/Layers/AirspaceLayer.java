@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.AirspaceCategory;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.R;
@@ -60,11 +61,12 @@ public class AirspaceLayer{
     private Airspace[] GetVisibleAirspaces()
     {
         BoundingBox box = mMap.getBoundingBox(0);
-//        return db.getAirpaces().getAirspacesByPosition(box.getMinLongitude(),
-//                box.getMaxLongitude(), box.getMinLatitude(), box.getMaxLatitude());
+
 
         return db.getAirpaces().getAirspacesByPosition(box.getMinLongitude(),
                 box.getMaxLongitude(), box.getMinLatitude(), box.getMaxLatitude());
+//        return db.getAirpaces().getAirspacesByPositionAndCountry(box.getMinLongitude(),
+//                box.getMaxLongitude(), box.getMinLatitude(), box.getMaxLatitude(), "Netherlands");
     }
 
     private class drawAirspaceAsync extends android.os.AsyncTask
@@ -82,51 +84,33 @@ public class AirspaceLayer{
     {
         Geometry outerGeomety = a.getAirspaceGeometry();
         if (!outerGeomety.isEmpty()) {
-            if (a.category.getBufferWidth()!=0) {
+            if (a.category.getTexture()) {
 
-                TextureItem tex = null;
-                tex = new TextureItem(AndroidGraphics.drawableToBitmap(context.getResources(), R.drawable.stroke5));
-                tex.mipmap = true;
-
-
-
-//                Style lineStyle = Style.builder()
-//                        .strokeColor(a.category.getStrokeColor())
-//                        .strokeWidth(a.category.getStrokeWidth())
-//                        .fillColor(a.category.getFillColor())
-//                        .fillAlpha(0)
-//                        .texture(tex)
-//                        .randomOffset(false)
-//                        .build();
+                TextureItem tex = getTextureItem(a.category);
 
                 Style lineStyle = Style.builder()
-                        .stippleColor(a.category.getFillColor())
-                        .stipple(10)
+                        //.stippleColor(a.category.getFillColor())
+                        .stipple(a.category.getOutlineWidth())
                         .stippleWidth(1)
-                        .strokeWidth(20)
-                        .strokeColor(a.category.getStrokeColor())
+                        .strokeWidth(a.category.getStrokeWidth())
+                        .strokeColor(a.category.getOutlineColor())
                         .fixed(true)
                         .texture(tex)
                         .randomOffset(false)
                         .build();
 
-                Style lineStyle1 = Style.builder()
-                        .strokeColor(a.category.getOutlineColor())
-                        //.strokeWidth(a.category.getOutlineWidth())
+                Style polygonStyle = Style.builder()
+                        .strokeColor(Color.TRANSPARENT)
                         .strokeWidth(0)
                         .fillColor(a.category.getFillColor())
-                        .fillAlpha(0)
-                        //.fillAlpha(Color.aToFloat(a.category.getFillColor()))
+                        .fillAlpha(Color.aToFloat(a.category.getFillColor()))
                         .build();
 
-                //Geometry innerBuffer = outerGeomety.buffer(a.category.getBufferWidth());
 
-                a.airspacePolygon1 = new PolygonDrawable(outerGeomety, lineStyle1);
-                //if (!innerBuffer.isEmpty()) {
-                    a.airspacePolygon2 = new LineDrawable(GeometryHelpers.getGeoPoints(outerGeomety), lineStyle);
-                    //a.airspacePolygon2 = new PolygonDrawable(innerBuffer, lineStyle);
-                    vectorLayer.add(a.airspacePolygon2);
-                //}
+                a.airspacePolygon1 = new PolygonDrawable(outerGeomety, polygonStyle);
+                a.airspacePolygon2 = new LineDrawable(GeometryHelpers.getGeoPoints(outerGeomety), lineStyle);
+
+                vectorLayer.add(a.airspacePolygon2);
 
                 vectorLayer.add(a.airspacePolygon1);
 
@@ -143,6 +127,31 @@ public class AirspaceLayer{
                 vectorLayer.add(a.airspacePolygon1);
             }
 
+        }
+    }
+
+    private TextureItem getTextureItem(AirspaceCategory category)
+    {
+        int res = 0;
+        switch (category)
+        {
+            case C: res = R.drawable.stroke8; break;
+            case CTR: res = R.drawable.stroke8; break;
+            case P: res = R.drawable.spoke; break;
+            case D: res = R.drawable.stroke8; break;
+            case R: res = R.drawable.spoke; break;
+            case PROHIBITED: res = R.drawable.spoke; break;
+            case DANGER: res = R.drawable.spoke; break;
+            case RESTRICTED: res = R.drawable.spoke; break;
+        }
+
+        if (res == 0) return null;
+        else
+        {
+            TextureItem tex = null;
+            tex = new TextureItem(AndroidGraphics.drawableToBitmap(context.getResources(), res));
+            tex.mipmap = false;
+            return tex;
         }
     }
 

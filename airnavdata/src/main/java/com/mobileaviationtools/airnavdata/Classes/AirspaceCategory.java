@@ -3,38 +3,39 @@ package com.mobileaviationtools.airnavdata.Classes;
 import android.graphics.Color;
 
 public enum AirspaceCategory {
-    // outlineColor, outlineWidth, strokeColor, strokeWidth, fillColor, zoomlevel, bufferWidth, visible
-    A (Color.BLACK, 0, 0xAF000000,3, Color.TRANSPARENT, 0 , 0d , true),
-    AWY (Color.GREEN, 2, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d , false),
-    B (Color.BLACK, 0, 0xBF000000,2, Color.TRANSPARENT, 0, 0d,  true),
-    C (Color.BLACK, 2, 0xA0E4A19E,10, Color.DKGRAY, 0, -0.002d, true),
-    CTR (Color.BLACK, 2, 0xA0E4A19E ,10, Color.DKGRAY, 0, -0.002d, true),
-    D (Color.BLACK, 0, 0xFFE4A19E ,4, 0x30E4A19, 0, 0d, true),
-    DANGER (Color.BLACK, 0, 0xFFFBA642,2, 0x10FBA642, 0, 0d, true),
-    Q (Color.BLACK, 0, 0xFFC06E8E,4, 0x50C06E8E, 0, 0d, true),
-    E (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, 0d, true),
-    F (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, 0d, true),
-    G (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, 0d, true),
-    GSEC (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false),
-    GP (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false),
-    GLIDING (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false),
-    OTH (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false),
-    RESTRICTED (Color.BLACK, 0, 0xFFFBA642,2, 0x10FBA642, 0, 0d, true),
-    R (Color.BLACK, 0, 0xFFFBA642,2, 0x10FBA642, 0, 0d, true),
-    TMA (Color.BLACK, 0, 0xFF7C6D92,4, Color.TRANSPARENT, 0, 0d, true),
-    TMZ (Color.BLACK, 0, 0xFFC3819E,5, Color.TRANSPARENT, 0, 0d, true),
-    TSA (Color.BLACK, 0, 0xFF7C6D92,4, Color.TRANSPARENT, 0, 0d, true),
-    WAVE (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, true),
-    W (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false),
-    PROHIBITED (Color.BLACK, 0, 0xFFFBA642,2, 0x10FBA642, 0, 0d, true),
-    P (Color.BLACK, 0, 0xFFFBA642,2, 0x10FBA642, 0, 0d, true),
-    FIR (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, 0d, true),
-    UIR (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, 0d, true),
-    RMZ (Color.BLACK, 0, 0xFFC06E8E,4, Color.TRANSPARENT, 0, 0d, true),
-    Z (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false),
-    ZP (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false),
-    UKN (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false),
-    IGA (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, 0d, false);
+    // outlineColor, outlineWidth, strokeColor, strokeWidth, fillColor, zoomlevel, texture, visible
+    A (Color.BLACK, 0, 0xAF000000,3, Color.TRANSPARENT, 0 , false , true),
+    AWY (Color.GREEN, 2, Color.YELLOW,4, Color.TRANSPARENT, 0, false , false),
+    B (Color.BLACK, 0, 0xBF000000,2, Color.TRANSPARENT, 0, false,  true),
+    C (Color.DKGRAY, 30, 0xA0E4A19E ,20, 0x70E4A19E ,0, true, false),
+    CTR (Color.DKGRAY, 30, 0xA0E4A19E ,20, 0x70E4A19E ,0, true, true),
+    //D (0xFFFBA642, 5, 0xFFFBA642, 15, 0x30E4A19, 0, true, true),
+    D (Color.DKGRAY, 30, 0xA0E4A19E ,20, 0x70E4A19E ,0, true, true),
+    DANGER (0xFFFBA642, 5, 0xFFFBA642, 15, 0x10FBA642, 0, true, true),
+    Q (Color.BLACK, 0, 0xFFC06E8E,4, 0x50C06E8E, 0, false, true),
+    E (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, false, true),
+    F (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, false, true),
+    G (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, false, true),
+    GSEC (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false),
+    GP (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false),
+    GLIDING (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false),
+    OTH (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false),
+    RESTRICTED (0xFFFBA642, 5, 0xFFFBA642, 15, 0x10FBA642, 0, true, true),
+    R (0xFFFBA642, 5, 0xFFFBA642, 15, 0x10FBA642, 0, true, true),
+    TMA (Color.BLACK, 0, 0xFF7C6D92,4, Color.TRANSPARENT, 0, false, true),
+    TMZ (Color.BLACK, 0, 0xFFC3819E,5, Color.TRANSPARENT, 0, false, true),
+    TSA (Color.BLACK, 0, 0xFF7C6D92,4, Color.TRANSPARENT, 0, false, true),
+    WAVE (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, true),
+    W (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false),
+    PROHIBITED (0xFFFBA642, 5, 0xFFFBA642, 15, 0x10FBA642, 0, true, true),
+    P (0xFFFBA642, 5, 0xFFFBA642, 15, 0x10FBA642, 0, true, true),
+    FIR (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, false, true),
+    UIR (Color.BLACK, 0, 0xAF000000,2, Color.TRANSPARENT, 0, false, true),
+    RMZ (Color.BLACK, 0, 0xFFC06E8E,4, Color.TRANSPARENT, 0, false, false),
+    Z (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false),
+    ZP (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false),
+    UKN (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false),
+    IGA (Color.BLACK, 0, Color.YELLOW,4, Color.TRANSPARENT, 0, false, false);
 
     private Integer outlineColor;
     private Integer outlineWidth;
@@ -43,14 +44,14 @@ public enum AirspaceCategory {
     private Integer fillColor;
     private Integer zoomLevel;
     private Boolean visible;
-    private Double bufferWidth;
+    private Boolean texture;
     AirspaceCategory(Integer outlineColor,
                      Integer outlineWidth,
                      Integer strokeColor,
                      Integer strokeWidth,
                      Integer fillColor,
                      Integer zoomLevel,
-                     Double bufferWidth,
+                     Boolean texture,
                      Boolean visible)
     {
         this.outlineColor = outlineColor;
@@ -59,7 +60,7 @@ public enum AirspaceCategory {
         this.strokeWidth = strokeWidth;
         this.fillColor = fillColor;
         this.zoomLevel = zoomLevel;
-        this.bufferWidth = bufferWidth;
+        this.texture = texture;
         this.visible = visible;
     }
 
@@ -70,7 +71,7 @@ public enum AirspaceCategory {
     public Integer getStrokeWidth(){return strokeWidth;}
     public Boolean getVisible(){return visible;}
     public Integer getZoomLevel() { return zoomLevel; }
-    public Double getBufferWidth() { return bufferWidth; }
+    public Boolean getTexture() { return texture; }
 
     @Override
     public String toString() {
