@@ -26,6 +26,11 @@ import java.util.List;
 @Entity(tableName = "tbl_Airspaces",
         indices = {@Index(name = "airspace_location_index", value = {"lat_top_left","lon_top_left","lat_bottom_right", "lot_bottom_right"})})
 public class Airspace {
+    public Airspace()
+    {
+        visible = false;
+    }
+
     @PrimaryKey
     public long id;
     public String name;
@@ -56,6 +61,8 @@ public class Airspace {
     public PolygonDrawable airspacePolygon1;
     @Ignore
     public LineDrawable airspacePolygon2;
+    @Ignore
+    public Boolean visible;
 
     @Ignore
     public void processGeometry() {

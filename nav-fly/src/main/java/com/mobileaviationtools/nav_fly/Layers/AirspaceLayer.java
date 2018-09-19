@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Classes.AirspaceCategory;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
+import com.mobileaviationtools.nav_fly.Classes.AirspaceList;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.R;
 
@@ -43,20 +44,21 @@ public class AirspaceLayer extends VectorLayer {
         this.mMap = map;
         db = AirnavDatabase.getInstance(context);
         mMap.layers().add(this);
-        airspaces = new ArrayList<>();
+        airspaces = new AirspaceList();
     }
 
     private Map mMap;
     private Context context;
     private AirnavDatabase db;
-    private ArrayList<Airspace> airspaces;
+    private AirspaceList airspaces;
 
     private String TAG = "AirspaceLayer";
 
     public void UpdateAirspaces()
     {
-        Airspace[] airspaces = GetVisibleAirspaces();
-        drawAirspaces(airspaces);
+        BoundingBox box = mMap.getBoundingBox(0);
+        Airspace[] airspaces = GetVisibleAirspaces(box);
+        drawAirspaces(airspaces, box);
         int i = 0;
     }
 
@@ -83,26 +85,12 @@ public class AirspaceLayer extends VectorLayer {
         return false;
     }
 
-    private Airspace[] GetVisibleAirspaces()
+    private Airspace[] GetVisibleAirspaces(BoundingBox box)
     {
-        BoundingBox box = mMap.getBoundingBox(0);
-
-
         return db.getAirpaces().getAirspacesByPosition(box.getMinLongitude(),
                 box.getMaxLongitude(), box.getMinLatitude(), box.getMaxLatitude());
 //        return db.getAirpaces().getAirspacesByPositionAndCountry(box.getMinLongitude(),
 //                box.getMaxLongitude(), box.getMinLatitude(), box.getMaxLatitude(), "Netherlands");
-    }
-
-    private class drawAirspaceAsync extends android.os.AsyncTask
-    {
-        public Airspace airspace;
-        @Override
-        protected Object doInBackground(Object[] objects) {
-            drawAirspace(airspace);
-            return null;
-        }
-
     }
 
     private void drawAirspace(Airspace a)
@@ -135,9 +123,9 @@ public class AirspaceLayer extends VectorLayer {
                 a.airspacePolygon1 = new PolygonDrawable(outerGeomety, polygonStyle);
                 a.airspacePolygon2 = new LineDrawable(GeometryHelpers.getGeoPoints(outerGeomety), lineStyle);
 
-                add(a.airspacePolygon2);
+                //add(a.airspacePolygon2);
 
-                add(a.airspacePolygon1);
+                //add(a.airspacePolygon1);
 
             }
             else
@@ -149,7 +137,7 @@ public class AirspaceLayer extends VectorLayer {
                         .fillAlpha(Color.aToFloat(a.category.getFillColor()))
                         .build();
                 a.airspacePolygon1 = new PolygonDrawable(outerGeomety, lineStyle);
-                add(a.airspacePolygon1);
+                //add(a.airspacePolygon1);
             }
 
         }
@@ -180,7 +168,7 @@ public class AirspaceLayer extends VectorLayer {
         }
     }
 
-    private void drawAirspaces(Airspace[] airspaces)
+    private void drawAirspaces(Airspace[] airspaces, BoundingBox box)
     {
         Boolean added = false;
 
@@ -191,12 +179,41 @@ public class AirspaceLayer extends VectorLayer {
                     this.airspaces.add(a);
                     added = true;
                 }
-//                drawAirspaceAsync drawAirspaceAsync = new drawAirspaceAsync();
-//                drawAirspaceAsync.airspace = a;
-//                drawAirspaceAsync.executeOnExecutor(android.os.AsyncTask.THREAD_POOL_EXECUTOR);
+
+                if (a.category.getZoomLevel()>0) {
+                    if (box.contains(new GeoPoint(a.lat_bottom_right, a.lot_bottom_right))
+                            || box.contains(new GeoPoint(a.lat_top_left, a.lon_top_left))) {
+                        if (mMap.getMapPosition().zoomLevel>a.category.getZoomLevel())
+                        {
+                            Airspace aa = this.airspaces.GetAirspace(a);
+                            if (!aa.visible) {
+                                if (aa.airspacePolygon1 != null) add(aa.airspacePolygon1);
+                                if (aa.airspacePolygon2 != null) add(aa.airspacePolygon2);
+                                aa.visible = true;
+                            }
+                        }
+                        else
+                        {
+                            Airspace aa = this.airspaces.GetAirspace(a);
+                            if (aa.visible)
+                            {
+                                if (aa.airspacePolygon1 != null) remove(aa.airspacePolygon1);
+                                if (aa.airspacePolygon2 != null) remove(aa.airspacePolygon2);
+                                aa.visible = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (a.airspacePolygon1 != null) add(a.airspacePolygon1);
+                    if (a.airspacePolygon2 != null) add(a.airspacePolygon2);
+                    a.visible = true;
+                }
             }
         }
 
-        if (added) update();
+        //if (added)
+            update();
     }
 }
