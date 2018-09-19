@@ -3,6 +3,7 @@ package com.mobileaviationtools.nav_fly.Layers;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Classes.AirspaceCategory;
@@ -18,6 +19,8 @@ import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
+import org.oscim.event.Gesture;
+import org.oscim.event.MotionEvent;
 import org.oscim.layers.vector.VectorLayer;
 import org.oscim.layers.vector.geometries.LineDrawable;
 import org.oscim.layers.vector.geometries.PolygonDrawable;
@@ -32,21 +35,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AirspaceLayer{
+public class AirspaceLayer extends VectorLayer {
     public AirspaceLayer(Map map, Context context)
     {
+        super(map);
         this.context = context;
         this.mMap = map;
         db = AirnavDatabase.getInstance(context);
-        vectorLayer = new VectorLayer(this.mMap);
-        mMap.layers().add(vectorLayer);
+        mMap.layers().add(this);
         airspaces = new ArrayList<>();
     }
 
     private Map mMap;
     private Context context;
     private AirnavDatabase db;
-    private VectorLayer vectorLayer;
     private ArrayList<Airspace> airspaces;
 
     private String TAG = "AirspaceLayer";
@@ -56,6 +58,29 @@ public class AirspaceLayer{
         Airspace[] airspaces = GetVisibleAirspaces();
         drawAirspaces(airspaces);
         int i = 0;
+    }
+
+    @Override
+    public boolean onGesture(Gesture g, MotionEvent e) {
+        if (g instanceof Gesture.Tap) {
+            //if (contains(e.getX(), e.getY())) {
+
+            //Get surrounded airspaces..
+            GeoPoint p = mMap.viewport().fromScreenPoint(e.getX(), e.getY());
+            Log.i(TAG,"AirspaceLayer tap\n" + p);
+            Airspace[] airspaces = db.getAirpaces().getAirspacesSurroundedBy(p.getLatitude(), p.getLongitude());
+            for(Airspace a : airspaces)
+            {
+
+                Log.i(TAG, "Found Airspace: " + a.name + " Category: " + a.category + " Bottom: "
+                        + a.altLimit_bottom+a.altLimit_bottom_unit
+                        + " Top: " + a.altLimit_top + a.altLimit_top_unit);
+            }
+
+            return true;
+            //}
+        }
+        return false;
     }
 
     private Airspace[] GetVisibleAirspaces()
@@ -110,9 +135,9 @@ public class AirspaceLayer{
                 a.airspacePolygon1 = new PolygonDrawable(outerGeomety, polygonStyle);
                 a.airspacePolygon2 = new LineDrawable(GeometryHelpers.getGeoPoints(outerGeomety), lineStyle);
 
-                vectorLayer.add(a.airspacePolygon2);
+                add(a.airspacePolygon2);
 
-                vectorLayer.add(a.airspacePolygon1);
+                add(a.airspacePolygon1);
 
             }
             else
@@ -124,7 +149,7 @@ public class AirspaceLayer{
                         .fillAlpha(Color.aToFloat(a.category.getFillColor()))
                         .build();
                 a.airspacePolygon1 = new PolygonDrawable(outerGeomety, lineStyle);
-                vectorLayer.add(a.airspacePolygon1);
+                add(a.airspacePolygon1);
             }
 
         }
@@ -172,6 +197,6 @@ public class AirspaceLayer{
             }
         }
 
-        if (added) vectorLayer.update();
+        if (added) update();
     }
 }

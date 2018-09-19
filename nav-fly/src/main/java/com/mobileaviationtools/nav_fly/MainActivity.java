@@ -116,8 +116,9 @@ public class MainActivity extends AppCompatActivity {
         //getMBTilesMapPerm();
         //setupPathLayer();
         //setupVectorLayer();
-        testMarkerLayerGestures();
         setupAirspacesLayer();
+        testMarkerLayerGestures();
+
 
 //        android.view.MotionEvent e = android.view.MotionEvent.obtain(0,0, android.view.MotionEvent.ACTION_MOVE,0,0,0);
 //        mMap.input.fire(null, new AndroidMotionEvent().wrap(e));

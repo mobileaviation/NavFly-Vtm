@@ -43,4 +43,14 @@ public abstract class AirspacesDao {
             "OR (A.lat_bottom_right>=:min_lat AND A.lat_bottom_right<=:max_lat AND A.lot_bottom_right>=:min_lon AND A.lot_bottom_right<=:max_lon)) " +
             "AND country = :country")
     public abstract Airspace[] getAirspacesByPositionAndCountry(double min_lon, double max_lon, double min_lat, double max_lat, String country);
+
+//    SELECT * FROM tbl_Airspaces " +
+//            " WHERE #LAT#<lat_top_left " +
+//            "AND #LAT#>lat_bottom_right " +
+//            "AND #LON#>lon_top_left " +
+//            "AND #LON#<lot_bottom_right;";
+
+    @Query("SELECT * FROM  tbl_Airspaces A WHERE "
+            + "(:lat<A.lat_top_left AND :lat>A.lat_bottom_right AND :lon>A.lon_top_left AND :lon<A.lot_bottom_right)")
+    public abstract Airspace[] getAirspacesSurroundedBy(double lat, double lon);
 }

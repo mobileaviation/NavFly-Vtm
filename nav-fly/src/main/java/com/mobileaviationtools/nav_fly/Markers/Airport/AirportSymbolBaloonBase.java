@@ -35,7 +35,7 @@ public class AirportSymbolBaloonBase extends MarkerSymbol {
         p.setAntiAlias(true);
         p.setStrokeWidth(size/10);
         p.setStyle(Paint.Style.STROKE);
-        p.setColor(Color.argb(255,168,103,148));
+        p.setColor(Color.argb(255,0,136,186));
 
         baseCanvas.drawCircle(size/2,size/2,radius,p);
 
