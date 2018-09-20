@@ -102,11 +102,11 @@ public class AirspaceLayer extends VectorLayer {
                 TextureItem tex = getTextureItem(a.category);
 
                 Style lineStyle = Style.builder()
-                        //.stippleColor(a.category.getFillColor())
+                        .stippleColor(a.category.getOutlineColor())
                         .stipple(a.category.getOutlineWidth())
                         .stippleWidth(1)
                         .strokeWidth(a.category.getStrokeWidth())
-                        .strokeColor(a.category.getOutlineColor())
+                        .strokeColor(a.category.getStrokeColor())
                         .fixed(true)
                         .texture(tex)
                         .randomOffset(false)
@@ -150,12 +150,12 @@ public class AirspaceLayer extends VectorLayer {
         {
             case C: res = R.drawable.stroke8; break;
             case CTR: res = R.drawable.stroke8; break;
-            case P: res = R.drawable.spoke; break;
+            case P: res = R.drawable.spoke1; break;
             case D: res = R.drawable.stroke8; break;
-            case R: res = R.drawable.spoke; break;
-            case PROHIBITED: res = R.drawable.spoke; break;
-            case DANGER: res = R.drawable.spoke; break;
-            case RESTRICTED: res = R.drawable.spoke; break;
+            case R: res = R.drawable.spoke1; break;
+            case PROHIBITED: res = R.drawable.spoke1; break;
+            case DANGER: res = R.drawable.spoke1; break;
+            case RESTRICTED: res = R.drawable.spoke1; break;
         }
 
         if (res == 0) return null;
