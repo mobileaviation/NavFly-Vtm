@@ -22,6 +22,7 @@ import com.mobileaviationtools.airnavdata.Api.AirportsAPIDataSource;
 import com.mobileaviationtools.airnavdata.Api.DatabaseTest;
 import com.mobileaviationtools.airnavdata.Api.NavaidAPIDataSource;
 import com.mobileaviationtools.airnavdata.Api.RetrofitTest;
+import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
 import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
 import com.mobileaviationtools.airnavdata.Firebase.NavaidDataSource;
@@ -29,7 +30,9 @@ import com.mobileaviationtools.airnavdata.Models.Statistics;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
+import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
+import com.mobileaviationtools.nav_fly.Route.Route;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
@@ -37,6 +40,7 @@ import org.oscim.android.cache.TileCache;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Color;
+import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
 import org.oscim.event.Gesture;
@@ -92,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
 
     private DefaultMapScaleBar mapScaleBar;
 
+    private Route route;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
@@ -115,9 +121,9 @@ public class MainActivity extends AppCompatActivity {
         createLayers();
         //getMBTilesMapPerm();
         //setupPathLayer();
-        //setupVectorLayer();
         setupAirspacesLayer();
-        testMarkerLayerGestures();
+        addMarkerLayers();
+
 
 
 //        android.view.MotionEvent e = android.view.MotionEvent.obtain(0,0, android.view.MotionEvent.ACTION_MOVE,0,0,0);
@@ -136,9 +142,34 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void testMarkerLayerGestures() {
+    public void addMarkerLayers() {
         mAirportMarkersLayer = new AirportMarkersLayer(mMap, null, this);
+        mAirportMarkersLayer.SetOnAirportSelected(new AirportSelected() {
+            @Override
+            public void Selected(Airport airport, GeoPoint geoPoint) {
+                Log.i(TAG, "Airport selected: " + airport.ident);
+                if (route != null)
+                {
+                    if (route.SelectedStartAirport == null)
+                    {
+                        route.SelectedStartAirport = airport;
+                        Log.i(TAG, "Route Start Airport selected: " + airport.ident);
+                    }
+                    else
+                    {
+                        if (route.SelectedEndAirport == null)
+                        {
+                            route.SelectedEndAirport = airport;
+                            Log.i(TAG, "Route Start Airport selected: " + airport.ident);
+                            route.StartRoute();
+                            route.DrawRoute(mMap);
+                        }
+                    }
+                }
+            }
+        });
         mMap.layers().add(mAirportMarkersLayer);
+
         mNavaidsMarkersLayer = new NaviadMarkersLayer(mMap, null, this);
         mMap.layers().add(mNavaidsMarkersLayer);
     }
@@ -160,6 +191,15 @@ public class MainActivity extends AppCompatActivity {
             MainActivity.this.startActivity(dbDonwloadIntent);
 
         }
+        if (id == R.id.start_new_route_menuitem)
+        {
+            if (route != null)
+                route.ClearRoute(mMap);
+            else
+                route = new Route("Test Route", this);
+            Log.i(TAG, "Start new route");
+        }
+
 
         return true;
     }
@@ -183,42 +223,6 @@ public class MainActivity extends AppCompatActivity {
         mAirspaceLayer = new AirspaceLayer(mMap, this);
     }
 
-    void setupVectorLayer()
-    {
-        Style lineStyle = Style.builder()
-                .strokeColor(Color.BLUE)
-                .strokeWidth(5).build();
-
-        VectorLayer vectorLayer = new VectorLayer(mMap)
-        {
-            @Override
-            public boolean onGesture(Gesture g, MotionEvent e) {
-                if (g instanceof Gesture.Tap) {
-                    if (contains(e.getX(), e.getY())) {
-                        Toast.makeText(MainActivity.this, "PathLayer tap\n" + mMap.viewport().fromScreenPoint(e.getX(), e.getY()), Toast.LENGTH_SHORT).show();
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
-
-        double[] packedCoordinates = new double[4];
-        packedCoordinates[0] = 5.5272;
-        packedCoordinates[1] = 52.4603;
-        packedCoordinates[2] = 4.8336;
-        packedCoordinates[3] = 53.1153;
-        LineDrawable line = new LineDrawable(packedCoordinates, lineStyle);
-
-
-
-
-        mMap.layers().add(vectorLayer);
-        vectorLayer.add(line);
-        vectorLayer.update();
-
-    }
-
     void setupPathLayer()
     {
         Style lineStyle = Style.builder()
@@ -239,21 +243,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         mMap.layers().add(pathLayer);
-
-        drawlineLelystadTexel(pathLayer);
     }
 
-    void drawlineLelystadTexel(PathLayer layer)
-    {
-        double[] packedCoordinates = new double[4];
-        packedCoordinates[0] = 5.5272;
-        packedCoordinates[1] = 52.4603;
-        packedCoordinates[2] = 4.8336;
-        packedCoordinates[3] = 53.1153;
 
-
-        layer.setLineString(packedCoordinates);
-    }
 
     void getMBTilesMapPerm()
     {

@@ -48,13 +48,22 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     private List<CombinedMarkerItem>  all_items;
     private List<String> visibleTypes;
 
+    private AirportSelected airportSelected;
+    public void SetOnAirportSelected(AirportSelected airportSelected)
+    {
+        this.airportSelected = airportSelected;
+    }
     private OnItemGestureListener<MarkerItem> onItemGestureListener;
     private void setOnItemGestureListener()
     {
         onItemGestureListener = new OnItemGestureListener<MarkerItem>() {
             @Override
             public boolean onItemSingleTapUp(int index, MarkerItem item) {
-                Log.i(TAG,"Single Tab on : " + item.toString() + " : " + item.title );
+                if (item instanceof AirportMarkerItem)
+                {
+                    if (airportSelected != null) airportSelected.Selected(((AirportMarkerItem) item).getAirport(), item.geoPoint);
+                }
+
                 return false;
             }
 

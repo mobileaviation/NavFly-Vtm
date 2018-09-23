@@ -164,6 +164,8 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
         return this.mOnItemGestureListener.onItemLongPress(index, item);
     }
 
+
+
     private final ActiveItem mActiveItemLongPress = new ActiveItem() {
         @Override
         public boolean run(final int index) {
@@ -269,6 +271,8 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 
         if (g instanceof Gesture.LongPress)
             return activateSelectedItems(e, mActiveItemLongPress);
+
+        //if (g instanceof Gesture.)
 
         return false;
     }
