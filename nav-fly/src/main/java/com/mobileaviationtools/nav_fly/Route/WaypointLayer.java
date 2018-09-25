@@ -1,20 +1,18 @@
 package com.mobileaviationtools.nav_fly.Route;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.mobileaviationtools.airnavdata.AirnavDatabase;
-import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkerItem;
-import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
-
+import org.oscim.event.Gesture;
+import org.oscim.event.MotionEvent;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.map.Map;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class WaypointLayer extends ItemizedLayer {
+public class WaypointLayer extends ItemizedExtLayer {
     private final String TAG = "WaypointLayer";
     private Context context;
     private List<WaypointMarkerItem> all_items;
@@ -46,9 +44,23 @@ public class WaypointLayer extends ItemizedLayer {
             }
 
             @Override
-            public boolean onItemLongPress(int index, MarkerItem item) {
+            public boolean onItemLongPress(int index, MarkerItem item)
+            {
+                if (item instanceof WaypointMarkerItem)
+                {
+                    Log.i(TAG, "On MarkerLayer longpress: " + item.toString());
+                    return true;
+                }
                 return false;
             }
+
+//            @Override
+//            public boolean onPress(MotionEvent e)
+//            {
+//                //Log.i(TAG, "On MarkerLayer press: " + e.toString());
+//                //return false;
+//            }
+
         };
 
         this.setOnItemGestureListener(onItemGestureListener);
