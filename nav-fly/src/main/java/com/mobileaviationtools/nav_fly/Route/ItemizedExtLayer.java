@@ -23,6 +23,8 @@ package com.mobileaviationtools.nav_fly.Route;
 
 import android.util.Log;
 
+import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
+
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.core.Box;
 import org.oscim.core.GeoPoint;
@@ -58,6 +60,7 @@ public class ItemizedExtLayer<Item extends MarkerInterface> extends MarkerLayer<
     protected final List<Item> mItemList;
     protected final Point mTmpPoint = new Point();
     protected OnItemGestureListener<Item> mOnItemGestureListener;
+    protected MarkerDragEvent mMarkerDragEvent;
     protected int mDrawnItemsLimit = Integer.MAX_VALUE;
     private  MapPosition mMapPosition;
     private WaypointMarkerItem mDragItem;
@@ -99,6 +102,10 @@ public class ItemizedExtLayer<Item extends MarkerInterface> extends MarkerLayer<
 
     public void setOnItemGestureListener(OnItemGestureListener<Item> listener) {
         mOnItemGestureListener = listener;
+    }
+
+    public void setMarkerDragEvent (MarkerDragEvent markerDragEvent){
+        mMarkerDragEvent = markerDragEvent;
     }
 
     @Override
@@ -187,6 +194,7 @@ public class ItemizedExtLayer<Item extends MarkerInterface> extends MarkerLayer<
             if (item instanceof WaypointMarkerItem) {
                 mMapPosition = mMap.getMapPosition();
                 mDragItem = (WaypointMarkerItem)item;
+                if (mMarkerDragEvent != null) mMarkerDragEvent.StartMarkerDrag(mDragItem);
                 return true;
             }
             else
@@ -288,6 +296,7 @@ public class ItemizedExtLayer<Item extends MarkerInterface> extends MarkerLayer<
         if ((motionEvent.getAction() == MotionEvent.ACTION_CANCEL || motionEvent.getAction() == MotionEvent.ACTION_UP)
                 && mDragItem != null)
         {
+            if (mMarkerDragEvent != null) mMarkerDragEvent.EndMarkerDrag(mDragItem, mDragItem.getPoint());
             mMapPosition = null;
             mDragItem = null;
         }
@@ -302,13 +311,15 @@ public class ItemizedExtLayer<Item extends MarkerInterface> extends MarkerLayer<
             Point point = new Point();
             mMap.viewport().toScreenPoint(mDragItem.getPoint(), point);
             point.x += mMap.getWidth()/2;
-            point.y += mMap.getHeight()/2;
+            point.y += (mMap.getHeight()/2);
             float mx = motionEvent.getX() - dragLastX;
-            float my = motionEvent.getY() - dragLastY;
+            float my = motionEvent.getY() - dragLastY - (75 * CanvasAdapter.getScale());
             mDragItem.geoPoint = mMap.viewport().fromScreenPoint((float)point.getX() + mx, (float)point.getY() + my);
             dragLastX += mx;
             dragLastY += my;
-            Log.i(TAG, " Dragging Marker: X: " + ((float)point.getX() + mx) + " Y: " + ((float)point.getY() + my));
+            //Log.i(TAG, " Dragging Marker: X: " + ((float)point.getX() + mx) + " Y: " + ((float)point.getY() + my));
+
+            if (mMarkerDragEvent != null) mMarkerDragEvent.MarkerDragging(mDragItem, mDragItem.getPoint());
             populate();
 
         }
@@ -319,8 +330,8 @@ public class ItemizedExtLayer<Item extends MarkerInterface> extends MarkerLayer<
 
     @Override
     public void onMapEvent(Event e, MapPosition mapPosition) {
+        // Fix the map in position when a marker is dragged
         if (e == ANIM_END || e == POSITION_EVENT || e == MOVE_EVENT)
-            //mMap.setMapPosition(mapPosition);
         {
             if (mMapPosition != null)
                 mMap.setMapPosition(mMapPosition);

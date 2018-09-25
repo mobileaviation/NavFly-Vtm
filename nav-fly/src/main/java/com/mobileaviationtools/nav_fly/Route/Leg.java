@@ -12,12 +12,10 @@ public class Leg {
         endWaypoint = new Waypoint(end);
     }
 
-    public Leg(Airport start, Airport end)
+    public Leg(Waypoint start, Waypoint end)
     {
-        startWaypoint = new Waypoint(new GeoPoint(start.latitude_deg, start.longitude_deg));
-        startWaypoint.name = start.name;
-        endWaypoint = new Waypoint(new GeoPoint(end.latitude_deg, end.longitude_deg));
-        endWaypoint.name = end.name;
+        startWaypoint = start;
+        endWaypoint = end;
     }
 
     public Waypoint startWaypoint;

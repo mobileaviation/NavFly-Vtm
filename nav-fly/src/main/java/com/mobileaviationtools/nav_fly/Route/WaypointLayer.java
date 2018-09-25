@@ -15,7 +15,7 @@ import java.util.List;
 public class WaypointLayer extends ItemizedExtLayer {
     private final String TAG = "WaypointLayer";
     private Context context;
-    private List<WaypointMarkerItem> all_items;
+    //private List<WaypointMarkerItem> all_items;
 
     private WaypointLayer(Map map, MarkerSymbol defaultMarker) {
         super(map, defaultMarker);
@@ -24,7 +24,7 @@ public class WaypointLayer extends ItemizedExtLayer {
     {
         this(map, defaultMarker);
         this.context = context;
-        all_items = new ArrayList<>();
+        //all_items = new ArrayList<>();
         setOnItemGestureListener();
 
     }
@@ -66,14 +66,18 @@ public class WaypointLayer extends ItemizedExtLayer {
         this.setOnItemGestureListener(onItemGestureListener);
     }
 
-    public void PlaceMarker(Waypoint waypoint)
+    public WaypointMarkerItem PlaceMarker(Waypoint waypoint)
     {
-        WaypointMarkerItem item = new WaypointMarkerItem(waypoint, context);
-        if (!all_items.contains(item)) {
+        if (waypoint.marker == null) {
+            WaypointMarkerItem item = new WaypointMarkerItem(waypoint, context);
             item.InitMarker();
             this.addItem(item);
-            this.all_items.add(item);
+            waypoint.marker = item;
+            //this.all_items.add(item);
+            return item;
         }
+
+        return null;
     }
 }
 

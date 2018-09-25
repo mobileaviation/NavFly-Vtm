@@ -2,24 +2,24 @@ package com.mobileaviationtools.nav_fly.Route;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
-
 import com.mobileaviationtools.airnavdata.Entities.Airport;
-import com.mobileaviationtools.nav_fly.MainActivity;
-
+import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.event.Gesture;
 import org.oscim.event.MotionEvent;
+import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.vector.PathLayer;
 import org.oscim.map.Map;
 
 import java.util.ArrayList;
 
-public class Route extends ArrayList<Leg> {
+public class Route extends ArrayList<Waypoint> {
     public Route(String name, Context context)
     {
         this.name = name;
+        this.context = context;
+        legs = new ArrayList<>();
     }
 
     private String TAG = "Route";
@@ -29,15 +29,26 @@ public class Route extends ArrayList<Leg> {
     public Airport SelectedStartAirport;
     public Airport SelectedEndAirport;
 
+    private ArrayList<Leg> legs;
+
     public void StartRoute()
     {
-        Leg leg = new Leg(SelectedStartAirport, SelectedEndAirport);
-        this.add(leg);
+        Waypoint startWaypoint = Waypoint.CreateWaypoint(SelectedStartAirport);
+        this.add(startWaypoint);
+
+        Waypoint endWaypoint = Waypoint.CreateWaypoint(SelectedEndAirport);
+        this.add(endWaypoint);
+
+        Leg leg = new Leg(startWaypoint, endWaypoint);
+        legs.add(leg);
     }
 
     private PathLayer routePathLayer;
     private WaypointLayer waypointLayer;
     private Map mMap;
+    private MarkerDragEvent onWaypointDrag;
+
+
     public void DrawRoute(Map map)
     {
         mMap = map;
@@ -47,13 +58,11 @@ public class Route extends ArrayList<Leg> {
                 createNewMarkerLayer(map);
             }
             routePathLayer.clearPath();
-            for (Leg l : this)
+            for (Waypoint w : this)
             {
-                routePathLayer.addPoint(l.startWaypoint.point);
-                waypointLayer.PlaceMarker(l.startWaypoint);
+                routePathLayer.addPoint(w.point);
+                waypointLayer.PlaceMarker(w);
             }
-            routePathLayer.addPoint(this.get(this.size()-1).endWaypoint.point);
-            waypointLayer.PlaceMarker(this.get(this.size()-1).endWaypoint);
             routePathLayer.update();
         }
     }
@@ -62,7 +71,35 @@ public class Route extends ArrayList<Leg> {
     {
         waypointLayer = new WaypointLayer(map, null, context);
         map.layers().add(waypointLayer);
+        setupWaypointDragging();
+        waypointLayer.setMarkerDragEvent(onWaypointDrag);
     }
+
+    private void setupWaypointDragging()
+    {
+        onWaypointDrag = new MarkerDragEvent() {
+            @Override
+            public void StartMarkerDrag(MarkerItem marker) {
+
+            }
+
+            @Override
+            public void MarkerDragging(MarkerItem marker, GeoPoint newLocation) {
+
+            }
+
+            @Override
+            public void EndMarkerDrag(MarkerItem markerItem, GeoPoint newLocation) {
+                if (markerItem instanceof WaypointMarkerItem)
+                {
+                    WaypointMarkerItem item = (WaypointMarkerItem)markerItem;
+                    item.UpdateWaypointLocation(newLocation);
+                    DrawRoute(mMap);
+                }
+            }
+        };
+    }
+
 
     private void createNewPathLayer(Map map)
     {
@@ -86,8 +123,13 @@ public class Route extends ArrayList<Leg> {
     {
         if (routePathLayer != null)
             routePathLayer.clearPath();
+        if (waypointLayer != null) {
+            waypointLayer.mItemList.clear();
+            waypointLayer.populate();
+        }
         SelectedStartAirport = null;
         SelectedEndAirport = null;
+        legs.clear();
         this.clear();
     }
 }

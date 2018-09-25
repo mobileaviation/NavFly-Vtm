@@ -18,8 +18,6 @@ public class WaypointMarkerItem extends MarkerItem {
 
     public WaypointMarkerItem(Waypoint waypoint, Context context) {
         this(waypoint.name, waypoint.name, waypoint.point);
-        Coordinate coordinate = new Coordinate(waypoint.point.getLongitude(), waypoint.point.getLatitude());
-        point = new GeometryFactory().createPoint(coordinate);
         this.waypoint = waypoint;
         this.context = context;
     }
@@ -32,5 +30,9 @@ public class WaypointMarkerItem extends MarkerItem {
 
     private Waypoint waypoint;
     private Context context;
-    private Point point;
+
+    public void UpdateWaypointLocation(GeoPoint location)
+    {
+        waypoint.point = location;
+    }
 }
