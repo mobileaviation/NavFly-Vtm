@@ -4,6 +4,10 @@ import android.content.Context;
 import android.util.Log;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.event.Gesture;
@@ -39,8 +43,19 @@ public class Route extends ArrayList<Waypoint> {
         Waypoint endWaypoint = Waypoint.CreateWaypoint(SelectedEndAirport);
         this.add(endWaypoint);
 
-        Leg leg = new Leg(startWaypoint, endWaypoint);
-        legs.add(leg);
+        createLegs();
+    }
+
+    public void createLegs()
+    {
+        legs.clear();
+        for (int i = 1; i<this.size(); i++)
+        {
+            Waypoint start = get(i-1);
+            Waypoint end = get(i);
+            Leg leg = new Leg(start, end);
+            legs.add(leg);
+        }
     }
 
     private PathLayer routePathLayer;
@@ -109,6 +124,17 @@ public class Route extends ArrayList<Waypoint> {
                 if (g instanceof Gesture.Tap) {
                     if (contains(e.getX(), e.getY())) {
                         Log.i(TAG, "Tapped on route, at: " + mMap.viewport().fromScreenPoint(e.getX(), e.getY()));
+                        GeoPoint point = mMap.viewport().fromScreenPoint(e.getX(), e.getY());
+
+                        Leg selectedLeg = findLeg(point);
+                        if (selectedLeg != null)
+                        {
+                            InsertnewWaypoint(point, selectedLeg);
+                            createLegs();
+                            clearPathLayer();
+                            DrawRoute(mMap);
+                        }
+
                         return true;
                     }
                 }
@@ -119,14 +145,47 @@ public class Route extends ArrayList<Waypoint> {
         map.layers().add(routePathLayer);
     }
 
-    public void ClearRoute(Map map)
+    private void InsertnewWaypoint(GeoPoint point, Leg selectedLeg)
     {
+        Waypoint newWaypoint = new Waypoint(point);
+        newWaypoint.name = "LON"+point.longitudeE6 + " LAT"+ point.latitudeE6;
+        Integer index = indexOf(selectedLeg.endWaypoint);
+        Route.this.add(index, newWaypoint);
+    }
+
+    private Leg findLeg(GeoPoint point)
+    {
+        Leg return_leg = null;
+        for (Leg leg: legs)
+        {
+            GeometryFactory geometryFactory = new GeometryFactory();
+            Geometry leg_line = geometryFactory.createLineString(leg.getLegCoordinates());
+            Geometry buffer = leg_line.buffer(0.01);
+            Geometry gpoint = geometryFactory.createPoint(new Coordinate(point.getLongitude(), point.getLatitude()));
+            if (buffer.contains(gpoint))
+            {
+                return_leg = leg;
+            }
+        }
+        return return_leg;
+    }
+
+    private void clearPathLayer() {
         if (routePathLayer != null)
             routePathLayer.clearPath();
+    }
+
+    private void clearMarkerLayer(){
         if (waypointLayer != null) {
             waypointLayer.mItemList.clear();
             waypointLayer.populate();
         }
+    }
+
+    public void ClearRoute(Map map)
+    {
+        clearPathLayer();
+        clearMarkerLayer();
         SelectedStartAirport = null;
         SelectedEndAirport = null;
         legs.clear();
