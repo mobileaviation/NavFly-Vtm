@@ -35,6 +35,12 @@ public class Route extends ArrayList<Waypoint> {
 
     private ArrayList<Leg> legs;
 
+    private RouteEvents routeEvents;
+
+    public void setRouteEvents(RouteEvents routeEvents) {
+        this.routeEvents = routeEvents;
+    }
+
     public void StartRoute()
     {
         Waypoint startWaypoint = Waypoint.CreateWaypoint(SelectedStartAirport);
@@ -44,6 +50,8 @@ public class Route extends ArrayList<Waypoint> {
         this.add(endWaypoint);
 
         createLegs();
+
+        if (routeEvents != null) routeEvents.NewRouteCreated(this);
     }
 
     public void createLegs()
@@ -129,10 +137,11 @@ public class Route extends ArrayList<Waypoint> {
                         Leg selectedLeg = findLeg(point);
                         if (selectedLeg != null)
                         {
-                            InsertnewWaypoint(point, selectedLeg);
+                            Waypoint newWaypoint = InsertnewWaypoint(point, selectedLeg);
                             createLegs();
                             clearPathLayer();
                             DrawRoute(mMap);
+                            if (routeEvents != null) routeEvents.NewWaypointInserted(Route.this, newWaypoint);
                         }
 
                         return true;
@@ -145,12 +154,13 @@ public class Route extends ArrayList<Waypoint> {
         map.layers().add(routePathLayer);
     }
 
-    private void InsertnewWaypoint(GeoPoint point, Leg selectedLeg)
+    private Waypoint InsertnewWaypoint(GeoPoint point, Leg selectedLeg)
     {
         Waypoint newWaypoint = new Waypoint(point);
         newWaypoint.name = "LON"+point.longitudeE6 + " LAT"+ point.latitudeE6;
         Integer index = indexOf(selectedLeg.endWaypoint);
         Route.this.add(index, newWaypoint);
+        return  newWaypoint;
     }
 
     private Leg findLeg(GeoPoint point)

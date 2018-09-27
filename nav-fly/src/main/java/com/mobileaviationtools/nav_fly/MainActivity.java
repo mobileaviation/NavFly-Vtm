@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -33,6 +34,9 @@ import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
 import com.mobileaviationtools.nav_fly.Route.Route;
+import com.mobileaviationtools.nav_fly.Route.RouteEvents;
+import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
+import com.mobileaviationtools.nav_fly.Route.Waypoint;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
@@ -200,8 +204,26 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG, "Start new route");
         }
 
+        setupRouteEvents(route);
 
         return true;
+    }
+
+    public void setupRouteEvents(Route route)
+    {
+        route.setRouteEvents(new RouteEvents() {
+            @Override
+            public void NewWaypointInserted(Route route, Waypoint newWaypoint) {
+                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+                routeListFragment.InvalidateList();
+            }
+
+            @Override
+            public void NewRouteCreated(Route route) {
+                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+                routeListFragment.SetRoute(route);
+            }
+        });
     }
 
     @Override
