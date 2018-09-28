@@ -5,9 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkerItem;
 import com.mobileaviationtools.nav_fly.R;
+
+import org.oscim.android.Utils.StringFormatter;
 
 public class RouteItemAdapter extends BaseAdapter {
     private Route route;
@@ -41,10 +46,20 @@ public class RouteItemAdapter extends BaseAdapter {
         View rowView = inflater.inflate(R.layout.route_list_item, viewGroup, false);
 
         TextView waypointNameTextView = (TextView) rowView.findViewById(R.id.waypointNameText);
-        TextView legNameTextView = (TextView) rowView.findViewById(R.id.legNameText);
+        TextView waypointLatText = (TextView) rowView.findViewById(R.id.waypointLatText);
+        TextView waypointLonText = (TextView) rowView.findViewById(R.id.waypointLonText);
 
         Waypoint waypoint = route.get(i);
         waypointNameTextView.setText(waypoint.name);
+
+        waypointLatText.setText(StringFormatter.convertLatitude(waypoint.point.getLatitude()));
+        waypointLonText.setText(StringFormatter.convertLongitude(waypoint.point.getLongitude()));
+
+        ImageView icon = (ImageView) rowView.findViewById(R.id.waypointIconImage);
+        if (waypoint.type == WaypointType.airport) {
+            Airport a = (Airport)waypoint.ref;
+            icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
+        }
 
         return rowView;
     }

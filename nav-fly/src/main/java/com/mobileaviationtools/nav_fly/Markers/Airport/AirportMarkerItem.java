@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly.Markers.Airport;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import com.mobileaviationtools.airnavdata.Classes.AirportType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -8,6 +9,7 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.oscim.android.canvas.AndroidBitmap;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.MarkerItem;
@@ -36,19 +38,23 @@ public class AirportMarkerItem extends MarkerItem{
 
     public void InitMarker()
     {
-        MarkerSymbol symbol = null;
-        switch (airport.type){
-            case small_airport: { symbol = AirportSymbolSmall.GetAirportSymbol(airport, this.context);  break;}
-            case medium_airport: { symbol = AirportSymbolMedium.GetAirportSymbol(airport, this.context); break;}
-            case large_airport: { symbol = AirportSymbolLarge.GetAirportSymbol(airport, this.context); break;}
-            case seaplane_base: { symbol = AirportSymbolSeaBase.GetAirportSymbol(airport, this.context); break;}
-            case heliport: { symbol = AirportSymbolHeliport.GetAirportSymbol(airport, this.context); break;}
-            case balloonport: { symbol = AirportSymbolBaloonBase.GetAirportSymbol(airport, this.context); break;}
-            case closed: { symbol = AirportSymbolClosed.GetAirportSymbol(airport, this.context); break;}
-        }
-
-
+        MarkerSymbol symbol = new MarkerSymbol(new AndroidBitmap(GetMarkerBitmap(airport)), MarkerSymbol.HotspotPlace.CENTER, false);
         this.setMarker(symbol);
+    }
+
+    public static Bitmap GetMarkerBitmap(Airport airport)
+    {
+        Bitmap icon = null;
+        switch (airport.type){
+            case small_airport: { icon = AirportSymbolSmall.DrawAirportIcon(airport);  break;}
+            case medium_airport: { icon = AirportSymbolMedium.DrawAirportIcon(airport); break;}
+            case large_airport: { icon = AirportSymbolLarge.DrawAirportIcon(airport); break;}
+            case seaplane_base: { icon = AirportSymbolSeaBase.DrawAirportIcon(airport); break;}
+            case heliport: { icon = AirportSymbolHeliport.DrawAirportIcon(airport); break;}
+            case balloonport: { icon = AirportSymbolBaloonBase.DrawAirportIcon(airport); break;}
+            case closed: { icon = AirportSymbolClosed.DrawAirportIcon(airport); break;}
+        }
+        return icon;
     }
 
     @Override

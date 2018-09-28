@@ -19,10 +19,10 @@ public class NavaidSymbolVOR extends MarkerSymbol {
 
     public static NavaidSymbolVOR GetVORSymbol(Navaid navaid, Context context)
     {
-        return new NavaidSymbolVOR(new AndroidBitmap(draw(navaid)), HotspotPlace.CENTER, true);
+        return new NavaidSymbolVOR(new AndroidBitmap(DrawNavaidsIcon(navaid)), HotspotPlace.CENTER, true);
     }
 
-    private static android.graphics.Bitmap draw(Navaid navaid)
+    public static android.graphics.Bitmap DrawNavaidsIcon(Navaid navaid)
     {
         int size = 30;
 

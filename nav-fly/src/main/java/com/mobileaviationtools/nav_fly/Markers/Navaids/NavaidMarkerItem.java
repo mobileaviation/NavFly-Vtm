@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly.Markers.Navaids;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import com.mobileaviationtools.airnavdata.Classes.NavaidType;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
@@ -8,6 +9,7 @@ import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.oscim.android.canvas.AndroidBitmap;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.MarkerItem;
@@ -32,20 +34,25 @@ public class NavaidMarkerItem extends MarkerItem {
     }
 
     public void InitMarker() {
-        MarkerSymbol symbol = null;
+        MarkerSymbol symbol = new MarkerSymbol(new AndroidBitmap(GetMarkerBitmap(navaid)), MarkerSymbol.HotspotPlace.CENTER, true);
+        this.setMarker(symbol);
+    }
+
+    public static Bitmap GetMarkerBitmap(Navaid navaid) {
+        Bitmap icon = null;
 
         switch (navaid.type)
         {
-            case DME: symbol = NavaidSymbolDME.GetDMESymbol(navaid, context); break;
-            case NDB: symbol = NavaidSymbolNDB.GetNDBSymbol(navaid, context); break;
-            case VOR: symbol = NavaidSymbolVOR.GetVORSymbol(navaid, context); break;
-            case TACAN: symbol = NavaidSymbolTACAN.GetTACANSymbol(navaid, context); break;
-            case VORTAC: symbol = NavaidSymbolVORTAC.GetVORTACSymbol(navaid, context); break;
-            case NDB_DME: symbol = NavaidSymbolNDBDME.GetNDBDMESymbol(navaid, context); break;
-            case VOR_DME: symbol = NavaidSymbolVORDME.GetVORDMESymbol(navaid, context); break;
+            case DME: icon = NavaidSymbolDME.DrawNavaidsIcon(navaid); break;
+            case NDB: icon = NavaidSymbolNDB.DrawNavaidsIcon(navaid); break;
+            case VOR: icon = NavaidSymbolVOR.DrawNavaidsIcon(navaid); break;
+            case TACAN: icon = NavaidSymbolTACAN.DrawNavaidsIcon(navaid); break;
+            case VORTAC: icon = NavaidSymbolVORTAC.DrawNavaidsIcon(navaid); break;
+            case NDB_DME: icon = NavaidSymbolNDBDME.DrawNavaidsIcon(navaid); break;
+            case VOR_DME: icon = NavaidSymbolVORDME.DrawNavaidsIcon(navaid); break;
         }
 
-        this.setMarker(symbol);
+        return icon;
     }
 
     @Override

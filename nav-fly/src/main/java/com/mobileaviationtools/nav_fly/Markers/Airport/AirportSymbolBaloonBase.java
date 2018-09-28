@@ -19,10 +19,10 @@ public class AirportSymbolBaloonBase extends MarkerSymbol {
 
     public static AirportSymbolBaloonBase GetAirportSymbol(Airport airport, Context context)
     {
-        return new AirportSymbolBaloonBase(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER);
+        return new AirportSymbolBaloonBase(new AndroidBitmap(DrawAirportIcon(airport)), HotspotPlace.CENTER);
     }
 
-    private static android.graphics.Bitmap draw(Airport airport)
+    public static android.graphics.Bitmap DrawAirportIcon(Airport airport)
     {
         int size = 30;
         int radius = 12;

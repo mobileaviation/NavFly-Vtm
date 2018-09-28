@@ -19,10 +19,10 @@ public class NavaidSymbolVORTAC extends MarkerSymbol {
 
     public static NavaidSymbolVORTAC GetVORTACSymbol(Navaid navaid, Context context)
     {
-        return new NavaidSymbolVORTAC(new AndroidBitmap(draw(navaid)), HotspotPlace.CENTER, false);
+        return new NavaidSymbolVORTAC(new AndroidBitmap(DrawNavaidsIcon(navaid)), HotspotPlace.CENTER, false);
     }
 
-    private static android.graphics.Bitmap draw(Navaid navaid)
+    public static android.graphics.Bitmap DrawNavaidsIcon(Navaid navaid)
     {
         int size = 33;
         int radius = 12;

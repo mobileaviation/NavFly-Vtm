@@ -22,10 +22,10 @@ public class AirportSymbolHeliport extends MarkerSymbol {
 
     public static AirportSymbolHeliport GetAirportSymbol(Airport airport, Context context)
     {
-        return new AirportSymbolHeliport(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER);
+        return new AirportSymbolHeliport(new AndroidBitmap(DrawAirportIcon(airport)), HotspotPlace.CENTER);
     }
 
-    private static android.graphics.Bitmap draw(Airport airport)
+    public static android.graphics.Bitmap DrawAirportIcon(Airport airport)
     {
         int size = 30;
         int radius = 13;

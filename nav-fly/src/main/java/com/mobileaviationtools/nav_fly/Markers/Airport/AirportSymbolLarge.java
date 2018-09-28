@@ -24,10 +24,10 @@ public class AirportSymbolLarge extends MarkerSymbol {
 
     public static AirportSymbolLarge GetAirportSymbol(Airport airport, Context context)
     {
-        return new AirportSymbolLarge(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER, false);
+        return new AirportSymbolLarge(new AndroidBitmap(DrawAirportIcon(airport)), HotspotPlace.CENTER, false);
     }
 
-    private static android.graphics.Bitmap draw(Airport airport)
+    public static android.graphics.Bitmap DrawAirportIcon(Airport airport)
     {
         RunwayHelpers runwayHelpers = new RunwayHelpers(airport);
 

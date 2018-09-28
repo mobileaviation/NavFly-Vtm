@@ -19,10 +19,10 @@ public class AirportSymbolSeaBase extends MarkerSymbol {
 
     public static AirportSymbolSeaBase GetAirportSymbol(Airport airport, Context context)
     {
-        return new AirportSymbolSeaBase(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER);
+        return new AirportSymbolSeaBase(new AndroidBitmap(DrawAirportIcon(airport)), HotspotPlace.CENTER);
     }
 
-    private static android.graphics.Bitmap draw(Airport airport)
+    public static android.graphics.Bitmap DrawAirportIcon(Airport airport)
     {
         int size = 30 * java.lang.Math.round(CanvasAdapter.getScale());
         int radius = 12 * java.lang.Math.round(CanvasAdapter.getScale());

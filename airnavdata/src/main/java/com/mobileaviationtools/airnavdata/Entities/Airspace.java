@@ -31,6 +31,13 @@ public class Airspace {
         visible = false;
     }
 
+    @Ignore
+    public List<ATCStation> atcStations;
+    @Ignore
+    public List<ActiveDay> activeDays;
+    @Ignore
+    public List<ActivePeriod> activePeriods;
+
     @PrimaryKey
     public long id;
     public String name;
@@ -39,6 +46,7 @@ public class Airspace {
     public AirspaceCategory category;
     public long airspace_id;
     public String country;
+    public String transponder_mandatory_code;
     public long altLimit_top;
     @TypeConverters({AltitudeUnitConverter.class})
     public AltitudeUnit altLimit_top_unit;

@@ -199,12 +199,14 @@ public class MainActivity extends AppCompatActivity {
         {
             if (route != null)
                 route.ClearRoute(mMap);
-            else
+            else {
                 route = new Route("Test Route", this);
+                setupRouteEvents(route);
+            }
             Log.i(TAG, "Start new route");
         }
 
-        setupRouteEvents(route);
+
 
         return true;
     }

@@ -12,6 +12,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.mobileaviationtools.airnavdata.Classes.AirportTypeConverter;
+import com.mobileaviationtools.airnavdata.DAOs.ATCStationsDao;
+import com.mobileaviationtools.airnavdata.DAOs.ActiveDaysDao;
+import com.mobileaviationtools.airnavdata.DAOs.ActivePeriodsDao;
 import com.mobileaviationtools.airnavdata.DAOs.AirportsDao;
 import com.mobileaviationtools.airnavdata.DAOs.AirspacesDao;
 import com.mobileaviationtools.airnavdata.DAOs.CountriesDao;
@@ -22,6 +25,9 @@ import com.mobileaviationtools.airnavdata.DAOs.MBTilesDao;
 import com.mobileaviationtools.airnavdata.DAOs.NavaidsDao;
 import com.mobileaviationtools.airnavdata.DAOs.RegionsDao;
 import com.mobileaviationtools.airnavdata.DAOs.RunwaysDao;
+import com.mobileaviationtools.airnavdata.Entities.ATCStation;
+import com.mobileaviationtools.airnavdata.Entities.ActiveDay;
+import com.mobileaviationtools.airnavdata.Entities.ActivePeriod;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Country;
@@ -36,7 +42,8 @@ import com.mobileaviationtools.airnavdata.Entities.Runway;
 import java.io.FileReader;
 
 @Database(entities = {Airport.class, Runway.class, Frequency.class, Navaid.class,
-        Country.class, Region.class, Fix.class, Fir.class, Airspace.class, MBTile.class},
+        Country.class, Region.class, Fix.class, Fir.class, Airspace.class, MBTile.class,
+        ActivePeriod.class, ActiveDay.class, ATCStation.class},
         version = 1)
 public abstract class AirnavDatabase extends RoomDatabase {
     private static  final String DB_NAME = "room_airnav.db";
@@ -68,5 +75,8 @@ public abstract class AirnavDatabase extends RoomDatabase {
     public abstract FixesDao getFixes();
     public abstract AirspacesDao getAirpaces();
     public abstract MBTilesDao getTiles();
+    public abstract ATCStationsDao getAtcStations();
+    public abstract ActiveDaysDao getActiveDays();
+    public abstract ActivePeriodsDao getActivePeriods();
 
 }

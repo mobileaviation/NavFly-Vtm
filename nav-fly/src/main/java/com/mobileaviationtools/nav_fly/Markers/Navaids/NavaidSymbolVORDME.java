@@ -19,10 +19,10 @@ public class NavaidSymbolVORDME extends MarkerSymbol {
 
     public static NavaidSymbolVORDME GetVORDMESymbol(Navaid navaid, Context context)
     {
-        return new NavaidSymbolVORDME(new AndroidBitmap(draw(navaid)), HotspotPlace.CENTER, false);
+        return new NavaidSymbolVORDME(new AndroidBitmap(DrawNavaidsIcon(navaid)), HotspotPlace.CENTER, false);
     }
 
-    private static android.graphics.Bitmap draw(Navaid navaid)
+    public static android.graphics.Bitmap DrawNavaidsIcon(Navaid navaid)
     {
         int size = 30;
 

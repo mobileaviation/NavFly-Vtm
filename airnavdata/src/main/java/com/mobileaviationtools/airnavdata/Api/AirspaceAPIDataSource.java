@@ -6,8 +6,12 @@ import android.util.Log;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
 import com.mobileaviationtools.airnavdata.Classes.TableType;
+import com.mobileaviationtools.airnavdata.Entities.ATCStation;
+import com.mobileaviationtools.airnavdata.Entities.ActiveDay;
+import com.mobileaviationtools.airnavdata.Entities.ActivePeriod;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -46,6 +50,9 @@ public class AirspaceAPIDataSource {
     {
         @GET("v1/airnavdb/airspaces/limit/{start}/{count}")
         Call<List<Airspace>> getAirspace(@Path("start") int start, @Path("count") int count);
+
+        @GET("v1/airnavdb/airspaces/country/{country}")
+        Call<List<Airspace>> getAirspacesByCountry(@Path("country") String country);
     }
 
     public void loadAirspaces(int airspaces_count) {
@@ -62,6 +69,7 @@ public class AirspaceAPIDataSource {
     {
         AirspacesService service = retrofit.create(AirspacesService.class);
         Call<List<Airspace>> airspacesCall = service.getAirspace(position, 500);
+        //Call<List<Airspace>> airspacesCall = service.getAirspacesByCountry("Netherlands");
         airspacesCall.enqueue(new Callback<List<Airspace>>() {
             @Override
             public void onResponse(Call<List<Airspace>> call, Response<List<Airspace>> response) {
@@ -96,7 +104,21 @@ public class AirspaceAPIDataSource {
         for (Airspace a: airspaces)
         {
             a.processGeometry();
+
             db.getAirpaces().insertAirspace(a);
+
+            for (ActiveDay d: a.activeDays) d.airspace_id = a.id;
+            if (a.activeDays.size()>0) db.getActiveDays().insertActiveDays(a.activeDays);
+
+            for(ActivePeriod p : a.activePeriods) {
+                p.setDates();
+                p.airspace_id = a.id;
+            }
+            if (a.activePeriods.size()>0) db.getActivePeriods().insertActivePeriods(a.activePeriods);
+
+            for (ATCStation atc: a.atcStations) atc.airspace_id = a.id;
+            if (a.atcStations.size()>0) db.getAtcStations().insertATCStations(a.atcStations);
+
         }
 
         position = position + airspaces.size();

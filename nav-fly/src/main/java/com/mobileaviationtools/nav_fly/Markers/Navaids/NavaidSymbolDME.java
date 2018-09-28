@@ -19,10 +19,10 @@ public class NavaidSymbolDME extends MarkerSymbol {
 
     public static NavaidSymbolDME GetDMESymbol(Navaid navaid, Context context)
     {
-        return new NavaidSymbolDME(new AndroidBitmap(draw(navaid)), HotspotPlace.CENTER, false);
+        return new NavaidSymbolDME(new AndroidBitmap(DrawNavaidsIcon(navaid)), HotspotPlace.CENTER, false);
     }
 
-    private static android.graphics.Bitmap draw(Navaid navaid)
+    public static android.graphics.Bitmap DrawNavaidsIcon(Navaid navaid)
     {
         int size = 30;
 

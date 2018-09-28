@@ -21,10 +21,10 @@ public class AirportSymbolMedium extends MarkerSymbol {
 
     public static AirportSymbolMedium GetAirportSymbol(Airport airport, Context context)
     {
-        return new AirportSymbolMedium(new AndroidBitmap(draw(airport)), HotspotPlace.CENTER, false);
+        return new AirportSymbolMedium(new AndroidBitmap(DrawAirportIcon(airport)), HotspotPlace.CENTER, false);
     }
 
-    private static android.graphics.Bitmap draw(Airport airport)
+    public static android.graphics.Bitmap DrawAirportIcon(Airport airport)
     {
         RunwayHelpers runwayHelpers = new RunwayHelpers(airport);
 
