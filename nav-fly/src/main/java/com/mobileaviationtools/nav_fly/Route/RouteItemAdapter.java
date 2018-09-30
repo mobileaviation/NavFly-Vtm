@@ -76,7 +76,9 @@ public class RouteItemAdapter extends BaseAdapter {
             legLayout.setVisibility(View.VISIBLE);
             Leg l = route.getLeg(i);
             Long heading = Math.round(l.getBearing());
-            legHeadingText.setText(heading.toString());
+            legHeadingText.setText(heading.toString()+ "º");
+            ImageView compasImage = (ImageView) rowView.findViewById(R.id.compassImage);
+            compasImage.setRotation((float)l.getBearing());
         }
 
 
