@@ -11,6 +11,8 @@ public class Leg {
     {
         startWaypoint = new Waypoint(start);
         endWaypoint = new Waypoint(end);
+        startWaypoint.afterLeg = this;
+        endWaypoint.beforeLeg = this;
         calculateDistanceBearing();
 
     }
@@ -19,6 +21,8 @@ public class Leg {
     {
         startWaypoint = start;
         endWaypoint = end;
+        startWaypoint.afterLeg = this;
+        endWaypoint.beforeLeg = this;
         calculateDistanceBearing();
     }
 
@@ -26,6 +30,11 @@ public class Leg {
     {
         bearing = startWaypoint.point.bearingTo(endWaypoint.point);
         distance = startWaypoint.point.distance(endWaypoint.point);
+    }
+
+    public void UpdateLeg()
+    {
+        calculateDistanceBearing();
     }
 
     public Waypoint startWaypoint;

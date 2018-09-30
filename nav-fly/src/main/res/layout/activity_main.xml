@@ -20,7 +20,7 @@
     <fragment
         android:id="@+id/routeListFragment"
         android:name="com.mobileaviationtools.nav_fly.Route.RouteListFragment"
-        android:layout_width="370dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         app:layout_constraintEnd_toEndOf="parent"

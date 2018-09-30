@@ -20,6 +20,7 @@ public class RouteListFragment extends Fragment {
         // Required empty public constructor
     }
 
+    private Route route;
     private RouteItemAdapter routeItemAdapter;
 
     @Override
@@ -31,15 +32,37 @@ public class RouteListFragment extends Fragment {
 
     public void SetRoute(Route route)
     {
+        this.route = route;
         ListView routeListView = (ListView) this.getView().findViewById(R.id.routeListView);
         routeItemAdapter = new RouteItemAdapter(route, this.getContext());
+        setupRouteEvents(route);
         routeListView.setAdapter(routeItemAdapter);
-        InvalidateList();
     }
 
     public void InvalidateList()
     {
         routeItemAdapter.notifyDataSetChanged();
+    }
+
+
+    private void setupRouteEvents(Route route)
+    {
+        route.setRouteEvents(new RouteEvents() {
+            @Override
+            public void NewWaypointInserted(Route route, Waypoint newWaypoint) {
+                RouteListFragment.this.InvalidateList();
+            }
+
+            @Override
+            public void NewRouteCreated(Route route) {
+                RouteListFragment.this.SetRoute(route);
+            }
+            @Override
+            public void WaypointUpdated(Route route, Waypoint updatedWaypoint)
+            {
+                RouteListFragment.this.InvalidateList();
+            }
+        });
     }
 
 }

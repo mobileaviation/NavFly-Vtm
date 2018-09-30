@@ -6,10 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkerItem;
+import com.mobileaviationtools.nav_fly.Markers.Navaids.NavaidMarkerItem;
 import com.mobileaviationtools.nav_fly.R;
 
 import org.oscim.android.Utils.StringFormatter;
@@ -48,6 +51,9 @@ public class RouteItemAdapter extends BaseAdapter {
         TextView waypointNameTextView = (TextView) rowView.findViewById(R.id.waypointNameText);
         TextView waypointLatText = (TextView) rowView.findViewById(R.id.waypointLatText);
         TextView waypointLonText = (TextView) rowView.findViewById(R.id.waypointLonText);
+        TextView legHeadingText = (TextView) rowView.findViewById(R.id.headingText);
+
+        LinearLayout legLayout = (LinearLayout) rowView.findViewById(R.id.legLayout);
 
         Waypoint waypoint = route.get(i);
         waypointNameTextView.setText(waypoint.name);
@@ -60,6 +66,20 @@ public class RouteItemAdapter extends BaseAdapter {
             Airport a = (Airport)waypoint.ref;
             icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
         }
+        if (waypoint.type == WaypointType.navaid) {
+            Navaid a = (Navaid)waypoint.ref;
+            icon.setImageBitmap(NavaidMarkerItem.GetMarkerBitmap(a));
+        }
+
+        if (i == route.size()-1) legLayout.setVisibility(View.GONE);
+        else {
+            legLayout.setVisibility(View.VISIBLE);
+            Leg l = route.getLeg(i);
+            Long heading = Math.round(l.getBearing());
+            legHeadingText.setText(heading.toString());
+        }
+
+
 
         return rowView;
     }

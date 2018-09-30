@@ -21,6 +21,8 @@ public class Waypoint {
     public WaypointMarkerItem marker;
     public WaypointType type;
     public Object ref;
+    public Leg beforeLeg;
+    public Leg afterLeg;
 
     public static Waypoint CreateWaypoint(Airport airport)
     {

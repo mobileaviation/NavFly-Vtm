@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                 route.ClearRoute(mMap);
             else {
                 route = new Route("Test Route", this);
-                setupRouteEvents(route);
+                setupNewRoute(route);
             }
             Log.i(TAG, "Start new route");
         }
@@ -211,22 +211,34 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void setupRouteEvents(Route route)
+    public void setupNewRoute(Route route)
     {
-        route.setRouteEvents(new RouteEvents() {
-            @Override
-            public void NewWaypointInserted(Route route, Waypoint newWaypoint) {
-                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
-                routeListFragment.InvalidateList();
-            }
-
-            @Override
-            public void NewRouteCreated(Route route) {
-                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
-                routeListFragment.SetRoute(route);
-            }
-        });
+        RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+        routeListFragment.SetRoute(route);
     }
+
+//    public void setupRouteEvents(Route route)
+//    {
+//        route.setRouteEvents(new RouteEvents() {
+//            @Override
+//            public void NewWaypointInserted(Route route, Waypoint newWaypoint) {
+//                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+//                routeListFragment.InvalidateList();
+//            }
+//
+//            @Override
+//            public void NewRouteCreated(Route route) {
+//                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+//                routeListFragment.SetRoute(route);
+//            }
+//            @Override
+//            public void WaypointUpdated(Route route, Waypoint updatedWaypoint)
+//            {
+//                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+//                routeListFragment.InvalidateList();
+//            }
+//        });
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

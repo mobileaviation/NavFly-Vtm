@@ -29,6 +29,11 @@ public class WaypointMarkerItem extends MarkerItem {
     }
 
     private Waypoint waypoint;
+
+    public Waypoint getWaypoint() {
+        return waypoint;
+    }
+
     private Context context;
 
     public void UpdateWaypointLocation(GeoPoint location)

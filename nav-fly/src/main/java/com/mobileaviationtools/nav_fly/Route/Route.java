@@ -34,6 +34,10 @@ public class Route extends ArrayList<Waypoint> {
     public Airport SelectedEndAirport;
 
     private ArrayList<Leg> legs;
+    public Leg getLeg(Integer index)
+    {
+        return legs.get(index);
+    }
 
     private RouteEvents routeEvents;
 
@@ -117,10 +121,19 @@ public class Route extends ArrayList<Waypoint> {
                 {
                     WaypointMarkerItem item = (WaypointMarkerItem)markerItem;
                     item.UpdateWaypointLocation(newLocation);
+                    updateLegs(item.getWaypoint());
                     DrawRoute(mMap);
+
+                    if (routeEvents != null) routeEvents.WaypointUpdated(Route.this, item.getWaypoint());
                 }
             }
         };
+    }
+
+    private void updateLegs(Waypoint waypoint)
+    {
+        if (waypoint.beforeLeg != null) waypoint.beforeLeg.UpdateLeg();
+        if (waypoint.afterLeg != null) waypoint.afterLeg.UpdateLeg();
     }
 
 
