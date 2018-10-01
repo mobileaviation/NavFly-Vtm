@@ -33,6 +33,30 @@ public class Route extends ArrayList<Waypoint> {
     public Airport SelectedStartAirport;
     public Airport SelectedEndAirport;
 
+    private double indicatedAirspeed = 100;
+    private double windDirection = 0;
+    private double windSpeed = 0;
+
+    public void setIndicatedAirspeed(double indicatedAirspeed)
+    {
+        this.indicatedAirspeed = indicatedAirspeed;
+    }
+
+    public void setWind(double windDirection, double windSpeed)
+    {
+        this.windDirection = windDirection;
+        this.windSpeed = windSpeed;
+    }
+
+    private void setupRouteVariables()
+    {
+        for (Leg l: legs)
+        {
+            l.setupRouteVariables(this.indicatedAirspeed, this.windSpeed, this.windDirection);
+        }
+        if (routeEvents != null) routeEvents.RouteUpdated(this);
+    }
+
     private ArrayList<Leg> legs;
     public Leg getLeg(Integer index)
     {

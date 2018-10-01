@@ -62,6 +62,12 @@ public class RouteListFragment extends Fragment {
             {
                 RouteListFragment.this.InvalidateList();
             }
+            @Override
+            public void RouteUpdated(Route route)
+            {
+                RouteListFragment.this.InvalidateList();
+            }
+
         });
     }
 

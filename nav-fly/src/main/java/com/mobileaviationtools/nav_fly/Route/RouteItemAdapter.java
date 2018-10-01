@@ -52,8 +52,11 @@ public class RouteItemAdapter extends BaseAdapter {
         TextView waypointLatText = (TextView) rowView.findViewById(R.id.waypointLatText);
         TextView waypointLonText = (TextView) rowView.findViewById(R.id.waypointLonText);
         TextView legHeadingText = (TextView) rowView.findViewById(R.id.headingText);
+        TextView legDistanceText = (TextView) rowView.findViewById(R.id.distanceText);
 
         LinearLayout legLayout = (LinearLayout) rowView.findViewById(R.id.legLayout);
+
+        ImageView compasImage = (ImageView) rowView.findViewById(R.id.compassImage);
 
         Waypoint waypoint = route.get(i);
         waypointNameTextView.setText(waypoint.name);
@@ -77,8 +80,9 @@ public class RouteItemAdapter extends BaseAdapter {
             Leg l = route.getLeg(i);
             Long heading = Math.round(l.getBearing());
             legHeadingText.setText(heading.toString()+ "º");
-            ImageView compasImage = (ImageView) rowView.findViewById(R.id.compassImage);
             compasImage.setRotation((float)l.getBearing());
+            Long distance = Math.round(l.getDistanceNM());
+            legDistanceText.setText(distance.toString());
         }
 
 

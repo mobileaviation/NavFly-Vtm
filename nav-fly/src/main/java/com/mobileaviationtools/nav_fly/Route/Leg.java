@@ -13,7 +13,7 @@ public class Leg {
         endWaypoint = new Waypoint(end);
         startWaypoint.afterLeg = this;
         endWaypoint.beforeLeg = this;
-        calculateDistanceBearing();
+        calculateLegVariables();
 
     }
 
@@ -23,18 +23,27 @@ public class Leg {
         endWaypoint = end;
         startWaypoint.afterLeg = this;
         endWaypoint.beforeLeg = this;
-        calculateDistanceBearing();
+        calculateLegVariables();
     }
 
-    private void calculateDistanceBearing()
+    public void setupRouteVariables(double indicatedAirspeed, double windSpeed, double windDirection)
+    {
+        this.indicatedAirspeed = indicatedAirspeed;
+        this.windSpeed = windSpeed;
+        this.windDirection = windDirection;
+    }
+
+    private void calculateLegVariables()
     {
         bearing = startWaypoint.point.bearingTo(endWaypoint.point);
-        distance = startWaypoint.point.distance(endWaypoint.point);
+        distance = startWaypoint.point.sphericalDistance(endWaypoint.point);
+
+        // time calculation
     }
 
     public void UpdateLeg()
     {
-        calculateDistanceBearing();
+        calculateLegVariables();
     }
 
     public Waypoint startWaypoint;
@@ -53,12 +62,22 @@ public class Leg {
     public double getDistance() {
         return distance;
     }
+    private double meterToNMile = 0.000539956803d;
+    public double getDistanceNM() {
+        return distance * meterToNMile;
+    }
 
     private double bearing;
 
     public double getBearing() {
         return bearing;
     }
+
+    private double indicatedAirspeed = 100;
+
+    private double windDirection = 0;
+
+    private double windSpeed = 0;
 
     public String legName;
 }
