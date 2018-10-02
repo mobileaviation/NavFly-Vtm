@@ -34,27 +34,49 @@ public class Route extends ArrayList<Waypoint> {
     public Airport SelectedEndAirport;
 
     private double indicatedAirspeed = 100;
+
+    public double getWindSpeed() {
+        return windSpeed;
+    }
+
     private double windDirection = 0;
+
+    public double getWindDirection() {
+        return windDirection;
+    }
+
     private double windSpeed = 0;
+
+    public double getIndicatedAirspeed() {
+        return indicatedAirspeed;
+    }
 
     public void setIndicatedAirspeed(double indicatedAirspeed)
     {
         this.indicatedAirspeed = indicatedAirspeed;
+        setupRouteVariables();
     }
 
     public void setWind(double windDirection, double windSpeed)
     {
         this.windDirection = windDirection;
         this.windSpeed = windSpeed;
+        setupRouteVariables();
     }
 
     private void setupRouteVariables()
     {
+        double distance = 0;
+        double time = 0;
         for (Leg l: legs)
         {
-            l.setupRouteVariables(this.indicatedAirspeed, this.windSpeed, this.windDirection);
+            l.setupRouteVariables(this);
+            distance = distance + l.getDistanceNM();
+            l.setTotalDistanceNm(distance);
+            time = time + l.getLegTimeMinutes();
+            l.setTotalTimeMin(time);
         }
-        if (routeEvents != null) routeEvents.RouteUpdated(this);
+        //if (routeEvents != null) routeEvents.RouteUpdated(this);
     }
 
     private ArrayList<Leg> legs;
@@ -78,6 +100,7 @@ public class Route extends ArrayList<Waypoint> {
         this.add(endWaypoint);
 
         createLegs();
+        setupRouteVariables();
 
         if (routeEvents != null) routeEvents.NewRouteCreated(this);
     }
@@ -89,7 +112,7 @@ public class Route extends ArrayList<Waypoint> {
         {
             Waypoint start = get(i-1);
             Waypoint end = get(i);
-            Leg leg = new Leg(start, end);
+            Leg leg = new Leg(start, end, this);
             legs.add(leg);
         }
     }

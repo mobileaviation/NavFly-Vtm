@@ -138,7 +138,6 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
@@ -177,7 +176,6 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
@@ -212,13 +210,26 @@
                     android:textSize="7sp"
                     android:textStyle="italic" />
 
-                <TextView
-                    android:id="@+id/timeText"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="XX:XX"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/timeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="XX"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="2dp"
+                        android:layout_weight="1"
+                        android:text="Min"
+                        android:textSize="8sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
 
 

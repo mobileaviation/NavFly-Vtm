@@ -53,6 +53,9 @@ public class RouteItemAdapter extends BaseAdapter {
         TextView waypointLonText = (TextView) rowView.findViewById(R.id.waypointLonText);
         TextView legHeadingText = (TextView) rowView.findViewById(R.id.headingText);
         TextView legDistanceText = (TextView) rowView.findViewById(R.id.distanceText);
+        TextView timeText = (TextView) rowView.findViewById(R.id.timeText);
+        TextView legTotalDistanceText = (TextView) rowView.findViewById(R.id.distanceText);
+        TextView legTotalTimeText = (TextView) rowView.findViewById(R.id.timeText);
 
         LinearLayout legLayout = (LinearLayout) rowView.findViewById(R.id.legLayout);
 
@@ -78,11 +81,12 @@ public class RouteItemAdapter extends BaseAdapter {
         else {
             legLayout.setVisibility(View.VISIBLE);
             Leg l = route.getLeg(i);
-            Long heading = Math.round(l.getBearing());
-            legHeadingText.setText(heading.toString()+ "º");
+            legHeadingText.setText(((Long)Math.round(l.getBearing())).toString()+ "º");
             compasImage.setRotation((float)l.getBearing());
-            Long distance = Math.round(l.getDistanceNM());
-            legDistanceText.setText(distance.toString());
+            legDistanceText.setText(((Long)Math.round(l.getDistanceNM())).toString());
+            timeText.setText(((Long)Math.round(l.getLegTimeMinutes())).toString());
+            legTotalDistanceText.setText((((Long)Math.round(l.getTotalDistanceNm())).toString()));
+            legTotalTimeText.setText(((Long)Math.round(l.getTotalTimeMin())).toString());
         }
 
 
