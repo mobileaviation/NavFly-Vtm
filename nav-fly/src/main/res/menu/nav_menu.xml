@@ -12,6 +12,9 @@
     <!--android:id="@+id/action_load_chart_menuitem"-->
     <!--android:title="@string/action_load_test_chart" />-->
     <item
+        android:id="@+id/action_downloaddatabase"
+        android:title="@string/action_downloaddatabase" />
+    <item
         android:id="@+id/action_isnew_menuitem"
         android:title="@string/action_isnew" />
 </menu>

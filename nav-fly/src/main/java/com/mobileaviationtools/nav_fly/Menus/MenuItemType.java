@@ -15,5 +15,6 @@ public enum MenuItemType {
     airspacesTracking,
     appLocking,
     mapDirection,
-    more
+    more,
+    downloaddatabase
 }

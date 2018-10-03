@@ -30,8 +30,29 @@ public class Route extends ArrayList<Waypoint> {
 
     public String name;
     public Context context;
-    public Airport SelectedStartAirport;
-    public Airport SelectedEndAirport;
+
+    private Airport SelectedStartAirport;
+
+    public void setSelectedStartAirport(Airport selectedStartAirport) {
+        SelectedStartAirport = selectedStartAirport;
+        setStartAirport();
+    }
+    public boolean isStartAirportSet()
+    {
+        return (SelectedStartAirport != null);
+    }
+
+    private Airport SelectedEndAirport;
+
+    public void setSelectedEndAirport(Airport selectedEndAirport) {
+        SelectedEndAirport = selectedEndAirport;
+        setEndAirport();
+    }
+
+    public boolean isEndAirportSet()
+    {
+        return (SelectedEndAirport != null);
+    }
 
     private double indicatedAirspeed = 100;
 
@@ -86,18 +107,23 @@ public class Route extends ArrayList<Waypoint> {
         this.routeEvents = routeEvents;
     }
 
-    public void StartRoute()
+    private void setStartAirport()
     {
         Waypoint startWaypoint = Waypoint.CreateWaypoint(SelectedStartAirport);
         this.add(startWaypoint);
 
+        if (routeEvents != null) routeEvents.NewRouteCreated(this);
+    }
+
+    private void setEndAirport()
+    {
         Waypoint endWaypoint = Waypoint.CreateWaypoint(SelectedEndAirport);
         this.add(endWaypoint);
 
         createLegs();
         setupRouteVariables();
 
-        if (routeEvents != null) routeEvents.NewRouteCreated(this);
+        if (routeEvents != null) routeEvents.RouteUpdated(this);
     }
 
     public void createLegs()

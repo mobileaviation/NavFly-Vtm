@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
@@ -33,6 +34,9 @@ import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
+import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
+import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
+import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteEvents;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
@@ -72,6 +76,7 @@ import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
+import java.util.Date;
 
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
@@ -101,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
     private DefaultMapScaleBar mapScaleBar;
 
     private Route route;
+    private RouteListFragment routeListFragment;
+    private NavigationButtonFragment menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,17 +116,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        DatabaseTest databaseTest = new DatabaseTest();
-//        databaseTest.Test(this);
-
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
 
-
+        menu = (NavigationButtonFragment)getSupportFragmentManager().findFragmentById(R.id.menuFragment);
+        setupMenuListerners();
 
         mPrefs = new MapPreferences(MainActivity.class.getName(), this);
-
-
 
         setupMap();
         createLayers();
@@ -128,14 +131,9 @@ public class MainActivity extends AppCompatActivity {
         setupAirspacesLayer();
         addMarkerLayers();
 
-
-
-//        android.view.MotionEvent e = android.view.MotionEvent.obtain(0,0, android.view.MotionEvent.ACTION_MOVE,0,0,0);
-//        mMap.input.fire(null, new AndroidMotionEvent().wrap(e));
         mMap.events.bind(new Map.UpdateListener() {
             @Override
             public void onMapEvent(Event e, MapPosition mapPosition) {
-                //Log.i(TAG, "OnMapEvent + " + e.toString());
                 if (checkMap == null) checkMap = new CheckMap(mMap);
                 if(checkMap.Changed()) {
                     mAirportMarkersLayer.UpdateAirports();
@@ -154,18 +152,17 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Airport selected: " + airport.ident);
                 if (route != null)
                 {
-                    if (route.SelectedStartAirport == null)
+                    if (!route.isStartAirportSet())
                     {
-                        route.SelectedStartAirport = airport;
+                        route.setSelectedStartAirport(airport);
                         Log.i(TAG, "Route Start Airport selected: " + airport.ident);
                     }
                     else
                     {
-                        if (route.SelectedEndAirport == null)
+                        if (!route.isEndAirportSet())
                         {
-                            route.SelectedEndAirport = airport;
+                            route.setSelectedEndAirport(airport);
                             Log.i(TAG, "Route Start Airport selected: " + airport.ident);
-                            route.StartRoute();
                             route.DrawRoute(mMap);
                         }
                     }
@@ -187,58 +184,15 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        int id = item.getItemId();
-
-        if (id == R.id.download_database_menuitem)
-        {
-            Intent dbDonwloadIntent = new Intent(MainActivity.this, DatabaseDownloadActivity.class);
-            MainActivity.this.startActivity(dbDonwloadIntent);
-
-        }
-        if (id == R.id.start_new_route_menuitem)
-        {
-            if (route != null)
-                route.ClearRoute(mMap);
-            else {
-                route = new Route("Test Route", this);
-                setupNewRoute(route);
-            }
-            Log.i(TAG, "Start new route");
-        }
-
-
-
         return true;
     }
 
-    public void setupNewRoute(Route route)
+    public void setupNewRoute()
     {
-        RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+        route = new Route("Route: " + new Date().toString(), MainActivity.this);
+        routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
         routeListFragment.SetRoute(route);
     }
-
-//    public void setupRouteEvents(Route route)
-//    {
-//        route.setRouteEvents(new RouteEvents() {
-//            @Override
-//            public void NewWaypointInserted(Route route, Waypoint newWaypoint) {
-//                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
-//                routeListFragment.InvalidateList();
-//            }
-//
-//            @Override
-//            public void NewRouteCreated(Route route) {
-//                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
-//                routeListFragment.SetRoute(route);
-//            }
-//            @Override
-//            public void WaypointUpdated(Route route, Waypoint updatedWaypoint)
-//            {
-//                RouteListFragment routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
-//                routeListFragment.InvalidateList();
-//            }
-//        });
-//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -350,6 +304,34 @@ public class MainActivity extends AppCompatActivity {
         mMap.layers().add(mapScaleBarLayer);
 
         mMap.setTheme(VtmThemes.DEFAULT);
+    }
+
+    private void setupMenuListerners()
+    {
+        menu.SetOnButtonClicked(new OnNavigationMemuItemClicked() {
+            @Override
+            public Boolean OnMenuItemClicked(View button, MenuItemType itemType) {
+                switch (itemType){
+                    case routeCreate:
+                    {
+                        if (route != null)
+                            route.ClearRoute(mMap);
+                        else {
+                            setupNewRoute();
+                        }
+                        break;
+                    }
+                    case downloaddatabase:
+                    {
+                        Intent dbDonwloadIntent = new Intent(MainActivity.this, DatabaseDownloadActivity.class);
+                        MainActivity.this.startActivity(dbDonwloadIntent);
+                        break;
+                    }
+                }
+
+                return false;
+            }
+        });
     }
 
     @Override

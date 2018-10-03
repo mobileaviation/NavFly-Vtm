@@ -5,7 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -189,6 +189,7 @@ public class NavigationButtonFragment extends Fragment {
                 //if(menuItem.getItemId()==R.id.action_load_chart_menuitem) itemType = MenuItemType.loadCharts;
                 if(menuItem.getItemId()==R.id.action_settings_menuitem) itemType = MenuItemType.settings;
                 if(menuItem.getItemId()==R.id.action_isnew_menuitem) itemType = MenuItemType.isNew;
+                if(menuItem.getItemId()==R.id.action_downloaddatabase) itemType = MenuItemType.downloaddatabase;
                 if (itemType != null)
                     if (onNavigationMemuItemClicked != null) onNavigationMemuItemClicked.OnMenuItemClicked(null,itemType);
 
