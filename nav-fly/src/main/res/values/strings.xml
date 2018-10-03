@@ -93,7 +93,18 @@
     <string name="action_settings">Settings</string>
     <string name="download_db_res">Download Databases</string>
     <string name="start_new_route_res">Start New Route</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="close_menu">Open/Close Menu</string>
+    <string name="dirtecttobtn">Direct To</string>
+    <string name="flightplanactivate">Activate Route</string>
+    <string name="connected_disconnected">Connect / Disconnect</string>
+    <string name="trackactive">Lock Map to Location</string>
+    <string name="flightplanbutton">Add new Route</string>
+    <string name="maptype">Select Maps</string>
+    <string name="aerodromesearch">Search</string>
+    <string name="mapdirection">Set Map Direction</string>
+    <string name="airspace_locked">Enable/Disable airspace</string>
+    <string name="locked_unlocked">Lock/Unlock</string>
+    <string name="settings">More</string>
+    <string name="action_isnew">What is new?</string>
+    <string name="action_loadtrack">Load previous track</string>
 </resources>

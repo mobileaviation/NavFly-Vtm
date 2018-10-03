@@ -51,17 +51,13 @@ public class Route extends ArrayList<Waypoint> {
         return indicatedAirspeed;
     }
 
-    public void setIndicatedAirspeed(double indicatedAirspeed)
-    {
-        this.indicatedAirspeed = indicatedAirspeed;
-        setupRouteVariables();
-    }
-
-    public void setWind(double windDirection, double windSpeed)
+    public void setWindAndAirspeed(double windDirection, double windSpeed, double indicatedAirspeed)
     {
         this.windDirection = windDirection;
         this.windSpeed = windSpeed;
+        this.indicatedAirspeed = indicatedAirspeed;
         setupRouteVariables();
+        if (routeEvents != null) routeEvents.RouteUpdated(this);
     }
 
     private void setupRouteVariables()
@@ -76,7 +72,6 @@ public class Route extends ArrayList<Waypoint> {
             time = time + l.getLegTimeMinutes();
             l.setTotalTimeMin(time);
         }
-        //if (routeEvents != null) routeEvents.RouteUpdated(this);
     }
 
     private ArrayList<Leg> legs;
@@ -169,6 +164,7 @@ public class Route extends ArrayList<Waypoint> {
                     WaypointMarkerItem item = (WaypointMarkerItem)markerItem;
                     item.UpdateWaypointLocation(newLocation);
                     updateLegs(item.getWaypoint());
+                    setupRouteVariables();
                     DrawRoute(mMap);
 
                     if (routeEvents != null) routeEvents.WaypointUpdated(Route.this, item.getWaypoint());
@@ -199,6 +195,7 @@ public class Route extends ArrayList<Waypoint> {
                         {
                             Waypoint newWaypoint = InsertnewWaypoint(point, selectedLeg);
                             createLegs();
+                            setupRouteVariables();
                             clearPathLayer();
                             DrawRoute(mMap);
                             if (routeEvents != null) routeEvents.NewWaypointInserted(Route.this, newWaypoint);

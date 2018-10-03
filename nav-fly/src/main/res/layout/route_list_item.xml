@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
-    android:background="#6dcdee"
+    android:background="#FFCDC0"
     android:orientation="vertical">
 
     <LinearLayout
@@ -12,7 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="10"
-        android:background="#6dcdee"
         android:orientation="horizontal">
 
         <ImageView
@@ -20,18 +19,18 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginBottom="2dp"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
             app:srcCompat="@drawable/waypoint2" />
 
         <TextView
             android:id="@+id/waypointNameText"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:layout_marginBottom="0dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
             android:gravity="center_vertical"
             android:text="TextView"
             android:textSize="13sp"
@@ -70,17 +69,17 @@
         android:layout_width="match_parent"
         android:layout_height="26dp"
         android:layout_weight="10"
-        android:background="@drawable/leg"
+        android:background="@drawable/leg2"
         android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/compassImage"
             android:layout_width="20dp"
             android:layout_height="match_parent"
-            android:layout_marginBottom="2dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="2dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="2dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="2dp"
             app:srcCompat="@drawable/compassarrow" />
 
         <LinearLayout
@@ -98,6 +97,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Heading"
+                    android:textColor="@android:color/black"
                     android:textSize="7sp"
                     android:textStyle="italic" />
 
@@ -106,6 +106,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="XXXº"
+                    android:textColor="@android:color/black"
                     android:textSize="13sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -121,6 +122,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Distance"
+                    android:textColor="@android:color/black"
                     android:textSize="7sp"
                     android:textStyle="italic" />
 
@@ -134,6 +136,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="XXX"
+                        android:textColor="@android:color/black"
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
@@ -142,6 +145,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:text="NM"
+                        android:textColor="@android:color/black"
                         android:textSize="8sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -159,6 +163,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Total Distance"
+                    android:textColor="@android:color/black"
                     android:textSize="7sp"
                     android:textStyle="italic" />
 
@@ -172,6 +177,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="XXX"
+                        android:textColor="@android:color/black"
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
@@ -181,6 +187,7 @@
                         android:layout_marginLeft="2dp"
                         android:layout_weight="1"
                         android:text="NM"
+                        android:textColor="@android:color/black"
                         android:textSize="8sp"
                         android:textStyle="bold" />
 
@@ -194,19 +201,20 @@
                 android:layout_height="20dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 app:srcCompat="@drawable/clock_icon" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Time"
+                    android:textColor="@android:color/black"
                     android:textSize="7sp"
                     android:textStyle="italic" />
 
@@ -214,19 +222,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <TextView
                         android:id="@+id/timeText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="XX"
+                        android:textColor="@android:color/black"
                         android:textSize="13sp"
                         android:textStyle="bold" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="2dp"
                         android:layout_weight="1"
                         android:text="Min"
+                        android:textColor="@android:color/black"
                         android:textSize="8sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -242,21 +254,38 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total Time"
+                    android:textColor="@android:color/black"
                     android:textSize="7sp"
                     android:textStyle="italic" />
 
-                <TextView
-                    android:id="@+id/totaltTimeText"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="XX:XX"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    android:orientation="horizontal">
 
+                    <TextView
+                        android:id="@+id/totaltTimeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="XXX"
+                        android:textColor="@android:color/black"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="2dp"
+                        android:layout_weight="1"
+                        android:text="Min"
+                        android:textColor="@android:color/black"
+                        android:textSize="8sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
 
 
         </LinearLayout>

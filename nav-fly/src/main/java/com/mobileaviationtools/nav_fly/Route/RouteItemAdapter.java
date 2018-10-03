@@ -54,8 +54,8 @@ public class RouteItemAdapter extends BaseAdapter {
         TextView legHeadingText = (TextView) rowView.findViewById(R.id.headingText);
         TextView legDistanceText = (TextView) rowView.findViewById(R.id.distanceText);
         TextView timeText = (TextView) rowView.findViewById(R.id.timeText);
-        TextView legTotalDistanceText = (TextView) rowView.findViewById(R.id.distanceText);
-        TextView legTotalTimeText = (TextView) rowView.findViewById(R.id.timeText);
+        TextView legTotalDistanceText = (TextView) rowView.findViewById(R.id.totalDistanceText);
+        TextView legTotalTimeText = (TextView) rowView.findViewById(R.id.totaltTimeText);
 
         LinearLayout legLayout = (LinearLayout) rowView.findViewById(R.id.legLayout);
 
