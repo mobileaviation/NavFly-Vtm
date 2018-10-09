@@ -3,6 +3,29 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-
     <color name="black_overlay">#96000000</color>
+
+    <color name="primaryColor1">#ffbc00</color>
+    <color name="primaryColor2">#BF9A30</color>
+    <color name="primaryColor3">#A67A00</color>
+    <color name="primaryColor4">#FFCD40</color>
+    <color name="primaryColor5">#FFDA73</color>
+
+    <color name="secundaryColorA1">#84e900</color>
+    <color name="secundaryColorA2">#76AF2C</color>
+    <color name="secundaryColorA3">#569700</color>
+    <color name="secundaryColorA4">#A4F43D</color>
+    <color name="secundaryColorA5">#BAF46E</color>
+
+    <color name="secundaryColorB1">#e9002a</color>
+    <color name="secundaryColorB2">#AE2C4C</color>
+    <color name="secundaryColorB3">#970026</color>
+    <color name="secundaryColorB4">#F43D6B</color>
+    <color name="secundaryColorB5">#f46e8f</color>
+
+    <color name="complementaryColor1">#1921B1</color>
+    <color name="complementaryColor2">#2F3485</color>
+    <color name="complementaryColor3">#080E73</color>
+    <color name="complementaryColor4">#4D54D8</color>
+    <color name="complementaryColor5">#7277D8</color>
 </resources>

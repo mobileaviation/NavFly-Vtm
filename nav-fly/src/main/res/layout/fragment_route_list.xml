@@ -15,41 +15,71 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/secundaryColorB5"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/imageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
-                android:src="@drawable/flightplanactivate" />
+                android:background="@color/primaryColor1"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
+                android:src="@drawable/routebtn" />
 
             <ImageButton
                 android:id="@+id/imageButton3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
-                android:src="@drawable/flightplanactivate" />
+                android:background="@color/secundaryColorB1"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
+                android:src="@drawable/weather_routebtn" />
 
             <ImageButton
                 android:id="@+id/imageButton2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
-                android:src="@drawable/flightplanactivate" />
+                android:background="@color/secundaryColorA1"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
+                android:src="@drawable/notam_routebtn" />
         </LinearLayout>
-
-        <ListView
-            android:id="@+id/routeListView"
+        <LinearLayout
+            android:id="@+id/routeListLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@android:color/black"
-            android:dividerHeight="1dp">
+            android:orientation="horizontal">
+            <ListView
+                android:id="@+id/routeListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/black"
+                android:dividerHeight="1dp">
+            </ListView>
+        </LinearLayout>
 
-
-        </ListView>
     </LinearLayout>
 
 </LinearLayout>
