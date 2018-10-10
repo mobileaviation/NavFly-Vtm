@@ -21,7 +21,7 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/imageButton"
+                android:id="@+id/routeTabBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
@@ -36,7 +36,7 @@
                 android:src="@drawable/routebtn" />
 
             <ImageButton
-                android:id="@+id/imageButton3"
+                android:id="@+id/weatherTabBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
@@ -51,7 +51,7 @@
                 android:src="@drawable/weather_routebtn" />
 
             <ImageButton
-                android:id="@+id/imageButton2"
+                android:id="@+id/notamsTabBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"

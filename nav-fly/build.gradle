@@ -86,4 +86,5 @@ dependencies {
     //implementation files('libs/jts-core-1.15.0.jar')
 
     //implementation 'com.google.firebase:firebase-core:16.0.1'
+    compile project(path: ':weater_notam_data')
 }

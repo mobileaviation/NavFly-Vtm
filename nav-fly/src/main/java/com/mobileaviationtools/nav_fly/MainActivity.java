@@ -124,6 +124,9 @@ public class MainActivity extends AppCompatActivity {
 
         mPrefs = new MapPreferences(MainActivity.class.getName(), this);
 
+        routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+        routeListFragment.setMap(mMap);
+
         setupMap();
         createLayers();
         //getMBTilesMapPerm();
@@ -190,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
     public void setupNewRoute()
     {
         route = new Route("Route: " + new Date().toString(), MainActivity.this);
-        routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+
         routeListFragment.SetRoute(route);
     }
 
