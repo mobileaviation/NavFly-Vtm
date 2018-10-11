@@ -11,6 +11,9 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
+import com.mobileaviationtools.weater_notam_data.notams.Notams;
+import com.mobileaviationtools.weater_notam_data.services.NotamService;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
 import com.mobileaviationtools.weater_notam_data.services.WeatherServices;
 import com.mobileaviationtools.weater_notam_data.weather.Metar;
@@ -56,6 +59,7 @@ public class RouteListFragment extends Fragment {
         notamsBtn = (ImageButton) view.findViewById(R.id.notamsTabBtn);
 
         setWeatherBtnOnClick();
+        setNotamBtnOnClick();
 
         return view;
     }
@@ -125,6 +129,28 @@ public class RouteListFragment extends Fragment {
                                 Log.i(TAG, "Failure: " + message);
                             }
                         });
+            }
+        });
+    }
+
+    private void setNotamBtnOnClick()
+    {
+        notamsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MapPosition pos = map.getMapPosition();
+                NotamService notamService = new NotamService();
+                notamService.GetNotamsByLocationAndRadius(pos.getGeoPoint(), 100l, new NotamResponseEvent() {
+                    @Override
+                    public void OnNotamsResponse(Notams notams, String message) {
+                        Log.i(TAG, message);
+                    }
+
+                    @Override
+                    public void OnFailure(String message) {
+                        Log.i(TAG, "Failure: " + message);
+                    }
+                });
             }
         });
     }

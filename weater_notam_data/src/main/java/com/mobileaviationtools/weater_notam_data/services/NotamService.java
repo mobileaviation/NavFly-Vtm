@@ -2,7 +2,12 @@ package com.mobileaviationtools.weater_notam_data.services;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
+import com.mobileaviationtools.weater_notam_data.notams.Notams;
+
 import org.oscim.core.GeoPoint;
+import org.oscim.core.GeoPointConvertion;
 
 import java.io.IOException;
 
@@ -25,28 +30,40 @@ public class NotamService {
     private String TAG = "NotamService";
     private String aafUrl = "https://notams.aim.faa.gov/notamSearch/search";
 
-    public void GetNotamsByICAO(String icao)
+    public void GetNotamsByLocationAndRadius(GeoPoint location, Long radius, NotamResponseEvent notamResponseEvent)
+    {
+        MediaType FROM = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
+        String q = getQuery(3, "", location, radius);
+        RequestBody requestBody = RequestBody.create(FROM, q);
+        Request request = getRequest(requestBody);
+        doCall(request, notamResponseEvent);
+    }
+
+    public void GetNotamsByICAO(String icao, NotamResponseEvent notamResponseEvent)
     {
         MediaType FROM = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
         String q = getQuery(0, icao, null, 100l);
         RequestBody requestBody = RequestBody.create(FROM, q);
         Request request = getRequest(requestBody);
-        doCall(request);
+        doCall(request, notamResponseEvent);
     }
 
-    private void doCall(Request request)
+    private void doCall(Request request, final NotamResponseEvent event)
     {
         Call call = GetHttpClient().newCall(request);
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "NotamsCall error: " + e.getMessage());
+                if (event != null) event.OnFailure("NotamsCall error: " + e.getMessage());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String notamsJson = response.body().string();
+                Notams notams = new Gson().fromJson(notamsJson, Notams.class);
                 Log.i(TAG, "Retrieved Notams");
+                if (event != null) event.OnNotamsResponse(notams, response.message());
             }
         });
     }
@@ -81,6 +98,13 @@ public class NotamService {
     {
         // searchtype 0 = designatorsForLocation = {icao code}
         // searchtype 3 = lat/lon/radius
+
+        if (location != null)
+        {
+            GeoPointConvertion geoPointConvertion = new GeoPointConvertion();
+            GeoPointConvertion.GeoPointDMS gmsGeoPoint = geoPointConvertion.getGeoPointDMS(location);
+            Log.i(TAG, "test");
+        }
 
         String query = "searchType=" + searchType.toString() +
                 "&designatorsForLocation=" + icao +
