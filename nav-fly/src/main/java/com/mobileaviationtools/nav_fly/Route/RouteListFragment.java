@@ -14,11 +14,13 @@ import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
 import com.mobileaviationtools.weater_notam_data.services.WeatherServices;
 import com.mobileaviationtools.weater_notam_data.weather.Metar;
+import com.mobileaviationtools.weater_notam_data.weather.Taf;
 
 import org.oscim.core.MapPosition;
 import org.oscim.map.Map;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -106,16 +108,16 @@ public class RouteListFragment extends Fragment {
             public void onClick(View view) {
                 MapPosition pos = map.getMapPosition();
                 WeatherServices weatherServices = new WeatherServices();
-                weatherServices.GetMetarsByLocationAndRadius(pos.getGeoPoint(), 100,
+                weatherServices.GetTafsByLocationAndRadius(pos.getGeoPoint(), 100l,
                         new WeatherResponseEvent() {
                             @Override
-                            public void OnMetarsResponse(ArrayList<Metar> metars, String message) {
+                            public void OnMetarsResponse(List<Metar> metars, String message) {
                                 Log.i(TAG, message);
                             }
 
                             @Override
-                            public void OnTafsResponse() {
-
+                            public void OnTafsResponse(List<Taf> tafs, String message) {
+                                Log.i(TAG, message);
                             }
 
                             @Override

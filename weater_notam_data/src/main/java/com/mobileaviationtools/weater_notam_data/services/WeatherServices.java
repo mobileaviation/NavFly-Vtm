@@ -1,18 +1,13 @@
 package com.mobileaviationtools.weater_notam_data.services;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.mobileaviationtools.weater_notam_data.weather.Metar;
 import com.mobileaviationtools.weater_notam_data.weather.MetarsResponse;
-
+import com.mobileaviationtools.weater_notam_data.weather.TafsResponse;
 import org.oscim.core.GeoPoint;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Dispatcher;
@@ -27,11 +22,28 @@ public class WeatherServices {
 
     }
 
-    public void GetMetarsByLocationAndRadius(GeoPoint location, long distance, WeatherResponseEvent weatherResponseEvent)
-    {
-        HttpUrl.Builder urlBuilder = buildBaseUrl("metars");
+    private String TAG = "WeatherServices";
 
-        String command = "100;#LON#,#LAT#";
+    public void GetMetarsByLocationAndRadius(GeoPoint location, Long distance, WeatherResponseEvent weatherResponseEvent)
+    {
+        String cmd = "metars";
+        HttpUrl.Builder urlBuilder = buildBaseUrl(cmd);
+        Request request = getDataByLocationAndRadius(location, distance, urlBuilder);
+        doCall(cmd, request, weatherResponseEvent);
+    }
+
+    public void GetTafsByLocationAndRadius(GeoPoint location, Long distance, WeatherResponseEvent weatherResponseEvent)
+    {
+        String cmd = "tafs";
+        HttpUrl.Builder urlBuilder = buildBaseUrl(cmd);
+        Request request = getDataByLocationAndRadius(location, distance, urlBuilder);
+        doCall(cmd, request, weatherResponseEvent);
+    }
+
+    private Request getDataByLocationAndRadius(GeoPoint location, Long distance, HttpUrl.Builder urlBuilder)
+    {
+        String command = "#DIS#;#LON#,#LAT#";
+        command = command.replace("#DIS#", Long.toString(distance));
         command = command.replace("#LON#", Double.toString(location.getLongitude()));
         command = command.replace("#LAT#", Double.toString(location.getLatitude()));
 
@@ -43,7 +55,7 @@ public class WeatherServices {
                 .url(urlBuilder.build().toString())
                 .build();
 
-        doCall(request, weatherResponseEvent);
+        return request;
     }
 
     private HttpUrl.Builder buildBaseUrl(String datasource)
@@ -69,7 +81,7 @@ public class WeatherServices {
         return client;
     }
 
-    private void doCall(Request request, final WeatherResponseEvent event)
+    private void doCall(final String command, Request request, final WeatherResponseEvent event)
     {
         OkHttpClient client = GetHttpClient();
         client.newCall(request).enqueue(new Callback() {
@@ -80,19 +92,42 @@ public class WeatherServices {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-
-
-                try {
-                    Serializer serializer = new Persister();
-                    Reader reader = new StringReader(response.body().string());
-                    MetarsResponse resp =
-                    serializer.read(MetarsResponse.class, reader, false);
-                } catch (Exception e) {
-                    if (event != null) event.OnFailure(e.getMessage());
-                }
-
-                if (event != null) event.OnMetarsResponse(null, response.body().string());
+                String xml = response.body().string();
+                if (command.equals("metars"))
+                    getMetars(xml, event, response.message());
+                if (command.equals("tafs"))
+                    getTafs(xml, event, response.message());
             }
         });
+    }
+
+    private void getMetars(String xml, final WeatherResponseEvent event, String responseMessage)
+    {
+        try {
+            Serializer serializer = new Persister();
+            Reader reader = new StringReader(xml);
+            MetarsResponse resp =
+                    serializer.read(MetarsResponse.class, reader, false);
+            if (event != null) event.OnMetarsResponse(resp.data, responseMessage);
+        }
+        catch (Exception e)
+        {
+            if (event != null) event.OnFailure(e.getMessage() + "Metar Response: " + responseMessage + " XML: " + xml);
+        }
+    }
+
+    private void getTafs(String xml, final WeatherResponseEvent event, String responseMessage)
+    {
+        try {
+            Serializer serializer = new Persister();
+            Reader reader = new StringReader(xml);
+            TafsResponse resp =
+                    serializer.read(TafsResponse.class, reader, false);
+            if (event != null) event.OnTafsResponse(resp.data, responseMessage);
+        }
+        catch (Exception e)
+        {
+            if (event != null) event.OnFailure(e.getMessage() + "TAF Response: " + responseMessage + " XML: " + xml);
+        }
     }
 }

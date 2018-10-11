@@ -1,14 +1,27 @@
 package com.mobileaviationtools.weater_notam_data.weather;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+import java.util.List;
 
-import java.util.ArrayList;
-
-@JacksonXmlRootElement(localName = "response")
+@Root(name = "response")
 public class MetarsResponse {
-    @JacksonXmlElementWrapper(localName = "METAR")
-    private ArrayList<Metar> metars;
+    @Element(name="data_source")
+    public data_source data_source;
+
+    @Element(name="time_taken_ms")
+    public Long time_taken_ms;
+
+    @ElementList(name="data")
+    public List<Metar> data;
+
+    @Root
+    static class data_source {
+        @Attribute(name="name")
+        public String name;
+    }
 }
 
 

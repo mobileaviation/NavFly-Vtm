@@ -1,5 +1,5 @@
 rootProject.name = 'vtm-parent'
-include ':vtm', ':navfly', ':nav-fly', ':airnavdata', ':weater_notam_data', ':simple-xml-2.3.2'
+include ':vtm', ':navfly', ':nav-fly', ':airnavdata', ':weater_notam_data'
 include ':vtm-android'
 include ':vtm-android-example'
 include ':vtm-android-gdx'
