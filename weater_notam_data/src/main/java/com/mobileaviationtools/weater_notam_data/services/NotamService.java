@@ -3,6 +3,7 @@ package com.mobileaviationtools.weater_notam_data.services;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
 
@@ -28,27 +29,57 @@ public class NotamService {
     }
 
     private String TAG = "NotamService";
-    private String aafUrl = "https://notams.aim.faa.gov/notamSearch/search";
+    private String aafUrl = "https://notams.aim.faa.gov/notamSearch/";
 
     public void GetNotamsByLocationAndRadius(GeoPoint location, Long radius, NotamResponseEvent notamResponseEvent)
     {
+        getByLocationAndRadius(location, radius, notamResponseEvent, "search");
+    }
+    public void GetCountsByLocationAndRadius(GeoPoint location, Long radius, NotamResponseEvent notamResponseEvent)
+    {
+        getByLocationAndRadius(location, radius, notamResponseEvent, "counts");
+    }
+
+    private void getByLocationAndRadius(GeoPoint location, Long radius, NotamResponseEvent notamResponseEvent, String command)
+    {
         MediaType FROM = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
-        String q = getQuery(3, "", location, radius);
+        String q = getQuery(3, "", location, radius, 0l);
         RequestBody requestBody = RequestBody.create(FROM, q);
-        Request request = getRequest(requestBody);
-        doCall(request, notamResponseEvent);
+        Request request = getRequest(requestBody, command);
+        if (command.equals("search")) doNotamCall(request, notamResponseEvent);
+        if (command.equals("counts")) doCountsCall(request, notamResponseEvent);
     }
 
     public void GetNotamsByICAO(String icao, NotamResponseEvent notamResponseEvent)
     {
         MediaType FROM = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
-        String q = getQuery(0, icao, null, 100l);
+        String q = getQuery(0, icao, null, 100l, 0l);
         RequestBody requestBody = RequestBody.create(FROM, q);
-        Request request = getRequest(requestBody);
-        doCall(request, notamResponseEvent);
+        Request request = getRequest(requestBody, "search");
+        doNotamCall(request, notamResponseEvent);
     }
 
-    private void doCall(Request request, final NotamResponseEvent event)
+    private void doCountsCall(Request request, final NotamResponseEvent event)
+    {
+        Call call = GetHttpClient().newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "NotamsCall error: " + e.getMessage());
+                if (event != null) event.OnFailure("NotamsCall error: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String notamsJson = response.body().string();
+                NotamCounts counts = new Gson().fromJson(notamsJson, NotamCounts.class);
+                Log.i(TAG, "Retrieved Notam Counts");
+                if (event != null) event.OnNotamsCountResponse(counts, response.message());
+            }
+        });
+    }
+
+    private void doNotamCall(Request request, final NotamResponseEvent event)
     {
         Call call = GetHttpClient().newCall(request);
         call.enqueue(new Callback() {
@@ -68,10 +99,10 @@ public class NotamService {
         });
     }
 
-    private Request getRequest(RequestBody requestBody)
+    private Request getRequest(RequestBody requestBody, String command)
     {
         Request request = new Request.Builder()
-                .url(aafUrl)
+                .url(aafUrl + command)
                 .post(requestBody)
                 .addHeader("accept", "application/json")
                 .addHeader("origin", "https://notams.aim.faa.gov")
@@ -94,27 +125,29 @@ public class NotamService {
         return client;
     }
 
-    private String getQuery(Integer searchType, String icao, GeoPoint location, Long radius)
+    private String getQuery(Integer searchType, String icao, GeoPoint location, Long radius, Long offset)
     {
         // searchtype 0 = designatorsForLocation = {icao code}
         // searchtype 3 = lat/lon/radius
 
+        GeoPointConvertion geoPointConvertion = new GeoPointConvertion();
+        GeoPointConvertion.GeoPointDMS gmsGeoPoint = geoPointConvertion.getNewGeoPointDMS();
+
         if (location != null)
         {
-            GeoPointConvertion geoPointConvertion = new GeoPointConvertion();
-            GeoPointConvertion.GeoPointDMS gmsGeoPoint = geoPointConvertion.getGeoPointDMS(location);
+            gmsGeoPoint = geoPointConvertion.getGeoPointDMS(location);
             Log.i(TAG, "test");
         }
 
         String query = "searchType=" + searchType.toString() +
                 "&designatorsForLocation=" + icao +
                 "&designatorForAccountable=" +
-                "&latDegrees=" +
-                "&latMinutes=0" +
-                "&latSeconds=0" +
-                "&longDegrees=" +
-                "&longMinutes=0" +
-                "&longSeconds=0" +
+                "&latDegrees=" + gmsGeoPoint.latitude.degrees.toString() +
+                "&latMinutes=" + gmsGeoPoint.latitude.minutes.toString() +
+                "&latSeconds=" + gmsGeoPoint.latitude.seconds.toString() +
+                "&longDegrees=" + gmsGeoPoint.longitude.degrees.toString() +
+                "&longMinutes=" + gmsGeoPoint.longitude.minutes.toString() +
+                "&longSeconds=" + gmsGeoPoint.longitude.seconds.toString() +
                 "&radius=" + radius.toString() +
                 "&sortColumns=5+false" +
                 "&sortDirection=true" +
@@ -122,8 +155,8 @@ public class NotamService {
                 "&notamNumber=" +
                 "&radiusSearchOnDesignator=false" +
                 "&radiusSearchDesignator=" +
-                "&latitudeDirection=N" +
-                "&longitudeDirection=W" +
+                "&latitudeDirection=" + gmsGeoPoint.latitude.direction +
+                "&longitudeDirection=" + gmsGeoPoint.longitude.direction +
                 "&freeFormText=" +
                 "&flightPathText=" +
                 "&flightPathDivertAirfields=" +
@@ -135,7 +168,7 @@ public class NotamService {
                 "&flightPathResultsType=All+NOTAMs" +
                 "&archiveDate=" +
                 "&archiveDesignator=" +
-                "&offset=0" +
+                "&offset=" + offset.toString() +
                 "&notamsOnly=false" +
                 "&filters=" +
                 "&minRunwayLength=" +

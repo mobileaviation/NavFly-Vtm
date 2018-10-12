@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
 import com.mobileaviationtools.weater_notam_data.services.NotamService;
@@ -140,15 +141,19 @@ public class RouteListFragment extends Fragment {
             public void onClick(View view) {
                 MapPosition pos = map.getMapPosition();
                 NotamService notamService = new NotamService();
-                notamService.GetNotamsByLocationAndRadius(pos.getGeoPoint(), 100l, new NotamResponseEvent() {
+                notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, new NotamResponseEvent() {
                     @Override
                     public void OnNotamsResponse(Notams notams, String message) {
                         Log.i(TAG, message);
                     }
-
                     @Override
                     public void OnFailure(String message) {
                         Log.i(TAG, "Failure: " + message);
+                    }
+                    @Override
+                    public void OnNotamsCountResponse(NotamCounts counts, String message)
+                    {
+                        Log.i(TAG, message);
                     }
                 });
             }
