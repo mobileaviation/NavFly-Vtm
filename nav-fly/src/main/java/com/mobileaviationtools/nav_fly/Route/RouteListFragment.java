@@ -47,14 +47,18 @@ public class RouteListFragment extends Fragment {
 
     private Route route;
     private RouteItemAdapter routeItemAdapter;
+    private NotamsAirportItemAdapter notamsAirportItemAdapter;
 
     private ImageButton routeBtn;
     private ImageButton weatherBtn;
     private ImageButton notamsBtn;
+    private ImageButton notamsRefreshBtn;
 
     private LinearLayout routeLayout;
     private LinearLayout notamsLayout;
     private LinearLayout weatherLayout;
+
+    private ListView airportsList;
 
     private Map map;
 
@@ -71,6 +75,7 @@ public class RouteListFragment extends Fragment {
         routeBtn = (ImageButton) view.findViewById(R.id.routeTabBtn);
         weatherBtn = (ImageButton) view.findViewById(R.id.weatherTabBtn);
         notamsBtn = (ImageButton) view.findViewById(R.id.notamsTabBtn);
+        notamsRefreshBtn = (ImageButton) view.findViewById(R.id.notamsRefreshBtn);
 
         routeLayout = (LinearLayout) view.findViewById(R.id.routeListLayout);
         routeLayout.setVisibility(View.GONE);
@@ -81,6 +86,7 @@ public class RouteListFragment extends Fragment {
 
         setWeatherBtnOnClick();
         setNotamBtnOnClick();
+        setNotamResponseEvent();
         setRouteBtnOnClick();
 
         return view;
@@ -198,42 +204,57 @@ public class RouteListFragment extends Fragment {
         });
     }
 
+    private NotamResponseEvent notamResponseEvent;
+    private void setNotamResponseEvent()
+    {
+        notamResponseEvent = new NotamResponseEvent() {
+            @Override
+            public void OnNotamsResponse(Notams notams, String message) {
+                Log.i(TAG, message);
+            }
+
+            @Override
+            public void OnNotamsCountResponse(final NotamCounts counts, String message) {
+
+                Log.i(TAG, message);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        notamsAirportItemAdapter = new NotamsAirportItemAdapter(counts, RouteListFragment.this.getContext());
+                        airportsList = (ListView) getView().findViewById(R.id.notamsAirportsListView);
+                        airportsList.setAdapter(notamsAirportItemAdapter);
+                    }
+                });
+            }
+
+            @Override
+            public void OnFailure(String message) {
+                Log.i(TAG, "Failure: " + message);
+            }
+        };
+    }
     private void setNotamBtnOnClick()
     {
         notamsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (setLayoutVisiblity(layoutType.notams, false)) {
-                    MapPosition pos = map.getMapPosition();
-                    NotamService notamService = new NotamService();
-                    notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, new NotamResponseEvent() {
-                        @Override
-                        public void OnNotamsResponse(Notams notams, String message) {
-                            Log.i(TAG, message);
-
-                        }
-
-                        @Override
-                        public void OnFailure(String message) {
-                            Log.i(TAG, "Failure: " + message);
-                        }
-
-                        @Override
-                        public void OnNotamsCountResponse(final NotamCounts counts, String message) {
-                            Log.i(TAG, message);
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    NotamsAirportItemAdapter notamsAirportItemAdapter = new NotamsAirportItemAdapter(counts, RouteListFragment.this.getContext());
-                                    ListView airportsList = (ListView) getView().findViewById(R.id.notamsAirportsListView);
-                                    airportsList.setAdapter(notamsAirportItemAdapter);
-                                }
-                            });
-                        }
-                    });
+                    if (notamsAirportItemAdapter == null) {
+                        MapPosition pos = map.getMapPosition();
+                        NotamService notamService = new NotamService();
+                        notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
+                    }
                 }
             }
         });
-    }
 
+        notamsRefreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MapPosition pos = map.getMapPosition();
+                NotamService notamService = new NotamService();
+                notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
+            }
+        });
+    }
 }

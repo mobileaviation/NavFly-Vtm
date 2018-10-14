@@ -82,14 +82,39 @@
                 android:orientation="vertical"
                 android:visibility="visible">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="Notams"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold|italic" />
+                    android:layout_marginBottom="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Notams"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold|italic" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/notamsRefreshBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:layout_margin="5dp"
+                            android:background="@color/secundaryColorB2"
+                            android:padding="5dp"
+                            android:src="@drawable/refresh" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <ListView
                     android:id="@+id/notamsAirportsListView"
@@ -111,12 +136,39 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="Weather"
-                    android:textSize="18sp" />
+                    android:layout_marginBottom="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Weather"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold|italic" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/weatherRefreshBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:layout_margin="5dp"
+                            android:background="@color/secundaryColorB2"
+                            android:padding="5dp"
+                            android:src="@drawable/refresh" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -126,12 +178,57 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="Route"
-                    android:textSize="18sp" />
+                    android:layout_marginBottom="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Route"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold|italic" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/routeNewBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:layout_margin="5dp"
+                            android:background="@color/secundaryColorB2"
+                            android:padding="5dp"
+                            android:src="@drawable/refresh" />
+                        <ImageButton
+                            android:id="@+id/routeLoadBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:layout_margin="5dp"
+                            android:background="@color/secundaryColorB2"
+                            android:padding="5dp"
+                            android:src="@drawable/refresh" />
+                        <ImageButton
+                            android:id="@+id/routeSaveBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:layout_margin="5dp"
+                            android:background="@color/secundaryColorB2"
+                            android:padding="5dp"
+                            android:src="@drawable/refresh" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <ListView
                     android:id="@+id/routeListView"
