@@ -43,6 +43,12 @@ public class NotamsAirportItemAdapter extends BaseAdapter {
         return i;
     }
 
+    public Airport getAirport(int i)
+    {
+        String icao = notamCounts.counts[i].icaoId;
+        return  db.getAirport().getAirportByIdent(icao);
+    }
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context

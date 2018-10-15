@@ -24,15 +24,15 @@
                 android:id="@+id/routeTabBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
                 android:background="@color/primaryColor1"
-                android:paddingBottom="5dp"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
                 android:src="@drawable/routebtn" />
 
             <ImageButton
@@ -54,16 +54,16 @@
                 android:id="@+id/notamsTabBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
                 android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
                 android:layout_marginTop="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
                 android:background="@color/secundaryColorA1"
-                android:paddingBottom="5dp"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
                 android:src="@drawable/notam_routebtn" />
         </LinearLayout>
 
@@ -75,17 +75,18 @@
             android:background="@color/secundaryColorB5"
             android:orientation="horizontal">
 
-            <LinearLayout
+            <com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout
                 android:id="@+id/notamsListLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
+                    android:background="@color/secundaryColorA3"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -110,7 +111,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="right|center_vertical"
                             android:layout_margin="5dp"
-                            android:background="@color/secundaryColorB2"
+                            android:background="@color/secundaryColorA1"
                             android:padding="5dp"
                             android:src="@drawable/refresh" />
                     </LinearLayout>
@@ -119,15 +120,16 @@
                 <ListView
                     android:id="@+id/notamsAirportsListView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="2"></ListView>
 
                 <ListView
                     android:id="@+id/notamsList"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:layout_weight="1" />
-            </LinearLayout>
+            </com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout>
 
             <LinearLayout
                 android:id="@+id/weatherListLayout"
@@ -175,6 +177,7 @@
                 android:id="@+id/routeListLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/primaryColor3"
                 android:orientation="vertical"
                 android:visibility="gone">
 
@@ -206,25 +209,27 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="right|center_vertical"
                             android:layout_margin="5dp"
-                            android:background="@color/secundaryColorB2"
+                            android:background="@color/primaryColor1"
                             android:padding="5dp"
                             android:src="@drawable/refresh" />
+
                         <ImageButton
                             android:id="@+id/routeLoadBtn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="right|center_vertical"
                             android:layout_margin="5dp"
-                            android:background="@color/secundaryColorB2"
+                            android:background="@color/primaryColor1"
                             android:padding="5dp"
                             android:src="@drawable/refresh" />
+
                         <ImageButton
                             android:id="@+id/routeSaveBtn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="right|center_vertical"
                             android:layout_margin="5dp"
-                            android:background="@color/secundaryColorB2"
+                            android:background="@color/primaryColor1"
                             android:padding="5dp"
                             android:src="@drawable/refresh" />
                     </LinearLayout>

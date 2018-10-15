@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsAirportItemAdapter;
+import com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
@@ -55,7 +56,7 @@ public class RouteListFragment extends Fragment {
     private ImageButton notamsRefreshBtn;
 
     private LinearLayout routeLayout;
-    private LinearLayout notamsLayout;
+    private NotamsListLayout notamsLayout;
     private LinearLayout weatherLayout;
 
     private ListView airportsList;
@@ -75,18 +76,19 @@ public class RouteListFragment extends Fragment {
         routeBtn = (ImageButton) view.findViewById(R.id.routeTabBtn);
         weatherBtn = (ImageButton) view.findViewById(R.id.weatherTabBtn);
         notamsBtn = (ImageButton) view.findViewById(R.id.notamsTabBtn);
-        notamsRefreshBtn = (ImageButton) view.findViewById(R.id.notamsRefreshBtn);
 
         routeLayout = (LinearLayout) view.findViewById(R.id.routeListLayout);
         routeLayout.setVisibility(View.GONE);
-        notamsLayout = (LinearLayout) view.findViewById(R.id.notamsListLayout);
+
+        notamsLayout = (NotamsListLayout) view.findViewById(R.id.notamsListLayout);
         notamsLayout.setVisibility(View.GONE);
+        notamsLayout.init(getContext(), getActivity());
+
         weatherLayout = (LinearLayout) view.findViewById(R.id.weatherListLayout);
         weatherLayout.setVisibility(View.GONE);
 
         setWeatherBtnOnClick();
         setNotamBtnOnClick();
-        setNotamResponseEvent();
         setRouteBtnOnClick();
 
         return view;
@@ -204,56 +206,16 @@ public class RouteListFragment extends Fragment {
         });
     }
 
-    private NotamResponseEvent notamResponseEvent;
-    private void setNotamResponseEvent()
-    {
-        notamResponseEvent = new NotamResponseEvent() {
-            @Override
-            public void OnNotamsResponse(Notams notams, String message) {
-                Log.i(TAG, message);
-            }
 
-            @Override
-            public void OnNotamsCountResponse(final NotamCounts counts, String message) {
-
-                Log.i(TAG, message);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        notamsAirportItemAdapter = new NotamsAirportItemAdapter(counts, RouteListFragment.this.getContext());
-                        airportsList = (ListView) getView().findViewById(R.id.notamsAirportsListView);
-                        airportsList.setAdapter(notamsAirportItemAdapter);
-                    }
-                });
-            }
-
-            @Override
-            public void OnFailure(String message) {
-                Log.i(TAG, "Failure: " + message);
-            }
-        };
-    }
     private void setNotamBtnOnClick()
     {
         notamsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (setLayoutVisiblity(layoutType.notams, false)) {
-                    if (notamsAirportItemAdapter == null) {
-                        MapPosition pos = map.getMapPosition();
-                        NotamService notamService = new NotamService();
-                        notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
-                    }
+                    notamsLayout.setMap(map);
+                    notamsLayout.notamBtnClick();
                 }
-            }
-        });
-
-        notamsRefreshBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MapPosition pos = map.getMapPosition();
-                NotamService notamService = new NotamService();
-                notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
             }
         });
     }

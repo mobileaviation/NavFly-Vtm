@@ -87,4 +87,5 @@ dependencies {
 
     //implementation 'com.google.firebase:firebase-core:16.0.1'
     compile project(path: ':weater_notam_data')
+    implementation 'org.jetbrains:annotations-java5:15.0'
 }
