@@ -21,6 +21,8 @@ public class Taf {
 
     private String TAG = "TAF";
 
+    @Element(required = false)
+    public String station_id;
 
     @Element(required = false)
     public String raw_text;

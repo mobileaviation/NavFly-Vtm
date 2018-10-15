@@ -27,6 +27,9 @@ public class Metar {
     }
 
     @Element(required = false)
+    public String station_id;
+
+    @Element(required = false)
     public String raw_text;
 
     @Element(required = false)

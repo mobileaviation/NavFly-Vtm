@@ -14,6 +14,7 @@ import android.widget.ListView;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsAirportItemAdapter;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout;
+import com.mobileaviationtools.nav_fly.Route.Weather.WeatherListLayout;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
@@ -57,7 +58,7 @@ public class RouteListFragment extends Fragment {
 
     private LinearLayout routeLayout;
     private NotamsListLayout notamsLayout;
-    private LinearLayout weatherLayout;
+    private WeatherListLayout weatherLayout;
 
     private ListView airportsList;
 
@@ -84,8 +85,9 @@ public class RouteListFragment extends Fragment {
         notamsLayout.setVisibility(View.GONE);
         notamsLayout.init(getContext(), getActivity());
 
-        weatherLayout = (LinearLayout) view.findViewById(R.id.weatherListLayout);
+        weatherLayout = (WeatherListLayout) view.findViewById(R.id.weatherListLayout);
         weatherLayout.setVisibility(View.GONE);
+        weatherLayout.init(getContext(), getActivity());
 
         setWeatherBtnOnClick();
         setNotamBtnOnClick();
@@ -181,26 +183,9 @@ public class RouteListFragment extends Fragment {
         weatherBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (setLayoutVisiblity(layoutType.weather, false)) {
-                    MapPosition pos = map.getMapPosition();
-                    WeatherServices weatherServices = new WeatherServices();
-                    weatherServices.GetTafsByLocationAndRadius(pos.getGeoPoint(), 100l,
-                            new WeatherResponseEvent() {
-                                @Override
-                                public void OnMetarsResponse(List<Metar> metars, String message) {
-                                    Log.i(TAG, message);
-                                }
-
-                                @Override
-                                public void OnTafsResponse(List<Taf> tafs, String message) {
-                                    Log.i(TAG, message);
-                                }
-
-                                @Override
-                                public void OnFailure(String message) {
-                                    Log.i(TAG, "Failure: " + message);
-                                }
-                            });
+                if (setLayoutVisiblity(layoutType.weather, false)){
+                    weatherLayout.setMap(map);
+                    weatherLayout.weatherBtnClick();
                 }
             }
         });
