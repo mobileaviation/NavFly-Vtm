@@ -220,8 +220,17 @@ public class RouteListFragment extends Fragment {
 
     public void setupNewRoute()
     {
-        route = new Route("Route: " + new Date().toString(), getActivity());
-        SetRoute();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Start new route..")
+                .setMessage("Start a new route by selecting the departure and destination airport!")
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        route = new Route("Route: " + new Date().toString(), getActivity());
+                        SetRoute();
+                    }
+                })                 //Do nothing on no
+                .show();
     }
 
     private void setRouteFileBtnSClickEvents()
