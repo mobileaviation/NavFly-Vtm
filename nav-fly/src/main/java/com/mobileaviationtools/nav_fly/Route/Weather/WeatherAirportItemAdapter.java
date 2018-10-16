@@ -16,7 +16,7 @@ import com.mobileaviationtools.nav_fly.R;
 import java.util.List;
 
 public class WeatherAirportItemAdapter extends BaseAdapter {
-    public WeatherAirportItemAdapter(List<String> stations, Context context)
+    public WeatherAirportItemAdapter(List<Station> stations, Context context)
     {
         this.context = context;
         this.stations = stations;
@@ -24,7 +24,7 @@ public class WeatherAirportItemAdapter extends BaseAdapter {
     }
 
     private AirnavDatabase db;
-    private List<String> stations;
+    private List<Station> stations;
     private Context context;
 
     @Override
@@ -52,13 +52,21 @@ public class WeatherAirportItemAdapter extends BaseAdapter {
         TextView airportNameTextView = (TextView) rowView.findViewById(R.id.weatgerAirportNameText);
         TextView airportIcaoText = (TextView) rowView.findViewById(R.id.weatherAirportICAOText);
 
-        Airport a = db.getAirport().getAirportByIdent(stations.get(i));
-        a.runways = db.getRunways().getRunwaysByAirport(a.id);
+        Station station = stations.get(i);
+        Airport a = db.getAirport().getAirportByIdent(station.station_id);
+        if (a != null) {
+            a.runways = db.getRunways().getRunwaysByAirport(a.id);
 
-        icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
+            icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
 
-        airportNameTextView.setText(a.name);
-        airportIcaoText.setText(a.ident);
+            airportNameTextView.setText(a.name);
+            airportIcaoText.setText(a.ident);
+        }
+        else
+        {
+            airportNameTextView.setText("");
+            airportIcaoText.setText(station.station_id);
+        }
 
         return rowView;
     }

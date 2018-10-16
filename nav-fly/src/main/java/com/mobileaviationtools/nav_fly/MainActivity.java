@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
     private DefaultMapScaleBar mapScaleBar;
 
-    private Route route;
     private RouteListFragment routeListFragment;
     private NavigationButtonFragment menu;
 
@@ -153,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void Selected(Airport airport, GeoPoint geoPoint) {
                 Log.i(TAG, "Airport selected: " + airport.ident);
+                Route route = routeListFragment.getRoute();
                 if (route != null)
                 {
                     if (!route.isStartAirportSet())
@@ -188,13 +188,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item)
     {
         return true;
-    }
-
-    public void setupNewRoute()
-    {
-        route = new Route("Route: " + new Date().toString(), MainActivity.this);
-
-        routeListFragment.SetRoute(route);
     }
 
     @Override
@@ -315,15 +308,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Boolean OnMenuItemClicked(View button, MenuItemType itemType) {
                 switch (itemType){
-                    case routeCreate:
-                    {
-                        if (route != null)
-                            route.ClearRoute(mMap);
-                        else {
-                            setupNewRoute();
-                        }
-                        break;
-                    }
                     case downloaddatabase:
                     {
                         Intent dbDonwloadIntent = new Intent(MainActivity.this, DatabaseDownloadActivity.class);

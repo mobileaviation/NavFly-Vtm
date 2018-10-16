@@ -113,5 +113,12 @@ public class Metar {
     @Element(required = false)
     public float elevation_m;
 
+    @Override
+    public boolean equals (Object object)
+    {
+        if (object instanceof Metar )
+            return (this.station_id.equals(((Metar)object).station_id));
+        else return false;
+    }
 }
 

@@ -153,4 +153,12 @@ public class Taf {
 
     }
 
+    @Override
+    public boolean equals (Object object)
+    {
+        if (object instanceof Taf )
+            return (this.station_id.equals(((Taf)object).station_id));
+        else return false;
+    }
+
 }

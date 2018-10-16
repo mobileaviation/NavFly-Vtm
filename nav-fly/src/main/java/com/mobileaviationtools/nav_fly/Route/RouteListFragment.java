@@ -1,6 +1,8 @@
 package com.mobileaviationtools.nav_fly.Route;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.mobileaviationtools.nav_fly.MainActivity;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsAirportItemAdapter;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout;
@@ -28,6 +31,7 @@ import org.oscim.core.MapPosition;
 import org.oscim.map.Map;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,13 +52,18 @@ public class RouteListFragment extends Fragment {
     private String TAG = "RouteListFragment";
 
     private Route route;
+    public Route getRoute() {return route;}
+
     private RouteItemAdapter routeItemAdapter;
     private NotamsAirportItemAdapter notamsAirportItemAdapter;
 
     private ImageButton routeBtn;
     private ImageButton weatherBtn;
     private ImageButton notamsBtn;
-    private ImageButton notamsRefreshBtn;
+
+    private ImageButton routeNewBtn;
+    private ImageButton routeOpenBtn;
+    private ImageButton routeSaveBtn;
 
     private LinearLayout routeLayout;
     private NotamsListLayout notamsLayout;
@@ -78,6 +87,10 @@ public class RouteListFragment extends Fragment {
         weatherBtn = (ImageButton) view.findViewById(R.id.weatherTabBtn);
         notamsBtn = (ImageButton) view.findViewById(R.id.notamsTabBtn);
 
+        routeNewBtn = (ImageButton) view.findViewById(R.id.routeNewBtn);
+        routeOpenBtn = (ImageButton) view.findViewById(R.id.routeLoadBtn);
+        routeSaveBtn = (ImageButton) view.findViewById(R.id.routeSaveBtn);
+
         routeLayout = (LinearLayout) view.findViewById(R.id.routeListLayout);
         routeLayout.setVisibility(View.GONE);
 
@@ -92,13 +105,13 @@ public class RouteListFragment extends Fragment {
         setWeatherBtnOnClick();
         setNotamBtnOnClick();
         setRouteBtnOnClick();
+        setRouteFileBtnSClickEvents();
 
         return view;
     }
 
-    public void SetRoute(Route route)
+    private void SetRoute()
     {
-        this.route = route;
         ListView routeListView = (ListView) this.getView().findViewById(R.id.routeListView);
         routeItemAdapter = new RouteItemAdapter(route, this.getContext());
         setupRouteEvents(route);
@@ -122,7 +135,7 @@ public class RouteListFragment extends Fragment {
 
             @Override
             public void NewRouteCreated(Route route) {
-                RouteListFragment.this.SetRoute(route);
+                RouteListFragment.this.SetRoute();
             }
             @Override
             public void WaypointUpdated(Route route, Waypoint updatedWaypoint)
@@ -201,6 +214,52 @@ public class RouteListFragment extends Fragment {
                     notamsLayout.setMap(map);
                     notamsLayout.notamBtnClick();
                 }
+            }
+        });
+    }
+
+    public void setupNewRoute()
+    {
+        route = new Route("Route: " + new Date().toString(), getActivity());
+        SetRoute();
+    }
+
+    private void setRouteFileBtnSClickEvents()
+    {
+        routeNewBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (route != null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Clear route..")
+                            .setMessage("Are you sure you want to close the current route?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    route.ClearRoute(map);
+                                    setupNewRoute();
+                                }
+                            })
+                            .setNegativeButton("No", null)                        //Do nothing on no
+                            .show();
+                }
+                else {
+                    setupNewRoute();
+                }
+            }
+        });
+
+        routeOpenBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        routeSaveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
     }

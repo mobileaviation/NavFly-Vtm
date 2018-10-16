@@ -5,9 +5,12 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
@@ -32,7 +35,7 @@ public class WeatherListLayout extends LinearLayout {
 
     private List<Metar> metars;
     private List<Taf> tafs;
-    private List<String> stations;
+    private List<Station> stations;
 
     public WeatherListLayout(Context context) {
         super(context);
@@ -52,6 +55,9 @@ public class WeatherListLayout extends LinearLayout {
         this.activity = activity;
         weatherRefreshBtn = (ImageButton) findViewById(R.id.weatherRefreshBtn);
         weatherStationsList = (ListView) findViewById(R.id.weatherAirportsListView);
+        setWeatherResponse();
+        setWeatherListOnItemClick();
+        setWeatherRefreshBtnClick();
     }
 
     private void setWeatherResponse()
@@ -78,19 +84,40 @@ public class WeatherListLayout extends LinearLayout {
 
     private void setWeatherData()
     {
-        if ((metars!=null) && (tafs!=null))
-        {
-            stations = new ArrayList<>();
-            if (metars.size()>tafs.size())
-            {
-                for(Metar m : metars) stations.add(m.station_id);
-            } else
-            {
-                for(Taf t: tafs) stations.add(t.station_id);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if ((metars != null) && (tafs != null)) {
+                    stations = new ArrayList<>();
+                    if (metars.size() > tafs.size()) {
+                        for (Metar m : metars)
+                        {
+                            Station station = new Station();
+                            station.metar = m;
+                            station.station_id = m.station_id;
+                            Taf testTaf = new Taf();
+                            testTaf.station_id = m.station_id;
+                            int tafIndex = tafs.indexOf(testTaf);
+                            station.taf = (tafIndex>-1) ? tafs.get(tafIndex) : null;
+                            stations.add(station);
+                        }
+                    } else {
+                        for (Taf t : tafs){
+                            Station station = new Station();
+                            station.taf = t;
+                            station.station_id = t.station_id;
+                            Metar testMetar = new Metar();
+                            testMetar.station_id = t.station_id;
+                            int metarIndex = metars.indexOf(testMetar);
+                            station.metar = (metarIndex>-1) ? metars.get(metarIndex) : null;
+                            stations.add(station);
+                        }
+                    }
+                    WeatherAirportItemAdapter weatherAirportItemAdapter = new WeatherAirportItemAdapter(stations, getContext());
+                    weatherStationsList.setAdapter(weatherAirportItemAdapter);
+                }
             }
-            WeatherAirportItemAdapter weatherAirportItemAdapter = new WeatherAirportItemAdapter(stations, getContext());
-            weatherStationsList.setAdapter(weatherAirportItemAdapter);
-        }
+        });
     }
 
     public void weatherBtnClick()
@@ -101,6 +128,15 @@ public class WeatherListLayout extends LinearLayout {
         }
     }
 
+    private void setWeatherRefreshBtnClick()
+    {
+        weatherRefreshBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getWeatherData();
+            }
+        });
+    }
 
     private void getWeatherData()
     {
@@ -114,5 +150,26 @@ public class WeatherListLayout extends LinearLayout {
                 weatherResponseEvent);
         weatherServices.GetMetarsByLocationAndRadius(pos.getGeoPoint(), 100l,
                 weatherResponseEvent);
+    }
+
+    private void setWeatherListOnItemClick()
+    {
+        weatherStationsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                WeatherAirportItemAdapter adapter = (WeatherAirportItemAdapter) adapterView.getAdapter();
+                Station station = (Station)adapter.getItem(i);
+
+                if (station.metar != null) {
+                    TextView metarText = (TextView)findViewById(R.id.metarItemTxt);
+                    metarText.setText(station.metar.raw_text);
+                }
+
+                if (station.taf != null) {
+                    TextView tafText = (TextView)findViewById(R.id.tafItemTxt);
+                    tafText.setText(station.taf.raw_text);
+                }
+            }
+        });
     }
 }

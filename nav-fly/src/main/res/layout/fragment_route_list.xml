@@ -11,7 +11,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
@@ -24,15 +24,15 @@
                 android:id="@+id/routeTabBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
                 android:background="@color/primaryColor1"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingRight="10dp"
                 android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
                 android:src="@drawable/routebtn" />
 
             <ImageButton
@@ -54,31 +54,31 @@
                 android:id="@+id/notamsTabBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="2dp"
                 android:layout_marginBottom="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:background="@color/secundaryColorA1"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp"
-                android:paddingRight="10dp"
                 android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp"
                 android:src="@drawable/notam_routebtn" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ListLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/secundaryColorB5"
             android:orientation="horizontal">
 
             <com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout
                 android:id="@+id/notamsListLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/secundaryColorA5"
                 android:orientation="vertical"
                 android:visibility="gone">
 
@@ -86,7 +86,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
-                    android:background="@color/secundaryColorA3"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -120,21 +119,22 @@
                 <ListView
                     android:id="@+id/notamsAirportsListView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"></ListView>
+                    android:layout_height="300dp"></ListView>
 
                 <ListView
                     android:id="@+id/notamsList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:layout_weight="1" />
+                    android:divider="@android:color/black"
+                    android:dividerHeight="2dp" />
             </com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout>
 
             <com.mobileaviationtools.nav_fly.Route.Weather.WeatherListLayout
                 android:id="@+id/weatherListLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/secundaryColorB5"
                 android:orientation="vertical"
                 android:visibility="gone">
 
@@ -175,15 +175,77 @@
                 <ListView
                     android:id="@+id/weatherAirportsListView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="300dp"
                     android:layout_weight="2"></ListView>
 
-                <ListView
-                    android:id="@+id/weatherList"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/metarItemLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:background="@color/secundaryColorB5"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_weight="10"
+                            android:text="Metar:"
+                            android:textSize="16sp"
+                            android:textStyle="bold|italic" />
+
+                        <TextView
+                            android:id="@+id/metarItemTxt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="0dp"
+                            android:gravity="center_vertical"
+                            android:text="TextView"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/tafItemLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:background="@color/secundaryColorB5"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_weight="10"
+                            android:text="Taf:"
+                            android:textSize="16sp"
+                            android:textStyle="bold|italic" />
+
+                        <TextView
+                            android:id="@+id/tafItemTxt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="0dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginTop="0dp"
+                            android:gravity="center_vertical"
+                            android:text="TextView"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </com.mobileaviationtools.nav_fly.Route.Weather.WeatherListLayout>
 
             <LinearLayout
@@ -192,7 +254,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/primaryColor3"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -224,7 +286,7 @@
                             android:layout_margin="5dp"
                             android:background="@color/primaryColor1"
                             android:padding="5dp"
-                            android:src="@drawable/refresh" />
+                            android:src="@drawable/new_icon" />
 
                         <ImageButton
                             android:id="@+id/routeLoadBtn"
@@ -234,7 +296,7 @@
                             android:layout_margin="5dp"
                             android:background="@color/primaryColor1"
                             android:padding="5dp"
-                            android:src="@drawable/refresh" />
+                            android:src="@drawable/open" />
 
                         <ImageButton
                             android:id="@+id/routeSaveBtn"
@@ -244,7 +306,7 @@
                             android:layout_margin="5dp"
                             android:background="@color/primaryColor1"
                             android:padding="5dp"
-                            android:src="@drawable/refresh" />
+                            android:src="@drawable/save" />
                     </LinearLayout>
                 </LinearLayout>
 

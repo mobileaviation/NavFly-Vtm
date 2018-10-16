@@ -43,7 +43,8 @@
                     android:layout_height="30dp"
                     android:layout_margin="10dp"
                     android:background="@drawable/flightplanactivate"
-                    android:contentDescription="@string/flightplanactivate" />
+                    android:contentDescription="@string/flightplanactivate"
+                    android:visibility="gone" />
 
                 <ImageButton
                     android:id="@+id/connect_disconnect"
@@ -67,7 +68,8 @@
                     android:layout_height="30dp"
                     android:layout_margin="10dp"
                     android:background="@drawable/flightplanbutton"
-                    android:contentDescription="@string/flightplanbutton" />
+                    android:contentDescription="@string/flightplanbutton"
+                    android:visibility="gone" />
 
                 <ImageButton
                     android:id="@+id/map_type"
