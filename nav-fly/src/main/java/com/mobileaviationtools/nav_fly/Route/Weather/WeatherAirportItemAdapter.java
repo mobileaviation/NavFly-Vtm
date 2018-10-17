@@ -20,10 +20,8 @@ public class WeatherAirportItemAdapter extends BaseAdapter {
     {
         this.context = context;
         this.stations = stations;
-        db = AirnavDatabase.getInstance(context);
     }
 
-    private AirnavDatabase db;
     private List<Station> stations;
     private Context context;
 
@@ -53,14 +51,11 @@ public class WeatherAirportItemAdapter extends BaseAdapter {
         TextView airportIcaoText = (TextView) rowView.findViewById(R.id.weatherAirportICAOText);
 
         Station station = stations.get(i);
-        Airport a = db.getAirport().getAirportByIdent(station.station_id);
-        if (a != null) {
-            a.runways = db.getRunways().getRunwaysByAirport(a.id);
 
-            icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
-
-            airportNameTextView.setText(a.name);
-            airportIcaoText.setText(a.ident);
+        if (station.airport != null) {
+            icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(station.airport));
+            airportNameTextView.setText(station.airport.name);
+            airportIcaoText.setText(station.airport.ident);
         }
         else
         {

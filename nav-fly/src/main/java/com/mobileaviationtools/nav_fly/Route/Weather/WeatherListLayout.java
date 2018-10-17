@@ -92,24 +92,24 @@ public class WeatherListLayout extends LinearLayout {
                     if (metars.size() > tafs.size()) {
                         for (Metar m : metars)
                         {
-                            Station station = new Station();
-                            station.metar = m;
-                            station.station_id = m.station_id;
+                            Station station = new Station(getContext());
+                            station.setStation_id(m.station_id);
+                            station.setMetar(m);
                             Taf testTaf = new Taf();
                             testTaf.station_id = m.station_id;
                             int tafIndex = tafs.indexOf(testTaf);
-                            station.taf = (tafIndex>-1) ? tafs.get(tafIndex) : null;
+                            station.setTaf((tafIndex>-1) ? tafs.get(tafIndex) : null);
                             stations.add(station);
                         }
                     } else {
                         for (Taf t : tafs){
-                            Station station = new Station();
-                            station.taf = t;
-                            station.station_id = t.station_id;
+                            Station station = new Station(getContext());
+                            station.setStation_id(t.station_id);
+                            station.setTaf(t);
                             Metar testMetar = new Metar();
                             testMetar.station_id = t.station_id;
                             int metarIndex = metars.indexOf(testMetar);
-                            station.metar = (metarIndex>-1) ? metars.get(metarIndex) : null;
+                            station.setMetar((metarIndex>-1) ? metars.get(metarIndex) : null);
                             stations.add(station);
                         }
                     }

@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
+        //AirnavClient.deleteDatabaseFile(this, "room_airnav_route.db");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

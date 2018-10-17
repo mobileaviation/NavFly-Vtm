@@ -12,7 +12,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.mobileaviationtools.airnavdata.AirnavAirportInfoDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Notam;
+import com.mobileaviationtools.nav_fly.Classes.MapperHelper;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
@@ -61,6 +64,15 @@ public class NotamsListLayout extends LinearLayout {
         notamResponseEvent = new NotamResponseEvent() {
             @Override
             public void OnNotamsResponse(final Notams notams, String message) {
+                AirnavAirportInfoDatabase db = AirnavAirportInfoDatabase.getInstance(getContext());
+
+                Airport a  = MapperHelper.getAirport(notams.notamList[0].icaoId, getContext());
+                for (com.mobileaviationtools.weater_notam_data.notams.Notam n : notams.notamList)
+                {
+                    Notam db_notam = MapperHelper.getNotamEntity(n, a);
+                    db.getNotam().InsertNotam(db_notam);
+                }
+
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -69,7 +81,6 @@ public class NotamsListLayout extends LinearLayout {
                         notamsList.setAdapter(notamsItemAdapter);
                     }
                 });
-
             }
 
             @Override

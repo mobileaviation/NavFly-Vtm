@@ -2,7 +2,11 @@ package com.mobileaviationtools.nav_fly.Route;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Fix;
+import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -22,6 +26,7 @@ public class Route extends ArrayList<Waypoint> {
     public Route(String name, Context context)
     {
         this.name = name;
+        this.id = -1l;
         this.context = context;
         legs = new ArrayList<>();
     }
@@ -29,6 +34,7 @@ public class Route extends ArrayList<Waypoint> {
     private String TAG = "Route";
 
     public String name;
+    public Long id;
     public Context context;
 
     private Airport SelectedStartAirport;
@@ -241,6 +247,7 @@ public class Route extends ArrayList<Waypoint> {
     {
         Waypoint newWaypoint = new Waypoint(point);
         newWaypoint.name = "LON"+point.longitudeE6 + " LAT"+ point.latitudeE6;
+        newWaypoint.type = WaypointType.waypoint;
         Integer index = indexOf(selectedLeg.endWaypoint);
         Route.this.add(index, newWaypoint);
         return  newWaypoint;
@@ -283,5 +290,64 @@ public class Route extends ArrayList<Waypoint> {
         SelectedEndAirport = null;
         legs.clear();
         this.clear();
+    }
+
+    public void saveRoute(String name)
+    {
+        AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(context);
+
+        com.mobileaviationtools.airnavdata.Entities.Route routeEntity = new
+                com.mobileaviationtools.airnavdata.Entities.Route();
+        routeEntity.name = name;
+
+        this.id = db.getRoute().InsertRoute(routeEntity);
+
+        for (Waypoint p: this)
+        {
+            com.mobileaviationtools.airnavdata.Entities.Waypoint waypointEntity = new
+                    com.mobileaviationtools.airnavdata.Entities.Waypoint();
+            waypointEntity.index = this.indexOf(p);
+            waypointEntity.latitude = p.point.getLatitude();
+            waypointEntity.longitude = p.point.getLongitude();
+            waypointEntity.type = p.type.toString();
+            waypointEntity.name = p.name;
+            waypointEntity.route_id = id;
+
+            switch (p.type)
+            {
+                case airport:{
+                    if (p.ref instanceof Airport)
+                        waypointEntity.ref = ((Airport)p.ref).id.longValue();
+                    break;
+                }
+                case fix:{
+                    if (p.ref instanceof Fix)
+                        waypointEntity.ref = ((Fix)p.ref).id.longValue();
+                    break;
+                }
+                case navaid:{
+                    if (p.ref instanceof Navaid)
+                        waypointEntity.ref = ((Navaid)p.ref).id.longValue();
+                    break;
+                }
+                case waypoint:{
+                    waypointEntity.ref = -1l;
+                    break;
+                }
+            }
+
+            db.getWaypoint().InsertWaypoint(waypointEntity);
+        }
+    }
+
+    public void openRoute(Long routeId)
+    {
+        AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(context);
+        com.mobileaviationtools.airnavdata.Entities.Route[] routes = db.getRoute().getAllRoutes();
+        Long _id = routes[0].id;
+
+        com.mobileaviationtools.airnavdata.Entities.Waypoint[] waypoints = db.getWaypoint().GetWaypointsByRouteID(_id);
+
+        int i=1;
     }
 }

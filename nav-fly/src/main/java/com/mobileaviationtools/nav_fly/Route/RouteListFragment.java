@@ -261,14 +261,22 @@ public class RouteListFragment extends Fragment {
         routeOpenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                route.ClearRoute(map);
 
+                route = new Route("Route: " + new Date().toString(), getActivity());
+                SetRoute();
+                
+                route.openRoute(0l);
             }
         });
 
         routeSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (route != null)
+                {
+                    route.saveRoute(route.name);
+                }
             }
         });
     }

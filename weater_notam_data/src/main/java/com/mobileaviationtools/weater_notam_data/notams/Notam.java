@@ -9,9 +9,9 @@ public class Notam {
     public String endDate;
     public String source;
     public String sourceType;
-    public String icaoMessage;
-    public String traditionalMessage;
-    public String plainLanguageMessage;
+    public String icaoMessage;   //1
+    public String traditionalMessage; //2
+    public String plainLanguageMessage;  //3
     public String traditionalMessageFrom4thWord;
     public String icaoId;
     public String accountId;
