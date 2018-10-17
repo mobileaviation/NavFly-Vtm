@@ -6,11 +6,13 @@ import android.arch.persistence.room.Query;
 
 import com.mobileaviationtools.airnavdata.Entities.Route;
 
+import java.util.List;
+
 @Dao
 public abstract class RouteDao {
     @Insert
     public abstract long InsertRoute(Route route);
 
-    @Query("SELECT * FROM tbl_Route")
-    public abstract Route[] getAllRoutes();
+    @Query("SELECT * FROM tbl_Route ORDER BY id")
+    public abstract List<Route> getAllRoutes();
 }

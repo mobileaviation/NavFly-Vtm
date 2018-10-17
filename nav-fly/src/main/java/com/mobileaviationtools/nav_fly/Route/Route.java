@@ -343,10 +343,7 @@ public class Route extends ArrayList<Waypoint> {
     public void openRoute(Long routeId)
     {
         AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(context);
-        com.mobileaviationtools.airnavdata.Entities.Route[] routes = db.getRoute().getAllRoutes();
-        Long _id = routes[0].id;
-
-        com.mobileaviationtools.airnavdata.Entities.Waypoint[] waypoints = db.getWaypoint().GetWaypointsByRouteID(_id);
+        com.mobileaviationtools.airnavdata.Entities.Waypoint[] waypoints = db.getWaypoint().GetWaypointsByRouteID(routeId);
 
         int i=1;
     }

@@ -9,10 +9,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.nav_fly.MainActivity;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsAirportItemAdapter;
@@ -261,12 +264,47 @@ public class RouteListFragment extends Fragment {
         routeOpenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                route.ClearRoute(map);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Open Route");
+                View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.list_input, (ViewGroup) getView(), false);
+                final ListView routesList = (ListView) viewInflated.findViewById(R.id.list);
+                AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(getContext());
+                final List<com.mobileaviationtools.airnavdata.Entities.Route> routes = db.getRoute().getAllRoutes();
+                RouteLoadItemAdapter routeLoadItemAdapter = new RouteLoadItemAdapter(routes, getContext());
+                routesList.setAdapter(routeLoadItemAdapter);
+                routesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        routesList.setItemChecked(i, true);
+                    }
+                });
+                builder.setView(viewInflated);
+                builder.setIcon(android.R.drawable.ic_input_get);
+                builder.setMessage("Select Route to load!");
+                builder.setPositiveButton("Open", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int pos = routesList.getCheckedItemPosition();
+                        com.mobileaviationtools.airnavdata.Entities.Route selectedRoute =
+                                routes.get(pos);
 
-                route = new Route("Route: " + new Date().toString(), getActivity());
-                SetRoute();
-                
-                route.openRoute(0l);
+                        dialogInterface.dismiss();
+                        if (selectedRoute != null) {
+                            if (route != null) route.ClearRoute(map);
+                            route = new Route("Route: " + new Date().toString(), getActivity());
+                            SetRoute();
+                            route.openRoute(selectedRoute.id);
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+                builder.show();
+
             }
         });
 
@@ -275,7 +313,29 @@ public class RouteListFragment extends Fragment {
             public void onClick(View view) {
                 if (route != null)
                 {
-                    route.saveRoute(route.name);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Save Route");
+                    View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.text_input, (ViewGroup) getView(), false);
+                    final EditText input = (EditText) viewInflated.findViewById(R.id.input);
+                    input.setText(route.name);
+                    builder.setView(viewInflated);
+                    builder.setIcon(android.R.drawable.ic_input_get);
+                    builder.setMessage("Save this route with name:?");
+                    builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            route.saveRoute(input.getText().toString());
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+                    builder.show();
+
                 }
             }
         });
