@@ -1,12 +1,17 @@
 package com.mobileaviationtools.nav_fly.Route;
 
+import android.content.Context;
+
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
+import com.mobileaviationtools.nav_fly.Markers.Route.RouteLegSymbol;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.oscim.core.GeoPoint;
 
 public class Leg {
+    private Context context;
+
     public Leg(GeoPoint start, GeoPoint end, Route route)
     {
         startWaypoint = new Waypoint(start);
@@ -30,7 +35,9 @@ public class Leg {
         this.indicatedAirspeed = route.getIndicatedAirspeed();
         this.windSpeed = route.getWindSpeed();
         this.windDirection = route.getWindDirection();
+        this.context = route.context;
         calculateLegVariables();
+        createRouteSymbol();
     }
 
     private void calculateLegVariables()
@@ -45,6 +52,11 @@ public class Leg {
         timeMin = (getDistanceNM() / indicatedAirspeed) * 60;
     }
 
+    private void createRouteSymbol()
+    {
+        symbol = RouteLegSymbol.GetRouteLegSymbol(this, context );
+    }
+
     public void UpdateLeg()
     {
         calculateLegVariables();
@@ -52,6 +64,7 @@ public class Leg {
 
     public Waypoint startWaypoint;
     public Waypoint endWaypoint;
+    public RouteLegSymbol symbol;
 
     public Coordinate[] getLegCoordinates()
     {

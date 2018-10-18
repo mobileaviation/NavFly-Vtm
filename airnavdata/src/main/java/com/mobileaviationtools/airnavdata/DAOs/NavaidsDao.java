@@ -25,4 +25,7 @@ public abstract class NavaidsDao {
 
     @Query("SELECT * FROM tbl_Navaids WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat)")
     public abstract Navaid[] getNavaidsWithinBoundsByTypes(double Wlon, double Elon, double Nlat, double Slat);
+
+    @Query("SELECT * FROM tbl_Navaids WHERE id=:id")
+    public abstract Navaid getNavaidByID(Long id);
 }

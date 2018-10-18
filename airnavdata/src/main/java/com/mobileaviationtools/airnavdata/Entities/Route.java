@@ -7,5 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class Route {
     @PrimaryKey(autoGenerate = true)
     public Long id;
+    public Long createdDate;
+    public Long modifiedDate;
     public String name;
 }

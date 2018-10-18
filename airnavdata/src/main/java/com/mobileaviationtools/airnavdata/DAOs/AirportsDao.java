@@ -35,4 +35,7 @@ public abstract class AirportsDao {
 
     @Query("SELECT * FROM tbl_Airports WHERE ident=:ident")
     public abstract Airport getAirportByIdent(String ident);
+
+    @Query("SELECT * FROM tbl_Airports WHERE id=:id")
+    public abstract Airport getAirportByID(Long id);
 }

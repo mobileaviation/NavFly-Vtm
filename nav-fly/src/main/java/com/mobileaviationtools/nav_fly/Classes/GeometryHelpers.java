@@ -25,4 +25,20 @@ public class GeometryHelpers {
             return null;
         }
     }
+
+    public static GeoPoint midPoint(GeoPoint point1 ,GeoPoint point2){
+
+        double dLon = Math.toRadians(point2.getLongitude() - point1.getLongitude());
+        //convert to radians
+        double lat1 = Math.toRadians(point1.getLatitude());
+        double lat2 = Math.toRadians(point2.getLatitude());
+        double lon1 = Math.toRadians(point1.getLongitude());
+
+        double Bx = Math.cos(lat2) * Math.cos(dLon);
+        double By = Math.cos(lat2) * Math.sin(dLon);
+        double lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2), Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By));
+        double lon3 = lon1 + Math.atan2(By, Math.cos(lat1) + Bx);
+
+        return new GeoPoint(Math.toDegrees(lat3), Math.toDegrees(lon3));
+    }
 }

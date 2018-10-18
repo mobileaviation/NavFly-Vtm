@@ -291,9 +291,12 @@ public class RouteListFragment extends Fragment {
                         dialogInterface.dismiss();
                         if (selectedRoute != null) {
                             if (route != null) route.ClearRoute(map);
-                            route = new Route("Route: " + new Date().toString(), getActivity());
+                            route = new Route(selectedRoute.name, getActivity());
+
+                            route.createdDate = new Date(selectedRoute.createdDate);
+                            route.modifiedDate = new Date(selectedRoute.modifiedDate);
                             SetRoute();
-                            route.openRoute(selectedRoute.id);
+                            route.openRoute(selectedRoute.id, map);
                         }
                     }
                 });
@@ -313,31 +316,66 @@ public class RouteListFragment extends Fragment {
             public void onClick(View view) {
                 if (route != null)
                 {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Save Route");
-                    View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.text_input, (ViewGroup) getView(), false);
-                    final EditText input = (EditText) viewInflated.findViewById(R.id.input);
-                    input.setText(route.name);
-                    builder.setView(viewInflated);
-                    builder.setIcon(android.R.drawable.ic_input_get);
-                    builder.setMessage("Save this route with name:?");
-                    builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    saveRouteDialogs();
+                }
+            }
+        });
+    }
+
+    private void saveRouteDialogs()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Save Route");
+        View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.text_input, (ViewGroup) getView(), false);
+        final EditText input = (EditText) viewInflated.findViewById(R.id.input);
+        input.setText(route.name);
+        builder.setView(viewInflated);
+        builder.setIcon(android.R.drawable.ic_input_get);
+        builder.setMessage("Save this route with name:?");
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialogInterface, int i) {
+                final String routeName = input.getText().toString();
+                final AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(getContext());
+                final com.mobileaviationtools.airnavdata.Entities.Route r = db.getRoute().getRouteByName(routeName);
+                if (r == null) {
+                    dialogInterface.dismiss();
+                    route.saveRoute(routeName);
+                } else
+                {
+                    AlertDialog.Builder ov_builder = new AlertDialog.Builder(getContext());
+                    ov_builder.setTitle("Overwrite route?");
+                    ov_builder.setMessage("There is already a route with this name in the database..");
+                    ov_builder.setIcon(android.R.drawable.ic_dialog_alert);
+                    ov_builder.setPositiveButton("Overwrite", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                        public void onClick(DialogInterface ov_dialogInterface, int i) {
+                            ov_dialogInterface.dismiss();
                             dialogInterface.dismiss();
-                            route.saveRoute(input.getText().toString());
+                            db.getWaypoint().DeleteWaypointsByRouteID(r.id);
+                            db.getRoute().DeleteRoute(r);
+                            route.saveRoute(routeName);
                         }
                     });
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    ov_builder.setNegativeButton("Rename", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                        public void onClick(DialogInterface ov_dialogInterface, int i) {
+                            ov_dialogInterface.cancel();
                             dialogInterface.cancel();
+                            saveRouteDialogs();
                         }
                     });
-                    builder.show();
+                    ov_builder.show();
 
                 }
             }
         });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        builder.show();
     }
 }

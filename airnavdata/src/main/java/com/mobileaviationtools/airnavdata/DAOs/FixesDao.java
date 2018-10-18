@@ -24,4 +24,7 @@ public abstract class FixesDao {
 
     @Query("SELECT * FROM tbl_Fixes WHERE ident=:ident")
     public abstract List<Fix> getFixesByIdent(String ident);
+
+    @Query("SELECT * FROM tbl_Fixes WHERE id=:id")
+    public abstract Fix getFixesByID(Long id);
 }

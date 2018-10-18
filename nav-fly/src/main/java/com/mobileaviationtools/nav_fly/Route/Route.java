@@ -3,24 +3,31 @@ package com.mobileaviationtools.nav_fly.Route;
 import android.content.Context;
 import android.util.Log;
 
+import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
+import com.mobileaviationtools.nav_fly.R;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.event.Gesture;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.vector.PathLayer;
+import org.oscim.layers.vector.geometries.Style;
 import org.oscim.map.Map;
+import org.oscim.renderer.bucket.TextureItem;
+import org.oscim.theme.styles.LineStyle;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Route extends ArrayList<Waypoint> {
     public Route(String name, Context context)
@@ -28,6 +35,7 @@ public class Route extends ArrayList<Waypoint> {
         this.name = name;
         this.id = -1l;
         this.context = context;
+        this.createdDate = new Date();
         legs = new ArrayList<>();
     }
 
@@ -35,6 +43,8 @@ public class Route extends ArrayList<Waypoint> {
 
     public String name;
     public Long id;
+    public Date createdDate;
+    public Date modifiedDate;
     public Context context;
 
     private Airport SelectedStartAirport;
@@ -102,6 +112,11 @@ public class Route extends ArrayList<Waypoint> {
     }
 
     private ArrayList<Leg> legs;
+
+    public ArrayList<Leg> getLegs() {
+        return legs;
+    }
+
     public Leg getLeg(Integer index)
     {
         return legs.get(index);
@@ -144,7 +159,7 @@ public class Route extends ArrayList<Waypoint> {
         }
     }
 
-    private PathLayer routePathLayer;
+    private RoutePathLayer routePathLayer;
     private WaypointLayer waypointLayer;
     private Map mMap;
     private MarkerDragEvent onWaypointDrag;
@@ -161,7 +176,7 @@ public class Route extends ArrayList<Waypoint> {
             routePathLayer.clearPath();
             for (Waypoint w : this)
             {
-                routePathLayer.addPoint(w.point);
+                routePathLayer.AddWaypoint(w);
                 waypointLayer.PlaceMarker(w);
             }
             routePathLayer.update();
@@ -214,7 +229,7 @@ public class Route extends ArrayList<Waypoint> {
 
     private void createNewPathLayer(Map map)
     {
-        routePathLayer = new PathLayer(map, Color.BLUE, 10){
+        routePathLayer = new RoutePathLayer(map, 0xFF84e900, 10){
             @Override
             public boolean onGesture(Gesture g, MotionEvent e) {
                 if (g instanceof Gesture.Tap) {
@@ -240,7 +255,8 @@ public class Route extends ArrayList<Waypoint> {
             }
         };
 
-        map.layers().add(routePathLayer);
+        routePathLayer.AddLayer(map, this);
+        //map.layers().add(routePathLayer);
     }
 
     private Waypoint InsertnewWaypoint(GeoPoint point, Leg selectedLeg)
@@ -299,6 +315,9 @@ public class Route extends ArrayList<Waypoint> {
         com.mobileaviationtools.airnavdata.Entities.Route routeEntity = new
                 com.mobileaviationtools.airnavdata.Entities.Route();
         routeEntity.name = name;
+        this.modifiedDate = new Date();
+        routeEntity.modifiedDate = this.modifiedDate.getTime();
+        routeEntity.createdDate = this.createdDate.getTime();
 
         this.id = db.getRoute().InsertRoute(routeEntity);
 
@@ -338,13 +357,61 @@ public class Route extends ArrayList<Waypoint> {
 
             db.getWaypoint().InsertWaypoint(waypointEntity);
         }
+
+
     }
 
-    public void openRoute(Long routeId)
+    public void openRoute(Long routeId, Map map)
     {
+        mMap = map;
+        AirnavDatabase a_db = AirnavDatabase.getInstance(context);
         AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(context);
         com.mobileaviationtools.airnavdata.Entities.Waypoint[] waypoints = db.getWaypoint().GetWaypointsByRouteID(routeId);
 
-        int i=1;
+        for (com.mobileaviationtools.airnavdata.Entities.Waypoint db_waypoint : waypoints)
+        {
+            Waypoint newWaypoint = new Waypoint(db_waypoint.latitude, db_waypoint.longitude);
+            newWaypoint.type = WaypointType.valueOf(db_waypoint.type);
+
+            switch (newWaypoint.type)
+            {
+                case airport:{
+                    Airport a = a_db.getAirport().getAirportByID(db_waypoint.ref);
+                    a.runways = a_db.getRunways().getRunwaysByAirport(a.id);
+                    newWaypoint.ref = a;
+                    newWaypoint.name = a.name;
+                    break;
+                }
+                case fix:{
+                    Fix f = a_db.getFixes().getFixesByID(db_waypoint.ref);
+                    newWaypoint.ref = f;
+                    newWaypoint.name = f.name;
+                    break;
+                }
+                case navaid:{
+                    Navaid n = a_db.getNavaids().getNavaidByID(db_waypoint.ref);
+                    newWaypoint.ref = n;
+                    newWaypoint.name = n.name;
+                    break;
+                }
+                case waypoint:{
+                    newWaypoint.name = db_waypoint.name;
+                    break;
+                }
+            }
+
+            this.add(newWaypoint);
+        }
+
+        if (this.get(0).ref instanceof Airport)
+            SelectedStartAirport = (Airport)this.get(0).ref;
+        if (this.get(this.size()-1).ref instanceof Airport)
+            SelectedEndAirport = (Airport)this.get(this.size()-1).ref;
+
+        createLegs();
+        setupRouteVariables();
+        DrawRoute(mMap);
+
+        if (routeEvents != null) routeEvents.RouteUpdated(this);
     }
 }

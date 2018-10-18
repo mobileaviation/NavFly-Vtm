@@ -13,4 +13,7 @@ public abstract class WaypointDao {
 
     @Query("SELECT * FROM tbl_Waypoint WHERE route_id=:route_id")
     public abstract Waypoint[] GetWaypointsByRouteID(Long route_id);
+
+    @Query("DELETE FROM tbl_Waypoint WHERE route_id=:route_id")
+    public abstract void DeleteWaypointsByRouteID(Long route_id);
 }
