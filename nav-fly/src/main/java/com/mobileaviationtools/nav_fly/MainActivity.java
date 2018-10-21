@@ -3,12 +3,11 @@ package com.mobileaviationtools.nav_fly;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,19 +15,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
-import com.mobileaviationtools.airnavdata.AirnavDatabase;
-import com.mobileaviationtools.airnavdata.Api.AirnavClient;
-import com.mobileaviationtools.airnavdata.Api.AirportsAPIDataSource;
-import com.mobileaviationtools.airnavdata.Api.DatabaseTest;
-import com.mobileaviationtools.airnavdata.Api.NavaidAPIDataSource;
-import com.mobileaviationtools.airnavdata.Api.RetrofitTest;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
-import com.mobileaviationtools.airnavdata.Firebase.AirportsDataSource;
-import com.mobileaviationtools.airnavdata.Firebase.FBStatistics;
-import com.mobileaviationtools.airnavdata.Firebase.NavaidDataSource;
-import com.mobileaviationtools.airnavdata.Models.Statistics;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
@@ -38,30 +26,26 @@ import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.Route;
-import com.mobileaviationtools.nav_fly.Route.RouteEvents;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
-import com.mobileaviationtools.nav_fly.Route.Waypoint;
+import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.android.cache.TileCache;
+import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
-import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
-import org.oscim.event.Gesture;
-import org.oscim.event.MotionEvent;
+import org.oscim.layers.BitmapLayer;
+import org.oscim.layers.BitmapLocationLayer;
 import org.oscim.layers.GroupLayer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.layers.vector.VectorLayer;
-import org.oscim.layers.vector.geometries.LineDrawable;
-import org.oscim.layers.vector.geometries.Style;
-import org.oscim.layers.vector.PathLayer;
 import org.oscim.map.Map;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.GLViewport;
@@ -76,7 +60,6 @@ import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
-import java.util.Date;
 
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
@@ -128,8 +111,11 @@ public class MainActivity extends AppCompatActivity {
 
         setupMap();
         createLayers();
+
         //getMBTilesMapPerm();
-        //setupPathLayer();
+        //getBitmapOverlayPerm();
+        viewportTest();
+
         setupAirspacesLayer();
         addMarkerLayers();
 
@@ -190,13 +176,20 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private enum  requestType
+    {
+        mbtiles,
+        bitmap
+    }
+    private requestType request_Type;
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_EXTERNAL_STORAGE_ACCESS: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
-                    getMBTilesMap();
+                    if (request_Type==requestType.mbtiles) getMBTilesMap();
+                    if (request_Type==requestType.bitmap) getBitmapOverlay();
                 }
             }
             return;
@@ -209,39 +202,51 @@ public class MainActivity extends AppCompatActivity {
         mAirspaceLayer = new AirspaceLayer(mMap, this);
     }
 
-    void setupPathLayer()
-    {
-        Style lineStyle = Style.builder()
-                .fillColor(Color.BLUE)
-                .strokeColor(Color.BLACK)
-                .strokeWidth(2).build();
-
-        PathLayer pathLayer = new PathLayer(mMap, lineStyle){
-            @Override
-            public boolean onGesture(Gesture g, MotionEvent e) {
-                if (g instanceof Gesture.Tap) {
-                    if (contains(e.getX(), e.getY())) {
-                        Toast.makeText(MainActivity.this, "PathLayer tap\n" + mMap.viewport().fromScreenPoint(e.getX(), e.getY()), Toast.LENGTH_SHORT).show();
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
-        mMap.layers().add(pathLayer);
-    }
-
-
 
     void getMBTilesMapPerm()
     {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
         {
+            request_Type = requestType.mbtiles;
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
         }
         else {
             getMBTilesMap();
         }
+    }
+
+    void getBitmapOverlayPerm()
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        {
+            request_Type = requestType.bitmap;
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
+        }
+        else {
+            getBitmapOverlay();
+        }
+    }
+
+    void getBitmapOverlay()
+    {
+        BitmapLocationLayer userBitmapLayer = new BitmapLocationLayer(mMap, null);
+        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
+        Drawable drawable = Drawable.createFromPath(folder);
+        org.oscim.backend.canvas.Bitmap bitTest = AndroidGraphics.drawableToBitmap(drawable);
+        userBitmapLayer.getBitmapRenderer().setBitmap(bitTest, 1024, 1024);
+        userBitmapLayer.getBitmapRenderer().setOffset(0, 0);
+        userBitmapLayer.getBitmapRenderer().setPosition(GLViewport.Position.CENTER);
+        mMap.layers().add(userBitmapLayer);
+
+        //userBitmapLayer.getBitmapRenderer().setOffset(0,0);
+        //userBitmapLayer.getBitmapRenderer().update(mMap.viewport().);
+    }
+
+    void viewportTest()
+    {
+        BitmapToTile bitmapToTile = new BitmapToTile();
+        bitmapToTile.Test(mMapView, mMap);
     }
 
     void getMBTilesMap()
@@ -298,6 +303,7 @@ public class MainActivity extends AppCompatActivity {
         renderer.setPosition(GLViewport.Position.BOTTOM_LEFT);
         renderer.setOffset(5 * CanvasAdapter.getScale(), 0);
         mMap.layers().add(mapScaleBarLayer);
+
 
         mMap.setTheme(VtmThemes.DEFAULT);
     }
