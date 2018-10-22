@@ -1,5 +1,7 @@
 package com.mobileaviationtools.nav_fly.Test;
 
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 
@@ -62,10 +64,22 @@ public class BitmapToTile {
             FileInputStream fileInputStream = new FileInputStream(file);
             bitTest = AndroidGraphics.decodeBitmap(fileInputStream);
 
-            Bitmap m = CanvasAdapter.newBitmap(256, 256, 0);
-            Canvas c = CanvasAdapter.newCanvas();
-            c.setBitmap(m);
-            c.drawBitmap(bitTest, (float)p2.x, (float)p2.y);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = android.graphics.Bitmap.Config.ARGB_8888;
+            android.graphics.Bitmap bitmap = BitmapFactory.decodeFile(filename, options);
+
+            options.inMutable = true;
+
+            android.graphics.Bitmap bbb = android.graphics.Bitmap.createBitmap(256, 256, android.graphics.Bitmap.Config.ARGB_8888);
+            android.graphics.Canvas cc = new android.graphics.Canvas(bbb);
+
+            cc.drawBitmap(bitmap, new Rect(Math.round((float)p1.x), Math.round((float)p1.y), Math.round((float)p2.x), Math.round((float)p2.y)),
+                    new Rect(0,0,255,255), null);
+
+//            Bitmap m = CanvasAdapter.newBitmap(256, 256, 0);
+//            Canvas c = CanvasAdapter.newCanvas();
+//            c.setBitmap(m);
+//            c.drawBitmap(bitTest, (float)p2.x, (float)p2.y);
             int i=0;
 
         } catch (Exception e) {

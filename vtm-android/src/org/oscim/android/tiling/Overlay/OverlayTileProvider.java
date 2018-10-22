@@ -108,7 +108,7 @@ public class OverlayTileProvider {
             viewController.toScreenPoint(new GeoPoint(tbb.getMinLatitude(), tbb.getMaxLongitude()), p2);
 
             android.graphics.Canvas cc = new android.graphics.Canvas();
-            //cc.
+            //android.graphics.Bitmap bb =
 
             Bitmap m = CanvasAdapter.newBitmap(256, 256, 0);
             Canvas c = CanvasAdapter.newCanvas();
