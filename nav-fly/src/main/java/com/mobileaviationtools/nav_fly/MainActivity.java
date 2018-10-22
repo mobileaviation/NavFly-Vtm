@@ -245,8 +245,10 @@ public class MainActivity extends AppCompatActivity {
 
     void viewportTest()
     {
+        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
         BitmapToTile bitmapToTile = new BitmapToTile();
-        bitmapToTile.Test(mMapView, mMap);
+        bitmapToTile.Test(mMapView, mMap, folder);
     }
 
     void getMBTilesMap()
