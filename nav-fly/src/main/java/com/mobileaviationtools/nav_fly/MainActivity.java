@@ -65,10 +65,6 @@ import java.io.File;
 
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
-//import androidx.annotation.NonNull;
-//import androidx.appcompat.app.AppCompatActivity;
-//import androidx.core.app.ActivityCompat;
-//import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
     final static boolean USE_CACHE = false;
@@ -115,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
         createLayers();
 
         //getMBTilesMapPerm();
-        //getBitmapOverlayPerm();
-        viewportTest();
+        getBitmapOverlayPerm();
+        //viewportTest();
 
         setupAirspacesLayer();
         addMarkerLayers();
@@ -231,18 +227,6 @@ public class MainActivity extends AppCompatActivity {
 
     void getBitmapOverlay()
     {
-//        BitmapLocationLayer userBitmapLayer = new BitmapLocationLayer(mMap, null);
-//        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-//        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
-//        Drawable drawable = Drawable.createFromPath(folder);
-//        org.oscim.backend.canvas.Bitmap bitTest = AndroidGraphics.drawableToBitmap(drawable);
-//        userBitmapLayer.getBitmapRenderer().setBitmap(bitTest, 1024, 1024);
-//        userBitmapLayer.getBitmapRenderer().setOffset(0, 0);
-//        userBitmapLayer.getBitmapRenderer().setPosition(GLViewport.Position.CENTER);
-//        mMap.layers().add(userBitmapLayer);
-
-        //userBitmapLayer.getBitmapRenderer().setOffset(0,0);
-        //userBitmapLayer.getBitmapRenderer().update(mMap.viewport().);
         BoundingBox bb = new BoundingBox(52.31267664,5.38673401, 52.58511188, 5.71289063);
         File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";

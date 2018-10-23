@@ -52,7 +52,7 @@ public class OverlayTileSource extends TileSource {
 
     public class OverlayTileDecoder implements ITileDecoder {
 
-        @Override
+
         public boolean decode(Tile tile, ITileDataSink sink, InputStream is)
                 throws IOException {
 

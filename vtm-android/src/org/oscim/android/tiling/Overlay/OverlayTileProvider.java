@@ -1,25 +1,18 @@
 package org.oscim.android.tiling.Overlay;
 
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-
-import org.oscim.android.canvas.AndroidGraphics;
-import org.oscim.backend.CanvasAdapter;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.util.AffineTransformation;
+import org.oscim.android.canvas.AndroidBitmap;
 import org.oscim.backend.canvas.Bitmap;
-import org.oscim.backend.canvas.Canvas;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.Box;
-import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
-import org.oscim.core.Point;
 import org.oscim.core.Tile;
-import org.oscim.map.ViewController;
-import org.oscim.utils.MinHeap;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.nio.ByteBuffer;
 
 public class OverlayTileProvider {
     private String mErrorMessage;
@@ -44,7 +37,6 @@ public class OverlayTileProvider {
     private Integer mWidth;
     private Integer mHeight;
 
-    private MapPosition mapPosition;
 
     // ------------------------------------------------------------------------
     // Constructors
@@ -72,10 +64,6 @@ public class OverlayTileProvider {
                 mWidth = mBitmap.getWidth();
                 mHeight = mBitmap.getHeight();
 
-                mapPosition = new MapPosition();
-                mapPosition.setByBoundingBox(mImageOverlayBounds, mWidth, mHeight);
-                mapPosition.setPosition(mImageOverlayBounds.getMaxLatitude(), mImageOverlayBounds.getMinLongitude());
-
                 this.calculateZoomConstraints();
                 this.calculateBounds();
                 return true;
@@ -99,33 +87,84 @@ public class OverlayTileProvider {
         byte[] tile = null;
         if (this.isZoomLevelAvailable(z)) {
             Tile t = new Tile(x, y, (byte)z);
-            BoundingBox tbb = t.getBoundingBox();
-            ViewController viewController = new ViewController();
-            viewController.setViewSize(mWidth, mHeight);
-            viewController.setMapPosition(mapPosition);
+            if (this.isWithinBounds(t)) {
+                BoundingBox tbb = t.getBoundingBox();
 
-            Point p1  = new Point();
-            viewController.toScreenPoint(new GeoPoint(tbb.getMaxLatitude(), tbb.getMinLongitude()), p1);
+                Coordinate cc1 = new Coordinate(mImageOverlayBounds.getMinLongitude(), mImageOverlayBounds.getMinLatitude());
+                Coordinate cc2 = new Coordinate(mImageOverlayBounds.getMaxLongitude(), mImageOverlayBounds.getMaxLatitude());
+                Envelope wBox = new Envelope(cc1, cc2);
+                Envelope pBox = new Envelope(0, mWidth, 0, mHeight);
+                AffineTransformation wp = getWorldToRectangle(wBox, pBox);
 
-            Point p2  = new Point();
-            //59.514808654785156 46.290672302246094
-            viewController.toScreenPoint(new GeoPoint(tbb.getMinLatitude(), tbb.getMaxLongitude()), p2);
+                Coordinate testC1 = new Coordinate(tbb.getMinLongitude(), tbb.getMaxLatitude());
+                Coordinate p1 = wp.transform(testC1, new Coordinate());
 
-            android.graphics.Bitmap bbb = android.graphics.Bitmap.createBitmap(256, 256, android.graphics.Bitmap.Config.ARGB_8888);
-            android.graphics.Canvas cc = new android.graphics.Canvas(bbb);
+                Coordinate testC2 = new Coordinate(tbb.getMaxLongitude(), tbb.getMinLatitude());
+                Coordinate p2 = wp.transform(testC2, new Coordinate());
 
-            cc.drawBitmap(mBitmap
-                    , new Rect(Math.round((float)p1.x), Math.round((float)p1.y), Math.round((float)p2.x), Math.round((float)p2.y)),
-                    new Rect(0,0,255,255), null);
+                android.graphics.Bitmap tempbb = android.graphics.Bitmap.createBitmap(
+                        (int)Math.abs(p2.x-p1.x), (int)Math.abs(p2.y-p1.y),
+                        android.graphics.Bitmap.Config.ARGB_8888);
 
-            int size = 256 * 256;
-            ByteBuffer byteBuffer = ByteBuffer.allocate(size);
-            bbb.copyPixelsToBuffer(byteBuffer);
-            tile = byteBuffer.array();
+                android.graphics.Canvas cc = new android.graphics.Canvas(tempbb);
+
+                cc.drawBitmap(mBitmap
+                        , new Rect(Math.round((float) p1.x), Math.round((float) p1.y), Math.round((float) p2.x), Math.round((float) p2.y)),
+                        new Rect(0, 0, (int)Math.abs(p2.x-p1.x), (int)Math.abs(p2.y-p1.y)), null);
+
+                Bitmap b = new AndroidBitmap(getResizedBitmap(tempbb, 256, 256, false));
+                tile = b.getPngEncodedData();
+            }
 
         }
         return tile;
     }
+
+    private static android.graphics.Bitmap getResizedBitmap(android.graphics.Bitmap bm, int newWidth, int newHeight, boolean isNecessaryToKeepOrig) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        android.graphics.Bitmap scaledBitmap = android.graphics.Bitmap.createBitmap(newWidth, newHeight,
+                android.graphics.Bitmap.Config.ARGB_8888);
+
+        android.graphics.Canvas canvas = new android.graphics.Canvas(scaledBitmap);
+        canvas.setMatrix(matrix);
+        canvas.drawBitmap(bm, 0, 0, new Paint(Paint.FILTER_BITMAP_FLAG));
+
+        return scaledBitmap;
+    }
+
+    private AffineTransformation getWorldToRectangle(Envelope worldEnvelop, Envelope pixelsEnvelop)
+    {
+        int cols = (int) pixelsEnvelop.getWidth();
+        int rows = (int) pixelsEnvelop.getHeight();
+
+        double worldWidth = worldEnvelop.getWidth();
+        double worldHeight = worldEnvelop.getHeight();
+
+        double x = -worldEnvelop.getMinX();
+        double y = -worldEnvelop.getMinY();
+        AffineTransformation translate = AffineTransformation.translationInstance(x,y);
+
+        double xScale = cols / worldWidth;
+        double yScale = rows / worldHeight;
+        AffineTransformation scale = AffineTransformation.scaleInstance(xScale, yScale);
+
+        AffineTransformation mirror_y = new AffineTransformation(1, 0, 0, 0, -1, rows);
+
+        AffineTransformation world2pixel = new AffineTransformation(translate);
+        world2pixel.compose(scale);
+        world2pixel.compose(mirror_y);
+
+        return world2pixel;
+    }
+
 
     // ------------------------------------------------------------------------
     // Closeable Interface
@@ -189,12 +228,17 @@ public class OverlayTileProvider {
         return (zoom >= this.mMinimumZoom) && (zoom <= this.mMaximumZoom);
     }
 
+    public boolean isWithinBounds(Tile tile)
+    {
+        return tile.getBoundingBox().intersects(mImageOverlayBounds);
+    }
+
     // ------------------------------------------------------------------------
     // Private Methods
     // ------------------------------------------------------------------------
 
     private void calculateZoomConstraints() {
-        this.mMinimumZoom = 2;
+        this.mMinimumZoom = 10;
         this.mMaximumZoom = 20;
     }
 
