@@ -33,8 +33,10 @@ import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.android.cache.TileCache;
 import org.oscim.android.canvas.AndroidGraphics;
+import org.oscim.android.tiling.Overlay.OverlayTileSource;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
+import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
@@ -229,18 +231,26 @@ public class MainActivity extends AppCompatActivity {
 
     void getBitmapOverlay()
     {
-        BitmapLocationLayer userBitmapLayer = new BitmapLocationLayer(mMap, null);
-        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
-        Drawable drawable = Drawable.createFromPath(folder);
-        org.oscim.backend.canvas.Bitmap bitTest = AndroidGraphics.drawableToBitmap(drawable);
-        userBitmapLayer.getBitmapRenderer().setBitmap(bitTest, 1024, 1024);
-        userBitmapLayer.getBitmapRenderer().setOffset(0, 0);
-        userBitmapLayer.getBitmapRenderer().setPosition(GLViewport.Position.CENTER);
-        mMap.layers().add(userBitmapLayer);
+//        BitmapLocationLayer userBitmapLayer = new BitmapLocationLayer(mMap, null);
+//        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
+//        Drawable drawable = Drawable.createFromPath(folder);
+//        org.oscim.backend.canvas.Bitmap bitTest = AndroidGraphics.drawableToBitmap(drawable);
+//        userBitmapLayer.getBitmapRenderer().setBitmap(bitTest, 1024, 1024);
+//        userBitmapLayer.getBitmapRenderer().setOffset(0, 0);
+//        userBitmapLayer.getBitmapRenderer().setPosition(GLViewport.Position.CENTER);
+//        mMap.layers().add(userBitmapLayer);
 
         //userBitmapLayer.getBitmapRenderer().setOffset(0,0);
         //userBitmapLayer.getBitmapRenderer().update(mMap.viewport().);
+        BoundingBox bb = new BoundingBox(52.31267664,5.38673401, 52.58511188, 5.71289063);
+        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
+
+        OverlayTileSource overlayTileSource = new OverlayTileSource(folder, bb);
+        overlayTileSource.open();
+        mBitmapLayer = new BitmapTileLayer(mMap, overlayTileSource);
+        mMap.layers().add(mBitmapLayer);
     }
 
     void viewportTest()
@@ -248,7 +258,8 @@ public class MainActivity extends AppCompatActivity {
         File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
         BitmapToTile bitmapToTile = new BitmapToTile();
-        bitmapToTile.Test(mMapView, mMap, folder);
+        //bitmapToTile.Test(mMapView, mMap, folder);
+        bitmapToTile.TransformTest();
     }
 
     void getMBTilesMap()

@@ -1,5 +1,7 @@
 package org.oscim.android.tiling.Overlay;
 
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
 import org.oscim.android.canvas.AndroidGraphics;
@@ -17,6 +19,7 @@ import org.oscim.utils.MinHeap;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.ByteBuffer;
 
 public class OverlayTileProvider {
     private String mErrorMessage;
@@ -37,11 +40,10 @@ public class OverlayTileProvider {
     private BoundingBox mImageOverlayBounds;
 
     private String mPathToFile;
-    private Bitmap mBitmap;
+    private android.graphics.Bitmap mBitmap;
     private Integer mWidth;
     private Integer mHeight;
 
-    private ViewController viewController;
     private MapPosition mapPosition;
 
     // ------------------------------------------------------------------------
@@ -50,7 +52,6 @@ public class OverlayTileProvider {
     public OverlayTileProvider(String pathToFile, BoundingBox imageOverlayBounds) {
         mImageOverlayBounds = imageOverlayBounds;
         mPathToFile = pathToFile;
-        viewController = new ViewController();
     }
 
     public Boolean open()
@@ -58,18 +59,19 @@ public class OverlayTileProvider {
         if (new File(mPathToFile).exists()) {
 
             try {
-                FileInputStream fileInputStream = new FileInputStream(mPathToFile);
-                mBitmap = AndroidGraphics.decodeBitmap(fileInputStream);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = android.graphics.Bitmap.Config.ARGB_8888;
+                mBitmap = BitmapFactory.decodeFile(mPathToFile, options);
             }
             catch (Exception e)
             {
                 return false;
             }
-            if (mBitmap.isValid())
+            if (mBitmap != null)
             {
                 mWidth = mBitmap.getWidth();
                 mHeight = mBitmap.getHeight();
-                viewController.setViewSize(mWidth, mHeight);
+
                 mapPosition = new MapPosition();
                 mapPosition.setByBoundingBox(mImageOverlayBounds, mWidth, mHeight);
                 mapPosition.setPosition(mImageOverlayBounds.getMaxLatitude(), mImageOverlayBounds.getMinLongitude());
@@ -98,6 +100,8 @@ public class OverlayTileProvider {
         if (this.isZoomLevelAvailable(z)) {
             Tile t = new Tile(x, y, (byte)z);
             BoundingBox tbb = t.getBoundingBox();
+            ViewController viewController = new ViewController();
+            viewController.setViewSize(mWidth, mHeight);
             viewController.setMapPosition(mapPosition);
 
             Point p1  = new Point();
@@ -107,17 +111,18 @@ public class OverlayTileProvider {
             //59.514808654785156 46.290672302246094
             viewController.toScreenPoint(new GeoPoint(tbb.getMinLatitude(), tbb.getMaxLongitude()), p2);
 
-            android.graphics.Canvas cc = new android.graphics.Canvas();
-            //android.graphics.Bitmap bb =
+            android.graphics.Bitmap bbb = android.graphics.Bitmap.createBitmap(256, 256, android.graphics.Bitmap.Config.ARGB_8888);
+            android.graphics.Canvas cc = new android.graphics.Canvas(bbb);
 
-            Bitmap m = CanvasAdapter.newBitmap(256, 256, 0);
-            Canvas c = CanvasAdapter.newCanvas();
-            c.setBitmap(m);
-            c.drawBitmap(mBitmap, (float)p2.x, (float)p2.y);
+            cc.drawBitmap(mBitmap
+                    , new Rect(Math.round((float)p1.x), Math.round((float)p1.y), Math.round((float)p2.x), Math.round((float)p2.y)),
+                    new Rect(0,0,255,255), null);
 
-            tile = m.getPngEncodedData();
-            //Canvas c = CanvasAdapter.newCanvas();
-            //c.
+            int size = 256 * 256;
+            ByteBuffer byteBuffer = ByteBuffer.allocate(size);
+            bbb.copyPixelsToBuffer(byteBuffer);
+            tile = byteBuffer.array();
+
         }
         return tile;
     }

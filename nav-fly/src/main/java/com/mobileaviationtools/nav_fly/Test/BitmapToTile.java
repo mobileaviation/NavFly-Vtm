@@ -2,9 +2,17 @@ package com.mobileaviationtools.nav_fly.Test;
 
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.util.AffineTransformation;
+import org.locationtech.jts.shape.GeometricShapeBuilder;
+import org.locationtech.jts.util.GeometricShapeFactory;
 import org.oscim.android.MapView;
 import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.backend.CanvasAdapter;
@@ -23,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 public class BitmapToTile {
     public BitmapToTile()
@@ -31,6 +40,57 @@ public class BitmapToTile {
     }
 
     private ViewController viewController;
+
+    public void TransformTest()
+    {
+        GeometryFactory f = new GeometryFactory();
+        Coordinate[] cc = new Coordinate[2];
+        cc[0] = new Coordinate(5.38673401, 52.31267664);
+        cc[1] = new Coordinate(5.71289063, 52.58511188);
+        Geometry g = f.createLineString(cc);
+        Envelope wBox = new Envelope(cc[0], cc[1]);
+        Envelope pBox = new Envelope(0,1075, 0, 1435);
+        AffineTransformation wp = getWorldToRectangle(wBox, pBox);
+
+        Tile t = getTile(52.4, 5.4, (byte)11);
+        BoundingBox tbb = t.getBoundingBox();
+
+        Coordinate testC1 = new Coordinate(tbb.getMinLongitude(), tbb.getMaxLatitude());
+        Coordinate newC1 = wp.transform(testC1, new Coordinate());
+
+        Coordinate testC2 = new Coordinate(tbb.getMaxLongitude(), tbb.getMinLatitude());
+        Coordinate newC2 = wp.transform(testC2, new Coordinate());
+
+
+
+        int I=0;
+    }
+
+    private AffineTransformation getWorldToRectangle(Envelope worldEnvelop, Envelope pixelsEnvelop)
+    {
+        int cols = (int) pixelsEnvelop.getWidth();
+        int rows = (int) pixelsEnvelop.getHeight();
+
+        double worldWidth = worldEnvelop.getWidth();
+        double worldHeight = worldEnvelop.getHeight();
+
+        double x = -worldEnvelop.getMinX();
+        double y = -worldEnvelop.getMinY();
+        AffineTransformation translate = AffineTransformation.translationInstance(x,y);
+
+        double xScale = cols / worldWidth;
+        double yScale = rows / worldHeight;
+        AffineTransformation scale = AffineTransformation.scaleInstance(xScale, yScale);
+
+        AffineTransformation mirror_y = new AffineTransformation(1, 0, 0, 0, -1, rows);
+
+        AffineTransformation world2pixel = new AffineTransformation(translate);
+        world2pixel.compose(scale);
+        world2pixel.compose(mirror_y);
+
+        return world2pixel;
+    }
+
 
     public void Test(MapView view, Map map, String filename)
     {
@@ -46,7 +106,7 @@ public class BitmapToTile {
         newPos.setByBoundingBox(bb, 1075, 1435);
         newPos.setPosition(new GeoPoint(52.58511188, 5.38673401));
 
-        Tile t = getTile(52.58511188, 5.38673401, (byte)14);
+        Tile t = getTile(52.58511188, 5.38673401, (byte)11);
         BoundingBox tbb = t.getBoundingBox();
 
         v.setMapPosition(newPos);
@@ -61,9 +121,6 @@ public class BitmapToTile {
         File file = new File(filename);
         Bitmap bitTest = null;
         try {
-            FileInputStream fileInputStream = new FileInputStream(file);
-            bitTest = AndroidGraphics.decodeBitmap(fileInputStream);
-
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = android.graphics.Bitmap.Config.ARGB_8888;
             android.graphics.Bitmap bitmap = BitmapFactory.decodeFile(filename, options);
@@ -75,6 +132,11 @@ public class BitmapToTile {
 
             cc.drawBitmap(bitmap, new Rect(Math.round((float)p1.x), Math.round((float)p1.y), Math.round((float)p2.x), Math.round((float)p2.y)),
                     new Rect(0,0,255,255), null);
+
+            int size = 256 * 256;
+            ByteBuffer byteBuffer = ByteBuffer.allocate(size);
+            bbb.copyPixelsToBuffer(byteBuffer);
+            //byteArray = byteBuffer.array();
 
 //            Bitmap m = CanvasAdapter.newBitmap(256, 256, 0);
 //            Canvas c = CanvasAdapter.newCanvas();

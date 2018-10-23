@@ -30,7 +30,8 @@ public class OverlayTileSource extends TileSource {
 
     @Override
     public ITileDataSource getDataSource() {
-        return null;
+        return
+                new OverlayTileDataSource(this, mOverlayTileProvider, new OverlayTileDecoder());
     }
 
     @Override
