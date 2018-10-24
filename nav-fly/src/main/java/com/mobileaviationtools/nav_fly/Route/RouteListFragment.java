@@ -18,6 +18,7 @@ import android.widget.ListView;
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.nav_fly.MainActivity;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Route.Info.InfoLayout;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsAirportItemAdapter;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherListLayout;
@@ -49,7 +50,8 @@ public class RouteListFragment extends Fragment {
     {
         route,
         weather,
-        notams
+        notams,
+        info
     }
 
     private String TAG = "RouteListFragment";
@@ -63,6 +65,7 @@ public class RouteListFragment extends Fragment {
     private ImageButton routeBtn;
     private ImageButton weatherBtn;
     private ImageButton notamsBtn;
+    private ImageButton infoBtn;
 
     private ImageButton routeNewBtn;
     private ImageButton routeOpenBtn;
@@ -71,6 +74,7 @@ public class RouteListFragment extends Fragment {
     private LinearLayout routeLayout;
     private NotamsListLayout notamsLayout;
     private WeatherListLayout weatherLayout;
+    private InfoLayout infoLayout;
 
     private ListView airportsList;
 
@@ -89,6 +93,7 @@ public class RouteListFragment extends Fragment {
         routeBtn = (ImageButton) view.findViewById(R.id.routeTabBtn);
         weatherBtn = (ImageButton) view.findViewById(R.id.weatherTabBtn);
         notamsBtn = (ImageButton) view.findViewById(R.id.notamsTabBtn);
+        infoBtn = (ImageButton) view.findViewById(R.id.infoTabBtn);
 
         routeNewBtn = (ImageButton) view.findViewById(R.id.routeNewBtn);
         routeOpenBtn = (ImageButton) view.findViewById(R.id.routeLoadBtn);
@@ -105,9 +110,14 @@ public class RouteListFragment extends Fragment {
         weatherLayout.setVisibility(View.GONE);
         weatherLayout.init(getContext(), getActivity());
 
+        infoLayout = (InfoLayout) view.findViewById(R.id.infoLayout);
+        infoLayout.init(getContext(), getActivity());
+        infoLayout.setVisibility(View.GONE);
+
         setWeatherBtnOnClick();
         setNotamBtnOnClick();
         setRouteBtnOnClick();
+        setInfoBtnOnClick();
         setRouteFileBtnSClickEvents();
 
         return view;
@@ -163,6 +173,7 @@ public class RouteListFragment extends Fragment {
                         ((overrideGone) ? View.VISIBLE : View.GONE) : View.VISIBLE);
                 weatherLayout.setVisibility(View.GONE);
                 notamsLayout.setVisibility(View.GONE);
+                infoLayout.setVisibility(View.GONE);
                 return (routeLayout.getVisibility()==View.VISIBLE);
             }
             case notams:{
@@ -170,6 +181,7 @@ public class RouteListFragment extends Fragment {
                         ((overrideGone) ? View.VISIBLE : View.GONE) : View.VISIBLE);
                 weatherLayout.setVisibility(View.GONE);
                 routeLayout.setVisibility(View.GONE);
+                infoLayout.setVisibility(View.GONE);
                 return (notamsLayout.getVisibility()==View.VISIBLE);
             }
             case weather:
@@ -178,7 +190,17 @@ public class RouteListFragment extends Fragment {
                         ((overrideGone) ? View.VISIBLE : View.GONE) : View.VISIBLE);
                 routeLayout.setVisibility(View.GONE);
                 notamsLayout.setVisibility(View.GONE);
+                infoLayout.setVisibility(View.GONE);
                 return (weatherLayout.getVisibility()==View.VISIBLE);
+            }
+            case info:
+            {
+                infoLayout.setVisibility((infoLayout.getVisibility()==View.VISIBLE) ?
+                        ((overrideGone) ? View.VISIBLE : View.GONE) : View.VISIBLE);
+                routeLayout.setVisibility(View.GONE);
+                notamsLayout.setVisibility(View.GONE);
+                weatherLayout.setVisibility(View.GONE);
+                return (infoLayout.getVisibility()==View.VISIBLE);
             }
         }
         return false;
@@ -216,6 +238,18 @@ public class RouteListFragment extends Fragment {
                 if (setLayoutVisiblity(layoutType.notams, false)) {
                     notamsLayout.setMap(map);
                     notamsLayout.notamBtnClick();
+                }
+            }
+        });
+    }
+
+    private void setInfoBtnOnClick()
+    {
+        infoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (setLayoutVisiblity(layoutType.info, false)){
+                    infoLayout.setMap(map);
                 }
             }
         });

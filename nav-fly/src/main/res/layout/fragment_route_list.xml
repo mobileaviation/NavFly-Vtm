@@ -65,6 +65,22 @@
                 android:paddingRight="10dp"
                 android:paddingTop="5dp"
                 android:src="@drawable/notam_routebtn" />
+
+            <ImageButton
+                android:id="@+id/infoTabBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:background="@color/complementaryColor5"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:src="@drawable/infobtn" />
         </LinearLayout>
 
         <LinearLayout
@@ -254,7 +270,7 @@
                 android:layout_height="match_parent"
                 android:background="@color/primaryColor3"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -318,6 +334,143 @@
                     android:dividerHeight="1dp"></ListView>
             </LinearLayout>
 
+            <com.mobileaviationtools.nav_fly.Route.Info.InfoLayout
+                android:id="@+id/infoLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/complementaryColor1"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:text="Airport &amp; Navaid Info"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold|italic" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right|center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/infoRefreshBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:layout_margin="5dp"
+                            android:background="@color/complementaryColor5"
+                            android:padding="5dp"
+                            android:src="@drawable/refresh" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ListView
+                    android:id="@+id/infoAirportsListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_weight="2"></ListView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/black"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/infoItemLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:background="@color/complementaryColor5"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="15dp"
+                            android:text="Schiphol Airport............................."
+                            android:textColor="@color/primaryColor5"
+                            android:textSize="18sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/textView2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginTop="15dp"
+                            android:layout_marginEnd="16dp"
+                            android:text="EHAM"
+                            android:textColor="@color/primaryColor5"
+                            android:textSize="18sp"
+                            android:textStyle="bold|italic"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/textView"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/textView3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="8dp"
+                            android:text="Runways: 04/22, 06/24, 09/27, 18L/36R, 18C/36C, 18R/36L"
+                            android:textColor="@color/secundaryColorB5"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+                        <TextView
+                            android:id="@+id/textView5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="8dp"
+                            android:paddingBottom="8dp"
+                            android:text="Frequencies: TWR 119,225, GND 121,700, ATIS 108,400"
+                            android:textColor="@color/secundaryColorB5"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/additionalInfoItemLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:background="@color/secundaryColorB5"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_weight="10"
+                            android:text="Info:"
+                            android:textSize="16sp"
+                            android:textStyle="bold|italic" />
+
+
+                    </LinearLayout>
+                </LinearLayout>
+            </com.mobileaviationtools.nav_fly.Route.Info.InfoLayout>
         </LinearLayout>
 
     </LinearLayout>
