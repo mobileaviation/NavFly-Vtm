@@ -2,7 +2,9 @@ package com.mobileaviationtools.nav_fly.Classes;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jts.util.GeometricShapeFactory;
 import org.oscim.core.GeoPoint;
 
 import java.util.ArrayList;
@@ -41,4 +43,24 @@ public class GeometryHelpers {
 
         return new GeoPoint(Math.toDegrees(lat3), Math.toDegrees(lon3));
     }
+
+
+    public static Geometry getCircle(GeoPoint p, double diameter)
+    {
+        double latitude = p.getLatitude();
+        double longitude = p.getLongitude();
+        double diameterInMeters = diameter; // meter
+
+        GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
+        shapeFactory.setNumPoints(50); // adjustable
+        shapeFactory.setCentre(new Coordinate(latitude, longitude));
+        // Length in meters of 1° of latitude = always 111.32 km
+        shapeFactory.setWidth(diameterInMeters/111320d);
+        // Length in meters of 1° of longitude = 40075 km * cos( latitude ) / 360
+        shapeFactory.setHeight(diameterInMeters / (40075000 * Math.cos(Math.toRadians(latitude)) / 360));
+
+        return shapeFactory.createEllipse();
+    }
+
+
 }
