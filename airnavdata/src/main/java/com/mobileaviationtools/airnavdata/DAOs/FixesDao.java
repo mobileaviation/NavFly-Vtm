@@ -27,4 +27,7 @@ public abstract class FixesDao {
 
     @Query("SELECT * FROM tbl_Fixes WHERE id=:id")
     public abstract Fix getFixesByID(Long id);
+
+    @Query("SELECT * FROM tbl_Fixes WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat)")
+    public abstract Fix[] getFixessWithinBoundsByTypes(double Wlon, double Elon, double Nlat, double Slat);
 }

@@ -39,6 +39,18 @@ public class GeoPointConvertion {
         return pointDMS;
     }
 
+    public String getStringFormattedDMS(GeoPoint location)
+    {
+        GeoPointDMS dms = getGeoPointDMS(location);
+        String loc = dms.latitude.direction + dms.latitude.degrees.toString() + "º"
+        + dms.latitude.minutes.toString() + "'"  + dms.latitude.seconds.toString()  + "\""
+        + dms.longitude.direction + String.format("%03d", dms.longitude.degrees) + "º"
+        //        + dms.longitude.degrees.toString() + "º"
+                + dms.longitude.minutes.toString() + "'"  + dms.longitude.seconds.toString() + "\"";
+
+        return loc;
+    }
+
     public GeoPointDMS getNewGeoPointDMS()
     {
         return new GeoPointDMS();

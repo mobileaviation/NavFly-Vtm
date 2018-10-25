@@ -53,7 +53,7 @@ public class GeometryHelpers {
 
         GeometricShapeFactory shapeFactory = new GeometricShapeFactory();
         shapeFactory.setNumPoints(50); // adjustable
-        shapeFactory.setCentre(new Coordinate(latitude, longitude));
+        shapeFactory.setCentre(new Coordinate(longitude, latitude));
         // Length in meters of 1° of latitude = always 111.32 km
         shapeFactory.setWidth(diameterInMeters/111320d);
         // Length in meters of 1° of longitude = 40075 km * cos( latitude ) / 360
