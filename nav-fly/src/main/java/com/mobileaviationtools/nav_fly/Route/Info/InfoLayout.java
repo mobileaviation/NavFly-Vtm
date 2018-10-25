@@ -5,14 +5,19 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.AirportType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
+import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
+import com.mobileaviationtools.airnavdata.Entities.Runway;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Route;
@@ -22,6 +27,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.oscim.core.GeoPoint;
 import org.oscim.map.Map;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +49,17 @@ public class InfoLayout extends LinearLayout {
         navaidsBtn = (ImageButton) findViewById(R.id.navaidsInfoBtn);
         fixesBtn = (ImageButton) findViewById(R.id.fixesInfoBtn);
 
+        visibleTypes = new ArrayList<>();
+        visibleTypes.add(AirportType.large_airport.toString());
+        visibleTypes.add(AirportType.medium_airport.toString());
+        visibleTypes.add(AirportType.small_airport.toString());
+
         setButtonClickListeners();
+        setListViewItemClickListener();
     }
 
     private Map map;
+    private Route route;
     private Context context;
     private Activity activity;
     private ListView itemsList;
@@ -57,14 +70,29 @@ public class InfoLayout extends LinearLayout {
     private ImageButton airportsBtn;
     private ImageButton navaidsBtn;
     private ImageButton fixesBtn;
+    private StationsType stationsType;
+    private ArrayList<String> visibleTypes;
+
+    public enum StationsType
+    {
+        airports,
+        navaids,
+        fixes;
+    }
 
     public void setMap(Map map) {
         this.map = map;
     }
 
+    public void setRoute(Route route)
+    {
+        this.route = route;
+    }
+
     public void init(Context context, Activity activity) {
         this.context = context;
         this.activity = activity;
+        stationsType = StationsType.airports;
     }
 
     private void setButtonClickListeners()
@@ -72,18 +100,29 @@ public class InfoLayout extends LinearLayout {
         airportsBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (airportItems.size()>0)
-                {
-                    infoItemAdapter.setAirports(airportItems);
-                    itemsList.setAdapter(infoItemAdapter);
-                }
+                stationsType = StationsType.airports;
+                LoadList();
             }
         });
     }
 
-    public void FillItemsList(Route route, GeoPoint geoPoint)
+    public void LoadList()
     {
-        loadItemsList(route, geoPoint);
+        loadItemsList(route, map.getMapPosition().getGeoPoint());
+        switch (stationsType){
+            case airports:{
+                infoItemAdapter.setAirports(airportItems);
+                itemsList.setAdapter(infoItemAdapter);
+                break;
+            }
+            case fixes:
+            {
+                break;
+            }
+            case navaids:{
+                break;
+            }
+        }
     }
 
     private Geometry getAreaCheckBuffer(Route route, GeoPoint curPosition)
@@ -103,12 +142,12 @@ public class InfoLayout extends LinearLayout {
             }
             else
             {
-                checkBuf = GeometryHelpers.getCircle(curPosition, 100000d);
+                checkBuf = GeometryHelpers.getCircle(curPosition, 200000d);
             }
         }
         else
         {
-            checkBuf = GeometryHelpers.getCircle(curPosition, 100000d);
+            checkBuf = GeometryHelpers.getCircle(curPosition, 200000d);
         }
 
         return checkBuf;
@@ -124,25 +163,63 @@ public class InfoLayout extends LinearLayout {
         Coordinate c1 = corners[0];
         Coordinate c2 = corners[2];
 
-        Airport[] airports = db.getAirport().getAirportsWithinBounds(c1.x, c2.x, c2.y, c1.y);
-        for (Airport a : airports) {
-            if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(a.longitude_deg, a.latitude_deg)))) {
-                airportItems.add(a);
+        if (stationsType==StationsType.airports) {
+            Airport[] airports = db.getAirport().getAirportsWithinBoundsByTypes(c1.x, c2.x, c2.y, c1.y, visibleTypes);
+            for (Airport a : airports) {
+                if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(a.longitude_deg, a.latitude_deg)))) {
+                    a.runways = db.getRunways().getRunwaysByAirport(a.id);
+                    a.frequencies = db.getFrequency().getFrequenciesByAirport(a.id);
+                    airportItems.add(a);
+                }
             }
         }
 
-        Navaid[] navaids = db.getNavaids().getNavaidsWithinBoundsByTypes(c1.x,c2.x,c2.y,c1.y);
-        for (Navaid n : navaids) {
-            if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(n.longitude_deg, n.latitude_deg)))) {
-                navaidItems.add(n);
+        if (stationsType==StationsType.navaids) {
+            Navaid[] navaids = db.getNavaids().getNavaidsWithinBoundsByTypes(c1.x, c2.x, c2.y, c1.y);
+            for (Navaid n : navaids) {
+                if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(n.longitude_deg, n.latitude_deg)))) {
+                    navaidItems.add(n);
+                }
             }
         }
 
-        Fix[] fixes = db.getFixes().getFixessWithinBoundsByTypes(c1.x,c2.x,c2.y,c1.y);
-        for (Fix f : fixes) {
-            if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(f.longitude_deg, f.latitude_deg)))) {
-                fixItems.add(f);
+        if (stationsType==StationsType.fixes) {
+            Fix[] fixes = db.getFixes().getFixessWithinBoundsByTypes(c1.x, c2.x, c2.y, c1.y);
+            for (Fix f : fixes) {
+                if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(f.longitude_deg, f.latitude_deg)))) {
+                    fixItems.add(f);
+                }
             }
         }
+    }
+
+    private void setListViewItemClickListener()
+    {
+        itemsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                InfoItemAdapter adapter = (InfoItemAdapter)adapterView.getAdapter();
+                Object item = adapter.getItem(i);
+                if (item instanceof Airport)
+                {
+                    Airport a = (Airport) item;
+                    String runways = "Runways: ";
+                    for(Runway r: a.runways)
+                    {
+                        runways = runways + r.he_ident + "/" + r.le_ident + "(" + r.length_ft + "ft), ";
+                    }
+                    String frequencies = "Frequencies: ";
+                    for (Frequency f: a.frequencies)
+                    {
+                        frequencies = frequencies + f.type + ": " + String.format ("%.3f", f.frequency_mhz) + ", ";
+                    }
+
+                    TextView rText = (TextView)findViewById(R.id.runwaysInfoText);
+                    rText.setText(runways);
+                    TextView fText = (TextView)findViewById(R.id.frequenciesInfoText);
+                    fText.setText(frequencies);
+                }
+            }
+        });
     }
 }

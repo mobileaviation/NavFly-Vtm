@@ -68,7 +68,7 @@ public class InfoItemAdapter extends BaseAdapter {
             Airport a = (Airport) station;
             icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
             infoNameTextView.setText(a.name);
-            infoCodeText.setText(a.ident);
+            infoCodeText.setText(a.ident +  ((a.iata_code.isEmpty()) ? "" : " (" + a.iata_code + ")"));
             GeoPointConvertion dms = new GeoPointConvertion();
             infoLocationText.setText(dms.getStringFormattedDMS(new GeoPoint(a.latitude_deg, a.longitude_deg)));
         }

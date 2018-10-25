@@ -77,7 +77,9 @@
         android:id="@+id/infoItemsListView"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_weight="2"></ListView>
+        android:layout_weight="2"
+        android:divider="@android:color/white"
+        android:dividerHeight="2dp"></ListView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -95,47 +97,33 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/runwaysInfoText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="15dp"
-                android:text="Schiphol Airport............................."
-                android:textColor="@color/primaryColor5"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="16dp"
-                android:text="EHAM"
-                android:textColor="@color/primaryColor5"
-                android:textSize="18sp"
-                android:textStyle="bold|italic" />
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
-                android:text="Runways: 04/22, 06/24, 09/27, 18L/36R, 18C/36C, 18R/36L"
-                android:textColor="@color/secundaryColorB5"
-                android:textSize="12sp" />
+                android:shadowColor="@android:color/black"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="1"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/frequenciesInfoText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
                 android:paddingBottom="8dp"
-                android:text="Frequencies: TWR 119,225, GND 121,700, ATIS 108,400"
-                android:textColor="@color/secundaryColorB5"
-                android:textSize="12sp" />
+                android:shadowColor="@android:color/black"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="1"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -145,15 +133,6 @@
             android:layout_marginTop="2dp"
             android:background="@color/secundaryColorB5"
             android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_weight="10"
-                android:text="Info:"
-                android:textSize="16sp"
-                android:textStyle="bold|italic" />
 
 
         </LinearLayout>

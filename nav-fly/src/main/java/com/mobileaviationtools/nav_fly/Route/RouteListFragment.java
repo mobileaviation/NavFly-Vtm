@@ -250,7 +250,8 @@ public class RouteListFragment extends Fragment {
             public void onClick(View view) {
                 if (setLayoutVisiblity(layoutType.info, false)){
                     infoLayout.setMap(map);
-                    infoLayout.FillItemsList(route, map.getMapPosition().getGeoPoint());
+                    infoLayout.setRoute(route);
+                    infoLayout.LoadList();
                 }
             }
         });

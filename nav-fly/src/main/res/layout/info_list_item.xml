@@ -18,18 +18,18 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginBottom="2dp"
             android:layout_marginLeft="2dp"
             android:layout_marginTop="2dp"
-            android:layout_marginBottom="2dp"
             app:srcCompat="@drawable/waypoint2" />
 
         <TextView
             android:id="@+id/infoItemNameText"
             android:layout_width="150dp"
             android:layout_height="match_parent"
+            android:layout_marginBottom="0dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="0dp"
-            android:layout_marginBottom="0dp"
             android:gravity="center_vertical"
             android:text="TextView"
             android:textColor="@android:color/white"
