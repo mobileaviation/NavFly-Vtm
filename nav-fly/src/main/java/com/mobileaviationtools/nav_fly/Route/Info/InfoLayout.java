@@ -1,19 +1,28 @@
 package com.mobileaviationtools.nav_fly.Route.Info;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Environment;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Classes.AirportType;
+import com.mobileaviationtools.airnavdata.Classes.ChartType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
@@ -21,6 +30,7 @@ import com.mobileaviationtools.airnavdata.Entities.Runway;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Route;
+import com.mobileaviationtools.nav_fly.Route.RouteLoadItemAdapter;
 import com.mobileaviationtools.nav_fly.Route.Waypoint;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -29,7 +39,12 @@ import org.oscim.core.GeoPoint;
 import org.oscim.map.Map;
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class InfoLayout extends LinearLayout {
@@ -44,25 +59,34 @@ public class InfoLayout extends LinearLayout {
         fixItems = new ArrayList<>();
         infoItemAdapter = new InfoItemAdapter(getContext());
         itemsList = (ListView) findViewById(R.id.infoItemsListView);
+        airportChartsListView = (ListView) findViewById(R.id.airportChartsListView);
 
         airportsBtn = (ImageButton) findViewById(R.id.airportsInfoBtn);
         navaidsBtn = (ImageButton) findViewById(R.id.navaidsInfoBtn);
         fixesBtn = (ImageButton) findViewById(R.id.fixesInfoBtn);
+        assignChartbtn = (ImageButton) findViewById(R.id.assignChartbtn);
 
         visibleTypes = new ArrayList<>();
         visibleTypes.add(AirportType.large_airport.toString());
         visibleTypes.add(AirportType.medium_airport.toString());
         visibleTypes.add(AirportType.small_airport.toString());
 
+        setSelectedAirport(null);
+        selectedFix = null;
+        selectedNavaid = null;
+
         setButtonClickListeners();
         setListViewItemClickListener();
+        setAssignChartBtnClickListener();
     }
 
+    private String TAG = "InfoLayout";
     private Map map;
     private Route route;
     private Context context;
     private Activity activity;
     private ListView itemsList;
+    private ListView airportChartsListView;
     private InfoItemAdapter infoItemAdapter;
     private List<Airport> airportItems;
     private List<Navaid> navaidItems;
@@ -72,6 +96,17 @@ public class InfoLayout extends LinearLayout {
     private ImageButton fixesBtn;
     private StationsType stationsType;
     private ArrayList<String> visibleTypes;
+    private ImageButton assignChartbtn;
+
+    private Airport selectedAirport;
+    private Navaid selectedNavaid;
+    private Fix selectedFix;
+
+    private void setSelectedAirport(Airport airport)
+    {
+        selectedAirport = airport;
+        assignChartbtn.setEnabled((airport != null));
+    }
 
     public enum StationsType
     {
@@ -213,12 +248,104 @@ public class InfoLayout extends LinearLayout {
                     {
                         frequencies = frequencies + f.type + ": " + String.format ("%.3f", f.frequency_mhz) + ", ";
                     }
+                    setSelectedAirport(a);
 
                     TextView rText = (TextView)findViewById(R.id.runwaysInfoText);
                     rText.setText(runways);
                     TextView fText = (TextView)findViewById(R.id.frequenciesInfoText);
                     fText.setText(frequencies);
                 }
+            }
+        });
+    }
+
+    private void setChartListViewItemClickListerner()
+    {
+
+    }
+
+    public static class MyFileNameFilter implements FilenameFilter {
+
+        private ArrayList<String> ext;
+
+        public MyFileNameFilter(String[] extentions) {
+            this.ext = new ArrayList();
+            for (String e: extentions)
+            {
+                this.ext.add(e.toLowerCase());
+            }
+        }
+
+        @Override
+        public boolean accept(File dir, String name) {
+            boolean ret = false;
+            for (String e : ext)
+            {
+                ret = ret || name.toLowerCase().endsWith(e);
+            }
+            return ret;
+        }
+
+    }
+
+    private void setAssignChartBtnClickListener()
+    {
+        assignChartbtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                File[] files = downloadFolder.listFiles(new MyFileNameFilter(new String[]{".png", ".pdf"}));
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Assign Chart");
+                View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.chart_assign_list_item, (ViewGroup) InfoLayout.this, false);
+                final ListView filesList = (ListView) viewInflated.findViewById(R.id.list);
+
+                final ChartLoadItemAdapter chartLoadItemAdapter = new ChartLoadItemAdapter(files, getContext());
+                filesList.setAdapter(chartLoadItemAdapter);
+
+                filesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        filesList.setItemChecked(i, true);
+                    }
+                });
+                builder.setView(viewInflated);
+                builder.setIcon(android.R.drawable.ic_input_get);
+                builder.setMessage("Select Chart from list!");
+                builder.setPositiveButton("Assign", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int pos = filesList.getCheckedItemPosition();
+                        File file = (File)chartLoadItemAdapter.getItem(pos);
+                        try {
+                            FileInputStream fis = new FileInputStream(file);
+                            byte[] fileBytes = new byte[(int)file.length()];
+                            fis.read(fileBytes, 0, (int)file.length());
+                            Chart chart = new Chart();
+                            chart.filelocation = file.getAbsolutePath();
+                            chart.name = file.getName();
+                            chart.airport_ref = selectedAirport.id;
+                            chart.chart = fileBytes;
+                            chart.type = ChartType.getTypeByExtention(file);
+
+                            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+                            db.getCharts().InsertChart(chart);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.e(TAG, "problems reading " + file.getAbsolutePath());
+                        }
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+                builder.show();
             }
         });
     }
