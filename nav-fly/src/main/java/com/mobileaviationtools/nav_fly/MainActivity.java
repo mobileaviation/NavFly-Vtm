@@ -17,14 +17,17 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
+import com.mobileaviationtools.nav_fly.Layers.ChartsOverlayLayers;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
 import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
+import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     AirportMarkersLayer mAirportMarkersLayer;
     NaviadMarkersLayer mNavaidsMarkersLayer;
     AirspaceLayer mAirspaceLayer;
+    ChartsOverlayLayers chartsOverlayLayers;
 
     private TileCache mCache;
     TileSource mTileSource;
@@ -104,14 +108,14 @@ public class MainActivity extends AppCompatActivity {
 
         mPrefs = new MapPreferences(MainActivity.class.getName(), this);
 
-        routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
-        routeListFragment.setMap(mMap);
+        setupRouteFragment();
 
         setupMap();
         createLayers();
 
         //getMBTilesMapPerm();
-        getBitmapOverlayPerm();
+        //getBitmapOverlayPerm();
+        setupChartsOverlayLayers();
         //viewportTest();
 
         setupAirspacesLayer();
@@ -126,6 +130,22 @@ public class MainActivity extends AppCompatActivity {
                     mNavaidsMarkersLayer.UpdateNavaids();
                     mAirspaceLayer.UpdateAirspaces();
                 }
+            }
+        });
+    }
+
+    private void setupRouteFragment() {
+        routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
+        routeListFragment.setMap(mMap);
+        routeListFragment.setChartEvents(new ChartEvents() {
+            @Override
+            public void OnChartCheckedEvent(Chart chart, Boolean checked) {
+                chartsOverlayLayers.setChart(chart);
+            }
+
+            @Override
+            public void OnChartSelected(Chart chart) {
+
             }
         });
     }
@@ -260,6 +280,12 @@ public class MainActivity extends AppCompatActivity {
             mMap.layers().add(mBitmapLayer);
 
         }
+    }
+
+    void setupChartsOverlayLayers()
+    {
+        chartsOverlayLayers = new ChartsOverlayLayers(this, mMap);
+        chartsOverlayLayers.InitChartsFromDB();
     }
 
     void setupMap()

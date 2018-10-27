@@ -33,6 +33,7 @@ public class OverlayTileProvider {
     private BoundingBox mImageOverlayBounds;
 
     private String mPathToFile;
+    private byte[] mFileBytes;
     private android.graphics.Bitmap mBitmap;
     private Integer mWidth;
     private Integer mHeight;
@@ -46,7 +47,47 @@ public class OverlayTileProvider {
         mPathToFile = pathToFile;
     }
 
+    public OverlayTileProvider(byte[] fileBytes, BoundingBox imageOverlayBounds) {
+        mImageOverlayBounds = imageOverlayBounds;
+        mFileBytes = fileBytes;
+    }
+
     public Boolean open()
+    {
+        if (mFileBytes == null) {
+            return openFile();
+        }
+        else
+        {
+            return openFileBytes();
+        }
+    }
+
+    private Boolean openFileBytes()
+    {
+        if (mFileBytes != null)
+            if (mFileBytes.length>0) {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = android.graphics.Bitmap.Config.ARGB_8888;
+                mBitmap = BitmapFactory.decodeByteArray(mFileBytes, 0, mFileBytes.length, options);
+                if (mBitmap != null)
+                {
+                    mWidth = mBitmap.getWidth();
+                    mHeight = mBitmap.getHeight();
+
+                    this.calculateZoomConstraints();
+                    this.calculateBounds();
+                    return true;
+                }
+                else {
+                    return false;
+                }
+                }
+            else return false;
+        else return false;
+    }
+
+    private Boolean openFile()
     {
         if (new File(mPathToFile).exists()) {
 

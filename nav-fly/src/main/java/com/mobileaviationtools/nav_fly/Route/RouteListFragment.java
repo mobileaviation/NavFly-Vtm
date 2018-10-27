@@ -16,8 +16,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
+import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.MainActivity;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Info.InfoLayout;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsAirportItemAdapter;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout;
@@ -84,6 +86,12 @@ public class RouteListFragment extends Fragment {
         this.map = map;
     }
 
+    private ChartEvents chartEvents;
+    public void setChartEvents(ChartEvents chartEvents)
+    {
+        this.chartEvents = chartEvents;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -113,6 +121,7 @@ public class RouteListFragment extends Fragment {
         infoLayout = (InfoLayout) view.findViewById(R.id.infoLayout);
         infoLayout.init(getContext(), getActivity());
         infoLayout.setVisibility(View.GONE);
+        setupInfoLayoutEvents();
 
         setWeatherBtnOnClick();
         setNotamBtnOnClick();
@@ -253,6 +262,21 @@ public class RouteListFragment extends Fragment {
                     infoLayout.setRoute(route);
                     infoLayout.LoadList();
                 }
+            }
+        });
+    }
+
+    private void setupInfoLayoutEvents()
+    {
+        infoLayout.setChartEvent(new ChartEvents() {
+            @Override
+            public void OnChartCheckedEvent(Chart chart, Boolean checked) {
+                if (chartEvents != null) chartEvents.OnChartCheckedEvent(chart, checked);
+            }
+
+            @Override
+            public void OnChartSelected(Chart chart) {
+                if (chartEvents != null) chartEvents.OnChartSelected(chart);
             }
         });
     }

@@ -18,6 +18,7 @@ import java.io.InputStream;
 public class OverlayTileSource extends TileSource {
     static final Logger log = LoggerFactory.getLogger(MBTilesTileSource.class);
     private String mOverlayFile;
+    private byte[] mOverlayBytes;
     private BoundingBox refBox;
     private OverlayTileProvider mOverlayTileProvider;
 
@@ -26,6 +27,13 @@ public class OverlayTileSource extends TileSource {
         mOverlayFile = file;
         this.refBox = refBox;
         mOverlayTileProvider = new OverlayTileProvider(file, refBox);
+    }
+
+    public OverlayTileSource(byte[] fileBytes, BoundingBox refBox)
+    {
+        mOverlayBytes = fileBytes;
+        this.refBox = refBox;
+        mOverlayTileProvider = new OverlayTileProvider(fileBytes, refBox);
     }
 
     @Override

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -78,6 +79,7 @@ public class InfoLayout extends LinearLayout {
         setButtonClickListeners();
         setListViewItemClickListener();
         setAssignChartBtnClickListener();
+        setChartListViewItemClickListerner();
     }
 
     private String TAG = "InfoLayout";
@@ -88,6 +90,7 @@ public class InfoLayout extends LinearLayout {
     private ListView itemsList;
     private ListView airportChartsListView;
     private InfoItemAdapter infoItemAdapter;
+    private ChartItemAdapter chartItemAdapter;
     private List<Airport> airportItems;
     private List<Navaid> navaidItems;
     private List<Fix> fixItems;
@@ -106,6 +109,7 @@ public class InfoLayout extends LinearLayout {
     {
         selectedAirport = airport;
         assignChartbtn.setEnabled((airport != null));
+        loadCharts();
     }
 
     public enum StationsType
@@ -113,6 +117,13 @@ public class InfoLayout extends LinearLayout {
         airports,
         navaids,
         fixes;
+    }
+
+
+
+    private ChartEvents chartEvent;
+    public void setChartEvent(ChartEvents chartEvent){
+        this.chartEvent = chartEvent;
     }
 
     public void setMap(Map map) {
@@ -261,7 +272,13 @@ public class InfoLayout extends LinearLayout {
 
     private void setChartListViewItemClickListerner()
     {
-
+        airportChartsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ChartItemAdapter chartItemAdapter = (ChartItemAdapter)adapterView.getAdapter();
+                if (chartEvent != null) chartEvent.OnChartSelected((Chart)chartItemAdapter.getItem(i));
+            }
+        });
     }
 
     public static class MyFileNameFilter implements FilenameFilter {
@@ -288,6 +305,28 @@ public class InfoLayout extends LinearLayout {
 
     }
 
+    private void loadCharts()
+    {
+        if (selectedAirport != null)
+        {
+            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+            Chart[] charts = db.getCharts().getChartsByAirportRef(selectedAirport.id);
+            chartItemAdapter = new ChartItemAdapter(context, charts);
+            chartItemAdapter.setChartCheckedEvent(new ChartEvents() {
+                @Override
+                public void OnChartCheckedEvent(Chart chart, Boolean checked) {
+                    if (chartEvent != null) chartEvent.OnChartCheckedEvent(chart, checked);
+                }
+
+                @Override
+                public void OnChartSelected(Chart chart) {
+
+                }
+            });
+            airportChartsListView.setAdapter(chartItemAdapter);
+        }
+    }
+
     private void setAssignChartBtnClickListener()
     {
         assignChartbtn.setOnClickListener(new OnClickListener() {
@@ -300,6 +339,10 @@ public class InfoLayout extends LinearLayout {
                 builder.setTitle("Assign Chart");
                 View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.chart_assign_list_item, (ViewGroup) InfoLayout.this, false);
                 final ListView filesList = (ListView) viewInflated.findViewById(R.id.list);
+                final EditText latSText = (EditText) viewInflated.findViewById(R.id.latitudeSText);
+                final EditText latNText = (EditText) viewInflated.findViewById(R.id.latitudeNText);
+                final EditText lonEText = (EditText) viewInflated.findViewById(R.id.longitudeEText);
+                final EditText lonWText = (EditText) viewInflated.findViewById(R.id.longitudeWText);
 
                 final ChartLoadItemAdapter chartLoadItemAdapter = new ChartLoadItemAdapter(files, getContext());
                 filesList.setAdapter(chartLoadItemAdapter);
@@ -328,9 +371,15 @@ public class InfoLayout extends LinearLayout {
                             chart.airport_ref = selectedAirport.id;
                             chart.chart = fileBytes;
                             chart.type = ChartType.getTypeByExtention(file);
+                            chart.latitude_deg_n = Double.parseDouble(latNText.getText().toString());
+                            chart.latitude_deg_s = Double.parseDouble(latSText.getText().toString());
+                            chart.longitude_deg_e = Double.parseDouble(lonEText.getText().toString());
+                            chart.longitude_deg_w = Double.parseDouble(lonWText.getText().toString());
+                            chart.active = false;
 
                             AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
                             db.getCharts().InsertChart(chart);
+                            loadCharts();
                         }
                         catch (Exception e)
                         {
