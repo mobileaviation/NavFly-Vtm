@@ -7,6 +7,7 @@ import com.mobileaviationtools.airnavdata.Entities.Chart;
 
 import org.oscim.android.tiling.Overlay.OverlayTileSource;
 import org.oscim.core.BoundingBox;
+import org.oscim.layers.GroupLayer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.map.Map;
 import org.oscim.utils.pool.Inlist;
@@ -16,10 +17,11 @@ import java.util.List;
 
 public class ChartsOverlayLayers {
 
-    public ChartsOverlayLayers(Context content, Map map)
+    public ChartsOverlayLayers(Context content, Map map, int index)
     {
         this.mMap = map;
         this.context = content;
+        startIndex = index;
         this.charts = new ArrayList<ChartOverlay>();
     }
 
@@ -35,7 +37,7 @@ public class ChartsOverlayLayers {
 
     public class ChartOverlay
     {
-        public ChartOverlay(Context context, Map map, Chart chart)
+        public ChartOverlay(Context context, Map map, Chart chart, int index)
         {
             this.context = context;
             this.map = map;
@@ -56,7 +58,7 @@ public class ChartsOverlayLayers {
                 {
                     if (!map.layers().contains(bitmapLayer))
                     {
-                        map.layers().add(bitmapLayer);
+                        map.layers().add(startIndex, bitmapLayer);
                         map.updateMap(true);
                     }
                 }
@@ -87,13 +89,14 @@ public class ChartsOverlayLayers {
             overlayTileSource = new OverlayTileSource(chart.chart, boundingBox);
             overlayTileSource.open();
             bitmapLayer = new BitmapTileLayer(map, overlayTileSource);
-            map.layers().add(bitmapLayer);
+            map.layers().add(startIndex, bitmapLayer);
             map.updateMap(true);
         }
 
         private BoundingBox boundingBox;
         private Context context;
         private Map map;
+//        private GroupLayer groupLayer;
         private Chart chart;
         private OverlayTileSource overlayTileSource;
         private BitmapTileLayer bitmapLayer;
@@ -120,7 +123,7 @@ public class ChartsOverlayLayers {
 
     public void setChart(Chart chart)
     {
-        ChartOverlay chartOverlay = new ChartOverlay(context, mMap, chart);
+        ChartOverlay chartOverlay = new ChartOverlay(context, mMap, chart, startIndex);
         int i = charts.indexOf(chartOverlay);
         if (i<0) {
             charts.add(chartOverlay);
@@ -134,7 +137,9 @@ public class ChartsOverlayLayers {
     }
 
     private Map mMap;
+    private GroupLayer groupLayer;
     private Context context;
+    private int startIndex;
 
 
 }

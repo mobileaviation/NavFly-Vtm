@@ -210,6 +210,7 @@ public class InfoLayout extends LinearLayout {
         Coordinate c2 = corners[2];
 
         if (stationsType==StationsType.airports) {
+            airportItems.clear();
             Airport[] airports = db.getAirport().getAirportsWithinBoundsByTypes(c1.x, c2.x, c2.y, c1.y, visibleTypes);
             for (Airport a : airports) {
                 if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(a.longitude_deg, a.latitude_deg)))) {
@@ -221,6 +222,7 @@ public class InfoLayout extends LinearLayout {
         }
 
         if (stationsType==StationsType.navaids) {
+            navaidItems.clear();
             Navaid[] navaids = db.getNavaids().getNavaidsWithinBoundsByTypes(c1.x, c2.x, c2.y, c1.y);
             for (Navaid n : navaids) {
                 if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(n.longitude_deg, n.latitude_deg)))) {
@@ -230,6 +232,7 @@ public class InfoLayout extends LinearLayout {
         }
 
         if (stationsType==StationsType.fixes) {
+            fixItems.clear();
             Fix[] fixes = db.getFixes().getFixessWithinBoundsByTypes(c1.x, c2.x, c2.y, c1.y);
             for (Fix f : fixes) {
                 if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(f.longitude_deg, f.latitude_deg)))) {

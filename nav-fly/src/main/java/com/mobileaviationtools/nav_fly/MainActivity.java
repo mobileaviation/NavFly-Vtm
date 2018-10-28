@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     AirportMarkersLayer mAirportMarkersLayer;
     NaviadMarkersLayer mNavaidsMarkersLayer;
     AirspaceLayer mAirspaceLayer;
+    GroupLayer chartsGroupLayer;
     ChartsOverlayLayers chartsOverlayLayers;
 
     private TileCache mCache;
@@ -95,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //AirnavClient.deleteDatabaseFile(this, "room_airnav_route.db");
+        //AirnavClient.deleteDatabaseFile(this, "room_airnav_chart.db");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -284,7 +286,11 @@ public class MainActivity extends AppCompatActivity {
 
     void setupChartsOverlayLayers()
     {
-        chartsOverlayLayers = new ChartsOverlayLayers(this, mMap);
+//        chartsGroupLayer = new GroupLayer(mMap);
+//        mMap.layers().add(chartsGroupLayer);
+        int index = mMap.layers().size()-1;
+
+        chartsOverlayLayers = new ChartsOverlayLayers(this, mMap, index);
         chartsOverlayLayers.InitChartsFromDB();
     }
 
