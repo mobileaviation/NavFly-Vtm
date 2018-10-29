@@ -36,7 +36,9 @@ import com.mobileaviationtools.nav_fly.Route.Waypoint;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.modelmapper.internal.objenesis.ObjenesisHelper;
 import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
 import org.oscim.map.Map;
 import org.w3c.dom.Text;
 
@@ -80,6 +82,8 @@ public class InfoLayout extends LinearLayout {
         setListViewItemClickListener();
         setAssignChartBtnClickListener();
         setChartListViewItemClickListerner();
+
+        setPosition = true;
     }
 
     private String TAG = "InfoLayout";
@@ -91,15 +95,19 @@ public class InfoLayout extends LinearLayout {
     private ListView airportChartsListView;
     private InfoItemAdapter infoItemAdapter;
     private ChartItemAdapter chartItemAdapter;
+
     private List<Airport> airportItems;
     private List<Navaid> navaidItems;
     private List<Fix> fixItems;
+
     private ImageButton airportsBtn;
     private ImageButton navaidsBtn;
     private ImageButton fixesBtn;
     private StationsType stationsType;
     private ArrayList<String> visibleTypes;
     private ImageButton assignChartbtn;
+
+    private boolean setPosition;
 
     private Airport selectedAirport;
     private Navaid selectedNavaid;
@@ -171,6 +179,24 @@ public class InfoLayout extends LinearLayout {
         }
     }
 
+    public void ShowAirportInfo(Airport airport)
+    {
+        if (!airportItems.contains(airport))
+        {
+            airportItems.add(airport);
+            infoItemAdapter.setAirports(airportItems);
+            itemsList.setAdapter(infoItemAdapter);
+        }
+
+        setPosition = false;
+        int index = airportItems.indexOf(airport);
+        itemsList.requestFocusFromTouch();
+        itemsList.setSelection(index);
+        itemsList.performItemClick(itemsList.getAdapter().getView(index,null,null), index,
+                itemsList.getAdapter().getItemId(index));
+
+    }
+
     private Geometry getAreaCheckBuffer(Route route, GeoPoint curPosition)
     {
         Geometry checkBuf = null;
@@ -216,6 +242,7 @@ public class InfoLayout extends LinearLayout {
                 if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(a.longitude_deg, a.latitude_deg)))) {
                     a.runways = db.getRunways().getRunwaysByAirport(a.id);
                     a.frequencies = db.getFrequency().getFrequenciesByAirport(a.id);
+
                     airportItems.add(a);
                 }
             }
@@ -251,26 +278,41 @@ public class InfoLayout extends LinearLayout {
                 Object item = adapter.getItem(i);
                 if (item instanceof Airport)
                 {
-                    Airport a = (Airport) item;
-                    String runways = "Runways: ";
-                    for(Runway r: a.runways)
-                    {
-                        runways = runways + r.he_ident + "/" + r.le_ident + "(" + r.length_ft + "ft), ";
-                    }
-                    String frequencies = "Frequencies: ";
-                    for (Frequency f: a.frequencies)
-                    {
-                        frequencies = frequencies + f.type + ": " + String.format ("%.3f", f.frequency_mhz) + ", ";
-                    }
-                    setSelectedAirport(a);
+                    setAirportInfo((Airport)item);
 
-                    TextView rText = (TextView)findViewById(R.id.runwaysInfoText);
-                    rText.setText(runways);
-                    TextView fText = (TextView)findViewById(R.id.frequenciesInfoText);
-                    fText.setText(frequencies);
+                    if ((map != null) && setPosition) {
+                        MapPosition position = map.getMapPosition();
+                        position.setPosition(new GeoPoint(((Airport) item).latitude_deg, ((Airport) item).longitude_deg));
+                        map.setMapPosition(position);
+                    }
+                    else
+                    {
+                        setPosition = true;
+                    }
+
                 }
             }
         });
+    }
+
+    private void setAirportInfo(Airport airportInfo)
+    {
+        String runways = "Runways: ";
+        for(Runway r: airportInfo.runways)
+        {
+            runways = runways + r.he_ident + "/" + r.le_ident + "(" + r.length_ft + "ft), ";
+        }
+        String frequencies = "Frequencies: ";
+        for (Frequency f: airportInfo.frequencies)
+        {
+            frequencies = frequencies + f.type + ": " + String.format ("%.3f", f.frequency_mhz) + ", ";
+        }
+        setSelectedAirport(airportInfo);
+
+        TextView rText = (TextView)findViewById(R.id.runwaysInfoText);
+        rText.setText(runways);
+        TextView fText = (TextView)findViewById(R.id.frequenciesInfoText);
+        fText.setText(frequencies);
     }
 
     private void setChartListViewItemClickListerner()

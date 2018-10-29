@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
+import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.MainActivity;
 import com.mobileaviationtools.nav_fly.R;
@@ -144,6 +145,14 @@ public class RouteListFragment extends Fragment {
     public void InvalidateRouteList()
     {
         routeItemAdapter.notifyDataSetChanged();
+    }
+
+    public void ShowAirportInfo(Airport airport)
+    {
+        setLayoutVisiblity(layoutType.info, true);
+        infoLayout.setMap(map);
+        infoLayout.setRoute(route);
+        infoLayout.ShowAirportInfo(airport);
     }
 
 

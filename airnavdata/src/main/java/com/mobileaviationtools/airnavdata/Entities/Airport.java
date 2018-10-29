@@ -52,4 +52,11 @@ public class Airport {
     public String home_link;
     public String wikipedia_link;
     public String keywords;
+
+    @Override
+    public boolean equals(Object o)
+    {
+        boolean val = ((Airport)o).id.equals(this.id);
+        return val;
+    }
 }

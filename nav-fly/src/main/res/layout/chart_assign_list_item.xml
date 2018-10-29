@@ -33,10 +33,10 @@
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Latitude N" />
+                android:text="Latitude S" />
 
             <EditText
-                android:id="@+id/latitudeNText"
+                android:id="@+id/latitudeSText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -47,10 +47,10 @@
                 android:id="@+id/textView6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Latitude S" />
+                android:text="Latitude N" />
 
             <EditText
-                android:id="@+id/latitudeSText"
+                android:id="@+id/latitudeNText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

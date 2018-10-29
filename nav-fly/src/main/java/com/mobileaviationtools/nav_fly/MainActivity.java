@@ -165,17 +165,22 @@ public class MainActivity extends AppCompatActivity {
                     {
                         route.setSelectedStartAirport(airport);
                         Log.i(TAG, "Route Start Airport selected: " + airport.ident);
+                        return;
                     }
-                    else
+
+                    if (!route.isEndAirportSet())
                     {
-                        if (!route.isEndAirportSet())
-                        {
-                            route.setSelectedEndAirport(airport);
-                            Log.i(TAG, "Route Start Airport selected: " + airport.ident);
-                            route.DrawRoute(mMap);
-                        }
+                        route.setSelectedEndAirport(airport);
+                        Log.i(TAG, "Route Start Airport selected: " + airport.ident);
+                        route.DrawRoute(mMap);
+                        return;
                     }
+
+                    routeListFragment.ShowAirportInfo(airport);
+
                 }
+
+                routeListFragment.ShowAirportInfo(airport);
             }
         });
         mMap.layers().add(mAirportMarkersLayer);
