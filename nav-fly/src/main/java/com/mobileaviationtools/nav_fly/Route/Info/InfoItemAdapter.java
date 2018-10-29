@@ -9,7 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Fix;
+import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkerItem;
+import com.mobileaviationtools.nav_fly.Markers.Navaids.NavaidMarkerItem;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 
@@ -33,6 +36,20 @@ public class InfoItemAdapter extends BaseAdapter {
     {
         stations.clear();
         for (Airport a: airports) stations.add(a);
+        this.notifyDataSetChanged();
+    }
+
+    public void setNavaids(List<Navaid> navaids)
+    {
+        stations.clear();
+        for (Navaid n: navaids) stations.add(n);
+        this.notifyDataSetChanged();
+    }
+
+    public void setFix(List<Fix> fixes)
+    {
+        stations.clear();
+        for (Fix f: fixes) stations.add(f);
         this.notifyDataSetChanged();
     }
 
@@ -65,12 +82,30 @@ public class InfoItemAdapter extends BaseAdapter {
         Object station = stations.get(i);
 
         if (station instanceof Airport) {
-            Airport a = (Airport) station;
+            Airport a = (Airport)station;
             icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
             infoNameTextView.setText(a.name);
-            infoCodeText.setText(a.ident +  ((a.iata_code.isEmpty()) ? "" : " (" + a.iata_code + ")"));
+            infoCodeText.setText(a.ident + ((a.iata_code.isEmpty()) ? "" : " (" + a.iata_code + ")"));
             GeoPointConvertion dms = new GeoPointConvertion();
             infoLocationText.setText(dms.getStringFormattedDMS(new GeoPoint(a.latitude_deg, a.longitude_deg)));
+        }
+
+        if (station instanceof Navaid){
+            Navaid n = (Navaid)station;
+            icon.setImageBitmap(NavaidMarkerItem.GetMarkerBitmap(n));
+            infoNameTextView.setText(n.name);
+            infoCodeText.setText(n.ident);
+            GeoPointConvertion dms = new GeoPointConvertion();
+            infoLocationText.setText(dms.getStringFormattedDMS(new GeoPoint(n.latitude_deg, n.longitude_deg)));
+        }
+
+        if (station instanceof Fix)
+        {
+            Fix n = (Fix)station;
+            infoNameTextView.setText(n.ident);
+            infoCodeText.setText(n.ident);
+            GeoPointConvertion dms = new GeoPointConvertion();
+            infoLocationText.setText(dms.getStringFormattedDMS(new GeoPoint(n.latitude_deg, n.longitude_deg)));
         }
 
 

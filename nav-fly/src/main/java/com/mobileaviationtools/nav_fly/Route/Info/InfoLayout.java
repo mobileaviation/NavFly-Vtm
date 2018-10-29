@@ -147,6 +147,26 @@ public class InfoLayout extends LinearLayout {
         this.context = context;
         this.activity = activity;
         stationsType = StationsType.airports;
+        setInfoTitleText();
+    }
+
+    private void setInfoTitleText()
+    {
+        TextView titleTextView = (TextView) findViewById(R.id.infoTitleTextView);
+        switch (stationsType){
+            case navaids:{
+                titleTextView.setText("Navaids Info.");
+                break;
+            }
+            case fixes:{
+                titleTextView.setText("Fixes Info.");
+                break;
+            }
+            case airports: {
+                titleTextView.setText("Airports Info.");
+                break;
+            }
+        }
     }
 
     private void setButtonClickListeners()
@@ -156,8 +176,26 @@ public class InfoLayout extends LinearLayout {
             public void onClick(View view) {
                 stationsType = StationsType.airports;
                 LoadList();
+                setInfoTitleText();
             }
         });
+        navaidsBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stationsType = StationsType.navaids;
+                LoadList();
+                setInfoTitleText();
+            }
+        });
+        fixesBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stationsType = StationsType.fixes;
+                LoadList();
+                setInfoTitleText();
+            }
+        });
+
     }
 
     public void LoadList()
@@ -169,14 +207,20 @@ public class InfoLayout extends LinearLayout {
                 itemsList.setAdapter(infoItemAdapter);
                 break;
             }
-            case fixes:
+            case navaids:
             {
+                infoItemAdapter.setNavaids(navaidItems);
+                itemsList.setAdapter(infoItemAdapter);
                 break;
             }
-            case navaids:{
+            case fixes:{
+                infoItemAdapter.setFix(fixItems);
+                itemsList.setAdapter(infoItemAdapter);
                 break;
             }
         }
+
+        infoItemAdapter.notifyDataSetChanged();
     }
 
     public void ShowAirportInfo(Airport airport)
@@ -184,6 +228,13 @@ public class InfoLayout extends LinearLayout {
         if (!airportItems.contains(airport))
         {
             airportItems.add(airport);
+            infoItemAdapter.setAirports(airportItems);
+            itemsList.setAdapter(infoItemAdapter);
+        }
+
+        if (stationsType != StationsType.airports)
+        {
+            stationsType = StationsType.airports;
             infoItemAdapter.setAirports(airportItems);
             itemsList.setAdapter(infoItemAdapter);
         }
@@ -291,8 +342,47 @@ public class InfoLayout extends LinearLayout {
                     }
 
                 }
+                if (item instanceof Navaid)
+                {
+                    setNavaidInfo((Navaid) item);
+
+                    if ((map != null) && setPosition) {
+                        MapPosition position = map.getMapPosition();
+                        position.setPosition(new GeoPoint(((Navaid) item).latitude_deg, ((Navaid) item).longitude_deg));
+                        map.setMapPosition(position);
+                    }
+                    else
+                    {
+                        setPosition = true;
+                    }
+                }
+
+                if (item instanceof Fix)
+                {
+                    // setFixInfo
+
+                    if ((map != null) && setPosition) {
+                        MapPosition position = map.getMapPosition();
+                        position.setPosition(new GeoPoint(((Fix) item).latitude_deg, ((Fix) item).longitude_deg));
+                        map.setMapPosition(position);
+                    }
+                    else
+                    {
+                        setPosition = true;
+                    }
+                }
             }
         });
+    }
+
+    private void setNavaidInfo(Navaid navaid)
+    {
+        String nav = navaid.name + " (" + navaid.ident + ") " + navaid.type;
+        String nav2 = "Frequency: " + Double.toString(navaid.frequency_khz);
+        TextView rText = (TextView)findViewById(R.id.runwaysInfoText);
+        rText.setText(nav);
+        TextView fText = (TextView)findViewById(R.id.frequenciesInfoText);
+        fText.setText(nav2);
     }
 
     private void setAirportInfo(Airport airportInfo)
