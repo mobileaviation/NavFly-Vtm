@@ -2,6 +2,9 @@ package com.mobileaviationtools.nav_fly.Markers.Navaids;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
 
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Classes.BitmapHelpers;
@@ -28,6 +31,17 @@ public class NavaidSymbolNDB extends MarkerSymbol {
         android.graphics.Bitmap baseBitmap = android.graphics.Bitmap.createBitmap(size, size,
                 android.graphics.Bitmap.Config.ARGB_8888);
         Canvas baseCanvas = new Canvas(baseBitmap);
+
+        Paint p = new Paint();
+        p.setAntiAlias(true);
+        p.setStrokeWidth(3);
+        p.setStyle(Paint.Style.STROKE);
+        p.setPathEffect(new DashPathEffect(new float[]{3, 3}, 0));
+        p.setColor(Color.argb(255,0,136,186));
+
+        baseCanvas.drawCircle(15,15, 12, p);
+        baseCanvas.drawCircle(15,15, 8, p);
+        baseCanvas.drawCircle(15,15, 4, p);
 
         return BitmapHelpers.getScaledBitmap(baseBitmap);
     }
