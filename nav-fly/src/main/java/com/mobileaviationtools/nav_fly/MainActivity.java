@@ -35,6 +35,7 @@ import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
+import org.oscim.android.cache.OfflineTileCache;
 import org.oscim.android.cache.TileCache;
 import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.android.tiling.Overlay.OverlayTileSource;
@@ -71,7 +72,7 @@ import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
 
 public class MainActivity extends AppCompatActivity {
-    final static boolean USE_CACHE = false;
+    final static boolean USE_CACHE = true;
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
     final String TAG = "MainActivity";
 
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     GroupLayer chartsGroupLayer;
     ChartsOverlayLayers chartsOverlayLayers;
 
-    private TileCache mCache;
+    private OfflineTileCache mCache;
     TileSource mTileSource;
     protected BitmapTileLayer mBitmapLayer;
 
@@ -306,9 +307,11 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         if (USE_CACHE) {
-            mCache = new TileCache(this, null, "tile.db");
+            mCache = new OfflineTileCache(this, null, "airnav_tiles_cache.db");
+            long s = 512 * (1 << 10);
             mCache.setCacheSize(512 * (1 << 10));
             mTileSource.setCache(mCache);
+
         }
 
         mBaseLayer = mMap.setBaseMap(mTileSource);
@@ -352,6 +355,14 @@ public class MainActivity extends AppCompatActivity {
                     {
                         Intent dbDonwloadIntent = new Intent(MainActivity.this, DatabaseDownloadActivity.class);
                         MainActivity.this.startActivity(dbDonwloadIntent);
+                        break;
+                    }
+                    case maptype:
+                    {
+                        String url = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
+                        BoundingBox box = mMap.getBoundingBox(5);
+                        OfflineTileCache offlineTileCache = new OfflineTileCache(MainActivity.this, null, "testTile.db");
+                        offlineTileCache.DownloadTiles(box, url);
                         break;
                     }
                 }
