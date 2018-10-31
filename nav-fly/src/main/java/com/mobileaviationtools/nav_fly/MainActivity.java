@@ -22,6 +22,7 @@ import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Layers.ChartsOverlayLayers;
+import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
@@ -65,6 +66,7 @@ import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
+import org.oscim.utils.math.MathUtils;
 
 import java.io.File;
 
@@ -365,6 +367,12 @@ public class MainActivity extends AppCompatActivity {
                         offlineTileCache.DownloadTiles(box, url);
                         break;
                     }
+                    case search:
+                    {
+                        SelectionLayer s = new SelectionLayer(mMap, MainActivity.this);
+                        s.setAirportSelected(null);
+                    }
+
                 }
 
                 return false;
