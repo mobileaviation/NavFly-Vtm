@@ -1,7 +1,6 @@
 package com.mobileaviationtools.nav_fly.Layers;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,18 +9,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 import android.view.animation.LinearInterpolator;
-
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.nav_fly.Classes.BitmapHelpers;
-
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.oscim.android.canvas.AndroidBitmap;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
-import org.oscim.layers.marker.MarkerLayer;
 import org.oscim.layers.marker.MarkerSymbol;
-import org.oscim.layers.vector.VectorLayer;
 import org.oscim.map.Map;
 
 public class SelectionLayer extends ItemizedLayer {
@@ -37,6 +31,7 @@ public class SelectionLayer extends ItemizedLayer {
         this.mMap = map;
         selected = false;
         createAnimator();
+        setAnimationListeners();
     }
 
     private Context context;
@@ -54,16 +49,58 @@ public class SelectionLayer extends ItemizedLayer {
         selectionAnimator = ValueAnimator.ofFloat(42f, 50f);
         selectionAnimator.setDuration(500);
         selectionAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        selectionAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        selectionAnimator.setRepeatCount(10);
         selectionAnimator.setInterpolator(new LinearInterpolator());
+    }
+
+    private void setAnimationListeners()
+    {
+        selectionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                if (symbol != null) {
+                    Float animProgress = (Float) valueAnimator.getAnimatedValue();
+                    symbol = new MarkerSymbol(new AndroidBitmap(drawSelectionCircle(animProgress)), MarkerSymbol.HotspotPlace.CENTER, false);
+                    item.setMarker(symbol);
+                    SelectionLayer.this.update();
+                    mMap.render();
+                }
+            }
+
+        });
+        selectionAnimator.addListener(new Animator.AnimatorListener() {
+
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+
+                Log.i(TAG, "Animator End: ");
+                unSelectItem();
+                SelectionLayer.this.update();
+                mMap.render();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+                Log.i(TAG, "Animator Cancel");
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
     }
 
     public void unSelectItem()
     {
-        selectionAnimator.end();
         if (symbol != null) symbol = null;
         if (item != null){
-            this.mItemList.remove(item);
+            this.removeItem(item);
             item = null;
         }
         selected = false;
@@ -76,22 +113,8 @@ public class SelectionLayer extends ItemizedLayer {
         symbol = new MarkerSymbol(new AndroidBitmap(drawSelectionCircle(50f)), MarkerSymbol.HotspotPlace.CENTER, false);
         item = new MarkerItem("Selection", "Selection", new GeoPoint(airport.latitude_deg, airport.longitude_deg));
         item.setMarker(symbol);
-        //item = new MarkerItem()
         this.addItem(item);
         this.update();
-
-        selectionAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                Float animProgress = (Float) valueAnimator.getAnimatedValue();
-                symbol = new MarkerSymbol(new AndroidBitmap(drawSelectionCircle(animProgress)), MarkerSymbol.HotspotPlace.CENTER, false);
-                item.setMarker(symbol);
-                SelectionLayer.this.update();
-                mMap.render();
-
-                Log.i(TAG, "Selection Animator Test: " + animProgress.toString());
-            }
-        });
 
         if (!selectionAnimator.isStarted())selectionAnimator.start();
         selected = true;

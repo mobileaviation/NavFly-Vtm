@@ -462,6 +462,8 @@ public class InfoLayout extends LinearLayout {
         }
     }
 
+
+
     private void setAssignChartBtnClickListener()
     {
         assignChartbtn.setOnClickListener(new OnClickListener() {
