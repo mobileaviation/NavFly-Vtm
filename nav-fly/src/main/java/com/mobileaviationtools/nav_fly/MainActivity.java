@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     VectorTileLayer mBaseLayer;
     AirportMarkersLayer mAirportMarkersLayer;
     NaviadMarkersLayer mNavaidsMarkersLayer;
+    SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
     GroupLayer chartsGroupLayer;
     ChartsOverlayLayers chartsOverlayLayers;
@@ -135,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
                     mNavaidsMarkersLayer.UpdateNavaids();
                     mAirspaceLayer.UpdateAirspaces();
                 }
+
+                //if (mAirportSelectionLayer.getSelected()) mAirportSelectionLayer.unSelectItem();
             }
         });
     }
@@ -161,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void Selected(Airport airport, GeoPoint geoPoint) {
                 Log.i(TAG, "Airport selected: " + airport.ident);
+                mAirportSelectionLayer.setAirportSelected(airport);
                 Route route = routeListFragment.getRoute();
                 if (route != null)
                 {
@@ -190,6 +194,9 @@ public class MainActivity extends AppCompatActivity {
 
         mNavaidsMarkersLayer = new NaviadMarkersLayer(mMap, null, this);
         mMap.layers().add(mNavaidsMarkersLayer);
+
+        mAirportSelectionLayer = new SelectionLayer(mMap, null, this);
+        mMap.layers().add(mAirportSelectionLayer);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -369,8 +376,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case search:
                     {
-                        SelectionLayer s = new SelectionLayer(mMap, MainActivity.this);
-                        s.setAirportSelected(null);
+//                        SelectionLayer s = new SelectionLayer(mMap, MainActivity.this);
+//                        s.setAirportSelected(null);
                     }
 
                 }
