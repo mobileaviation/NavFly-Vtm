@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
+import com.mobileaviationtools.nav_fly.Settings.SettingsPopup;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
 
 import org.oscim.android.MapPreferences;
@@ -368,10 +370,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case maptype:
                     {
-                        String url = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
-                        BoundingBox box = mMap.getBoundingBox(5);
-                        OfflineTileCache offlineTileCache = new OfflineTileCache(MainActivity.this, null, "testTile.db");
-                        offlineTileCache.DownloadTiles(box, url);
+                        SettingsPopup settingsPopup = new SettingsPopup();
+                        settingsPopup.show(getSupportFragmentManager(), "test");
+                        //
+
+
+//                        String url = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
+//                        BoundingBox box = mMap.getBoundingBox(5);
+//                        OfflineTileCache offlineTileCache = new OfflineTileCache(MainActivity.this, null, "testTile.db");
+//                        offlineTileCache.DownloadTiles(box, url);
                         break;
                     }
                     case search:
