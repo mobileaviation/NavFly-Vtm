@@ -8,6 +8,7 @@ import org.oscim.core.BoundingBox;
 import org.oscim.core.Tile;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import okhttp3.Dispatcher;
@@ -81,6 +82,7 @@ public class OfflineTileCache extends TileCache {
             Log.i(TAG, "Download Tiles Count: " + tiles.size());
             double c = tiles.size();
             double t = 0;
+            int retry = 0;
             for (Tile tile: tiles)
             {
                 String url = baseUrl.replace("{Z}", Byte.toString(tile.zoomLevel));
@@ -91,28 +93,30 @@ public class OfflineTileCache extends TileCache {
                         .url(url)
                         .build();
 
-                OkHttpClient client = GetHttpClient();
                 try {
-                    Response response = client.newCall(request).execute();
-                    byte[] tilebytes = response.body().bytes();
-                    double p = (t / c) * 100;
-                    t = t + 1;
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream(tilebytes.length);
-                    baos.write(tilebytes, 0, tilebytes.length);
-                    Boolean success = true;
-                    saveTile(tile, baos, success );
-                    progress = Math.round(p);
-                    publishProgress(progress);
-                    Log.i(TAG, "Downloading : " + url + " Progress: " + Math.round(p) + "%" + " " + success.toString()  );
-
-
+                    doDownload(request, tile, c, t);
+                    t++;
                 }
                 catch (Exception e)
                 {
-                    log.error("Download error: " + e.getMessage());
+                    log.error("Download error: " + url + " : " + e.getMessage());
                 }
             }
             return null;
+        }
+
+        private void doDownload(Request request, Tile tile, double c, double t) throws IOException {
+            OkHttpClient client = GetHttpClient(1);
+            Response response = client.newCall(request).execute();
+            byte[] tilebytes = response.body().bytes();
+            double p = (t / c) * 100;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(tilebytes.length);
+            baos.write(tilebytes, 0, tilebytes.length);
+            Boolean success = true;
+            saveTile(tile, baos, success );
+            progress = Math.round(p);
+            publishProgress(progress);
+            Log.i(TAG, "Downloading : " + request.url().toString() + " Progress: " + Math.round(p) + "%" + " " + success.toString()  );
         }
 
         @Override
@@ -130,15 +134,15 @@ public class OfflineTileCache extends TileCache {
 
 
 
-    private OkHttpClient GetHttpClient()
+    private OkHttpClient GetHttpClient(int requestMax)
     {
         Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(10);
+        dispatcher.setMaxRequests(requestMax);
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.dispatcher(dispatcher);
 
         OkHttpClient client = builder.build();
-        client.dispatcher().setMaxRequests(10);
+        client.dispatcher().setMaxRequests(requestMax);
 
         return client;
     }

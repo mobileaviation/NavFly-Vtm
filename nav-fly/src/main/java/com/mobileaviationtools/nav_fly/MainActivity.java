@@ -3,7 +3,6 @@ package com.mobileaviationtools.nav_fly;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,13 +10,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
@@ -33,14 +30,13 @@ import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
-import com.mobileaviationtools.nav_fly.Settings.SettingsPopup;
+import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
+import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.android.cache.OfflineTileCache;
-import org.oscim.android.cache.TileCache;
-import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.android.tiling.Overlay.OverlayTileSource;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
@@ -48,14 +44,11 @@ import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
-import org.oscim.layers.BitmapLayer;
-import org.oscim.layers.BitmapLocationLayer;
 import org.oscim.layers.GroupLayer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
-import org.oscim.layers.vector.VectorLayer;
 import org.oscim.map.Map;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.GLViewport;
@@ -68,7 +61,6 @@ import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
-import org.oscim.utils.math.MathUtils;
 
 import java.io.File;
 
@@ -92,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
     GroupLayer chartsGroupLayer;
     ChartsOverlayLayers chartsOverlayLayers;
 
-    private OfflineTileCache mCache;
+    //private OfflineTileCache mCache;
+    private SettingsObject settingsObject;
     TileSource mTileSource;
     protected BitmapTileLayer mBitmapLayer;
 
@@ -110,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
 
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
+
+        createSettingsObject();
 
         menu = (NavigationButtonFragment)getSupportFragmentManager().findFragmentById(R.id.menuFragment);
         setupMenuListerners();
@@ -140,6 +135,32 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 //if (mAirportSelectionLayer.getSelected()) mAirportSelectionLayer.unSelectItem();
+            }
+        });
+    }
+
+    private void createSettingsObject()
+    {
+        settingsObject = new SettingsObject(this, mMap);
+        settingsObject.SetSettingsEvent(new SettingsObject.SettingsEvent() {
+            @Override
+            public void OnSettingChanged(SettingsObject.SettingType type, SettingsObject object) {
+
+            }
+
+            @Override
+            public void OnSettingsProgress(SettingsObject.SettingType type, SettingsObject object, String message) {
+
+            }
+
+            @Override
+            public void OnSettingsSaved(SettingsObject object) {
+
+            }
+
+            @Override
+            public void OnSettingsLoaded(SettingsObject object) {
+
             }
         });
     }
@@ -317,14 +338,7 @@ public class MainActivity extends AppCompatActivity {
                 .httpFactory(new OkHttpEngine.OkHttpFactory())
                 .build();
 
-        if (USE_CACHE) {
-            mCache = new OfflineTileCache(this, null, "airnav_tiles_cache.db");
-            long s = 512 * (1 << 10);
-            mCache.setCacheSize(512 * (1 << 10));
-            mTileSource.setCache(mCache);
-
-        }
-
+        settingsObject.setBaseCache(mTileSource);
         mBaseLayer = mMap.setBaseMap(mTileSource);
 
         /* set initial position on first run */
@@ -370,8 +384,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case maptype:
                     {
-                        SettingsPopup settingsPopup = new SettingsPopup();
-                        settingsPopup.show(getSupportFragmentManager(), "test");
+                        SettingsDialog settingsDialog = SettingsDialog.getInstance(MainActivity.this, settingsObject);
+                        settingsDialog.show(getSupportFragmentManager(), "test");
                         //
 
 
@@ -415,8 +429,7 @@ public class MainActivity extends AppCompatActivity {
         if (mapScaleBar != null)
             mapScaleBar.destroy();
 
-        if (mCache != null)
-            mCache.dispose();
+        settingsObject.dispose();
 
         mMapView.onDestroy();
 

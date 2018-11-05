@@ -17,7 +17,19 @@ import android.view.WindowManager;
 
 import com.mobileaviationtools.nav_fly.R;
 
-public class SettingsPopup  extends DialogFragment {
+public class SettingsDialog extends DialogFragment {
+    public SettingsDialog()
+    {
+        super();
+    }
+
+    public static SettingsDialog getInstance(Context context, SettingsObject object)
+    {
+        SettingsDialog settingsDialog = new SettingsDialog();
+        settingsDialog.context = context;
+        settingsDialog.settingsObject = object;
+        return settingsDialog;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,8 +51,8 @@ public class SettingsPopup  extends DialogFragment {
                         WindowManager.LayoutParams.MATCH_PARENT);
     }
 
+    private SettingsObject settingsObject;
     private Context context;
-    private FragmentManager fragmentManager;
 
     public void setup(View view)
     {
@@ -49,7 +61,7 @@ public class SettingsPopup  extends DialogFragment {
 
         // Add Fragments to adapter one by one
         adapter.addFragment(new SettingsFragmentBaseChart(), "Base Chart");
-        adapter.addFragment(new SettingsFragmentOffline(), "Offline");
+        adapter.addFragment(SettingsFragmentOffline.getInstance(context, settingsObject), "Offline");
         adapter.addFragment(new SettingsFragmentOverlays(), "Overlays");
         viewPager.setAdapter(adapter);
 
