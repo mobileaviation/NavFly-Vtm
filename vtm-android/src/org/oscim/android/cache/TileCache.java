@@ -95,6 +95,7 @@ public class TileCache implements ITileCache {
     private final SQLiteDatabase mDatabase;
     private final SQLiteStatement mStmtGetTile;
     private final SQLiteStatement mStmtPutTile;
+    private final SQLiteStatement mStmtDelTile;
 
     //private final SQLiteStatement mStmtUpdateTile;
 
@@ -126,6 +127,10 @@ public class TileCache implements ITileCache {
                 "INSERT INTO " + TABLE_NAME +
                 " (x, y, z, time, last_access, data)" +
                 " VALUES(?,?,?,?,?,?)");
+
+        mStmtDelTile = mDatabase.compileStatement("" +
+                "DELETE FROM " + TABLE_NAME +
+                " WHERE x=? AND y=? AND z=?");
 
         //mStmtUpdateTile = mDatabase.compileStatement("" +
         //        "UPDATE " + TABLE_NAME +
@@ -222,6 +227,18 @@ public class TileCache implements ITileCache {
 
             mStmtPutTile.execute();
             mStmtPutTile.clearBindings();
+        }
+    }
+
+    public void deleteOldTile(Tile tile) {
+        synchronized (mStmtPutTile) {
+            mStmtDelTile.bindLong(1, tile.tileX);
+            mStmtDelTile.bindLong(2, tile.tileY);
+            mStmtDelTile.bindLong(3, tile.zoomLevel);
+
+
+            mStmtDelTile.execute();
+            mStmtDelTile.clearBindings();
         }
     }
 
