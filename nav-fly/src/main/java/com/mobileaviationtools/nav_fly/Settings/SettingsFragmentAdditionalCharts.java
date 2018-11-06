@@ -9,17 +9,17 @@ import android.view.ViewGroup;
 
 import com.mobileaviationtools.nav_fly.R;
 
-public class SettingsFragmentOverlays extends Fragment {
-    public SettingsFragmentOverlays() {
+public class SettingsFragmentAdditionalCharts extends Fragment {
+    public SettingsFragmentAdditionalCharts() {
         // Required empty public constructor
     }
 
-    private static SettingsFragmentOverlays instance;
+    private static SettingsFragmentAdditionalCharts instance;
 
-    public static SettingsFragmentOverlays getInstance(Context context, SettingsObject settingsObject)
+    public static SettingsFragmentAdditionalCharts getInstance(Context context, SettingsObject settingsObject)
     {
         if (instance == null) {
-            SettingsFragmentOverlays instance = new SettingsFragmentOverlays();
+            SettingsFragmentAdditionalCharts instance = new SettingsFragmentAdditionalCharts();
             instance.context = context;
             instance.settingsObject = settingsObject;
             return instance;
@@ -31,7 +31,6 @@ public class SettingsFragmentOverlays extends Fragment {
     private Context context;
     private SettingsObject settingsObject;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +40,6 @@ public class SettingsFragmentOverlays extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.settings_fragment_overlays, container, false);
+        return inflater.inflate(R.layout.settings_fragment_basechart, container, false);
     }
 }

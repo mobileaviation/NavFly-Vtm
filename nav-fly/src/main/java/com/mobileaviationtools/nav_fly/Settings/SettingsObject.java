@@ -3,16 +3,24 @@ package com.mobileaviationtools.nav_fly.Settings;
 import android.content.Context;
 import android.icu.text.CollationKey;
 
+import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
+import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Entities.MBTile;
+import com.mobileaviationtools.nav_fly.Settings.Overlays.MBTileChart;
+
 import org.oscim.android.cache.OfflineTileCache;
 import org.oscim.android.cache.OfflineTileDownloadEvent;
 import org.oscim.core.BoundingBox;
 import org.oscim.map.Map;
 import org.oscim.tiling.TileSource;
 
+import java.util.ArrayList;
+
 public class SettingsObject  {
     public enum SettingType
     {
         basechart,
+        additionalcharts,
         offline,
         overlays
     }
@@ -26,13 +34,19 @@ public class SettingsObject  {
     }
 
     private final String OSCIMAPURL = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
+    private ArrayList<MBTileChart> mbTileCharts;
 
     public SettingsObject(Context context, Map map)
     {
         this.map = map;
+        this.context = context;
+
         baseCache = new OfflineTileCache(context, null, "airnav_base_tiles_cache.db");
         long s = 512 * (1 << 10);
         baseCache.setCacheSize(512 * (1 << 10));
+
+        mbTileCharts = new ArrayList<>();
+        loadMBTileChartsOverlays();
     }
 
     private OfflineTileCache baseCache;
@@ -59,6 +73,16 @@ public class SettingsObject  {
     {
         baseCache.SetOnOfflineTileDownloadEvent(callback);
         baseCache.DownloadTiles(map.getBoundingBox(0) ,OSCIMAPURL);
+    }
+
+    private void loadMBTileChartsOverlays()
+    {
+        AirnavDatabase airnavDatabase = AirnavDatabase.getInstance(context);
+        MBTile[] ofmTiles = airnavDatabase.getTiles().getAllMBTiles();
+
+
+
+
     }
 
     public void dispose()

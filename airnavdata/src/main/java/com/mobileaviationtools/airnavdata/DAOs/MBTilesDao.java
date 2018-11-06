@@ -2,6 +2,7 @@ package com.mobileaviationtools.airnavdata.DAOs;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
@@ -20,4 +21,7 @@ public abstract class MBTilesDao {
 
     @Insert
     public abstract void insertTile(MBTile mbTile);
+
+    @Query("SELECT * FROM tbl_MbTiles")
+    public abstract MBTile[] getAllMBTiles();
 }

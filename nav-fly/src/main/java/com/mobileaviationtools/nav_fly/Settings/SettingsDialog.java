@@ -60,9 +60,10 @@ public class SettingsDialog extends DialogFragment {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 
         // Add Fragments to adapter one by one
-        adapter.addFragment(new SettingsFragmentBaseChart(), "Base Chart");
+        adapter.addFragment(SettingsFragmentBaseChart.getInstance(context, settingsObject), "Base Chart");
+        adapter.addFragment(SettingsFragmentAdditionalCharts.getInstance(context, settingsObject), "Extra Charts");
         adapter.addFragment(SettingsFragmentOffline.getInstance(context, settingsObject), "Offline");
-        adapter.addFragment(new SettingsFragmentOverlays(), "Overlays");
+        adapter.addFragment(SettingsFragmentOverlays.getInstance(context, settingsObject), "Overlays");
         viewPager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tabs);

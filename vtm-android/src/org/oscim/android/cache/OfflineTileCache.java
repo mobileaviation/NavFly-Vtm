@@ -98,16 +98,16 @@ public class OfflineTileCache extends TileCache {
 
                 try {
                     doDownload(request, tile);
+                    double p = (t / c) * 100;
+                    publishProgress(Math.round(p), false, request.url().toString());
+                    t++;
+                    Log.i(TAG, "Downloading : " + request.url().toString() + " Progress: " + Math.round(p) + "%" );
                 }
                 catch (Exception e)
                 {
                     log.error("Download error: " + url + " : " + e.getMessage());
-                }
-                finally {
-                    double p = (t / c) * 100;
-                    publishProgress(Math.round(p));
-                    t++;
-                    Log.i(TAG, "Downloading : " + request.url().toString() + " Progress: " + Math.round(p) + "%" );
+                    publishProgress(0d, true, e.getMessage());
+                    //cancel(true);
                 }
             }
             return null;
@@ -131,7 +131,13 @@ public class OfflineTileCache extends TileCache {
 
         @Override
         protected void onProgressUpdate(Object[] values) {
-            if (offlineTileDownloadEvent != null) offlineTileDownloadEvent.onProgress((long)values[0]);
+
+            if (offlineTileDownloadEvent != null) {
+
+                if (!(boolean)values[1]) offlineTileDownloadEvent.onProgress((long) values[0], (String)values[2]);
+                if ((boolean)values[1]) offlineTileDownloadEvent.onError((String)values[2]);
+            }
+
             super.onProgressUpdate(values);
         }
     }

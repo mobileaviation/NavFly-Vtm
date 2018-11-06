@@ -8,10 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.mobileaviationtools.nav_fly.R;
 
 import org.oscim.android.cache.OfflineTileDownloadEvent;
+import org.oscim.backend.canvas.Color;
 import org.oscim.core.BoundingBox;
 
 public class SettingsFragmentOffline extends Fragment {
@@ -38,6 +40,7 @@ public class SettingsFragmentOffline extends Fragment {
 
     private ProgressBar baseTilesDownloadProgress;
     private Button startDownloadBaseTilesBtn;
+    private TextView dowloadInfoTextView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,7 @@ public class SettingsFragmentOffline extends Fragment {
 
         startDownloadBaseTilesBtn = (Button) view.findViewById(R.id.startDownloadBaseTilesBtn);
         baseTilesDownloadProgress = (ProgressBar) view.findViewById(R.id.baseTilesDownloadProgress);
+        dowloadInfoTextView = (TextView) view.findViewById(R.id.dowloadInfoTextView);
 
         startDownloadBaseTilesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,13 +73,22 @@ public class SettingsFragmentOffline extends Fragment {
 
         settingsObject.DownloadTiles(new OfflineTileDownloadEvent() {
             @Override
-            public void onProgress(long percent) {
+            public void onProgress(long percent, String message) {
+                dowloadInfoTextView.setText(message);
+                dowloadInfoTextView.setTextColor(Color.GRAY);
                 baseTilesDownloadProgress.setProgress((int)percent);
             }
 
             @Override
             public void onFinished() {
                 startDownloadBaseTilesBtn.setEnabled(true);
+            }
+
+            @Override
+            public void onError(String message) {
+                dowloadInfoTextView.setText(message);
+                dowloadInfoTextView.setTextColor(Color.RED);
+                //startDownloadBaseTilesBtn.setEnabled(true);
             }
         });
 

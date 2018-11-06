@@ -17,6 +17,7 @@ public class Chart {
     public ChartType type;
     public String filelocation;
     public int airport_ref;
+    public int mbtile_id;
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     public byte[] chart;
     public Double latitude_deg_n;

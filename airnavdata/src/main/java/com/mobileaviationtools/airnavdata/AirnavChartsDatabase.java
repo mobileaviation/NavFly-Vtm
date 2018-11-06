@@ -6,7 +6,9 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import com.mobileaviationtools.airnavdata.DAOs.ChartDao;
+import com.mobileaviationtools.airnavdata.DAOs.MBTilesDao;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
+import com.mobileaviationtools.airnavdata.Entities.MBTile;
 import com.mobileaviationtools.airnavdata.Entities.Route;
 import com.mobileaviationtools.airnavdata.Entities.Waypoint;
 
