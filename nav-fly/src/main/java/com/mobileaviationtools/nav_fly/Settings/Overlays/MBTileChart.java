@@ -67,8 +67,8 @@ public class MBTileChart {
     public boolean equals(Object object)
     {
         if (object instanceof MBTileChart) {
-            return ((MBTileChart)object).tile.mbtileslink.equals(
-                    this.tile.mbtileslink);
+            return (((MBTileChart)object).chart.mbtile_id==
+                    this.tile.id);
             } else return false;
     }
 }
