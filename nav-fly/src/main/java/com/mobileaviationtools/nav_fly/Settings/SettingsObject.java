@@ -5,6 +5,7 @@ import android.icu.text.CollationKey;
 
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
 import com.mobileaviationtools.nav_fly.Settings.Overlays.MBTileChart;
 
@@ -79,10 +80,23 @@ public class SettingsObject  {
     {
         AirnavDatabase airnavDatabase = AirnavDatabase.getInstance(context);
         MBTile[] ofmTiles = airnavDatabase.getTiles().getAllMBTiles();
+        AirnavChartsDatabase airnavChartsDatabase = AirnavChartsDatabase.getInstance(context);
+        Chart[] charts = airnavChartsDatabase.getCharts().getAllCharts();
 
+        for (MBTile tile: ofmTiles)
+        {
+            MBTileChart mbTileChart = new MBTileChart(context);
+            mbTileChart.setTile(tile);
+            mbTileCharts.add(mbTileChart);
+        }
 
-
-
+        for (Chart chart: charts)
+        {
+            MBTileChart mbTileChart = new MBTileChart(context);
+            mbTileChart.setChart(chart);
+            if (!mbTileCharts.contains(mbTileChart))
+                mbTileCharts.add(mbTileChart);
+        }
     }
 
     public void dispose()

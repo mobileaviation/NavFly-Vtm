@@ -3,6 +3,7 @@ package com.mobileaviationtools.nav_fly.Settings.Overlays;
 import android.content.Context;
 import android.net.Uri;
 
+import com.mobileaviationtools.airnavdata.Classes.ChartType;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
 
@@ -40,7 +41,9 @@ public class MBTileChart {
         this.chartType = type.ofm;
         File f = new File(Uri.parse(tile.mbtileslink).getPath());
         localFilename = baseParh + f.getName();
+        this.localfile = new File(this.localFilename);
         chartStatus = status.gone;
+        newChartFromTile();
     }
 
     private Chart chart;
@@ -55,6 +58,15 @@ public class MBTileChart {
         else chartStatus = status.gone;
     }
 
+    private void newChartFromTile()
+    {
+        this.chart = new Chart();
+        this.chart.type = ChartType.mbtiles;
+        this.chart.filelocation = this.localFilename;
+        this.chart.name = this.localfile.getName();
+        this.chart.mbtile_id = tile.id;
+    }
+
     private String localFilename;
     private File localfile;
     public String getLocalFilename() { return localFilename; }
@@ -67,8 +79,11 @@ public class MBTileChart {
     public boolean equals(Object object)
     {
         if (object instanceof MBTileChart) {
-            return (((MBTileChart)object).chart.mbtile_id==
-                    this.tile.id);
+            if (((MBTileChart)object).tile==null) return false;
+            if (this.chart == null) return false;
+
+            return (((MBTileChart)object).tile.id==
+                    this.chart.mbtile_id);
             } else return false;
     }
 }

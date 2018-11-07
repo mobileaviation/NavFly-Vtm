@@ -25,4 +25,7 @@ public abstract class ChartDao {
 
     @Query("SELECT * FROM tbl_Charts WHERE active=:active")
     public abstract Chart[] getActiveCharts(Boolean active);
+
+    @Query("SELECT * FROM tbl_Charts")
+    public abstract Chart[] getAllCharts();
 }
