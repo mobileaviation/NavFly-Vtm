@@ -75,6 +75,13 @@ public class MBTileChart {
     public status chartStatus;
     public double progress;
 
+    public String getName()
+    {
+        if (this.chart != null) return this.chart.name;
+        if (this.tile != null) return this.tile.name;
+        return localfile.getName();
+    }
+
     @Override
     public boolean equals(Object object)
     {

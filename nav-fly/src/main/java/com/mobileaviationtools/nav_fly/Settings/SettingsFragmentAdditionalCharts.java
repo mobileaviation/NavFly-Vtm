@@ -6,8 +6,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Settings.Overlays.ChartSettingsItemAdapter;
 
 public class SettingsFragmentAdditionalCharts extends Fragment {
     public SettingsFragmentAdditionalCharts() {
@@ -40,6 +42,13 @@ public class SettingsFragmentAdditionalCharts extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.settings_fragment_basechart, container, false);
+        View view =  inflater.inflate(R.layout.settings_fragment_addcharts, container, false);
+
+        ListView addChartsListView = (ListView) view.findViewById(R.id.addChartsListView);
+        ChartSettingsItemAdapter adapter = new ChartSettingsItemAdapter(context, settingsObject.getMbTileCharts());
+        addChartsListView.setAdapter(adapter);
+
+
+        return view;
     }
 }

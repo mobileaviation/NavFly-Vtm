@@ -99,6 +99,10 @@ public class SettingsObject  {
         }
     }
 
+    public ArrayList<MBTileChart> getMbTileCharts() {
+        return mbTileCharts;
+    }
+
     public void dispose()
     {
         if (baseCache != null)

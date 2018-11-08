@@ -48,6 +48,58 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
         TextView chartSetupTxt = (TextView)view.findViewById(R.id.chartSetupTxt);
         ImageButton downloadChartButton = (ImageButton) view.findViewById(R.id.downloadChartButton);
         ProgressBar chartDownloadProgress = (ProgressBar) view.findViewById(R.id.chartDownloadProgress);
+        chartDownloadProgress.setMax(100);
+
+        MBTileChart chart = charts.get(i);
+        activateChartCheckBox.setTag(chart);
+        downloadChartButton.setTag(chart);
+
+        chartSetupTxt.setText(chart.getName());
+
+        switch (chart.chartStatus){
+            case gone:
+            {
+                chartDownloadProgress.setVisibility(View.GONE);
+                downloadChartButton.setImageDrawable(context.getResources().getDrawable(R.drawable.download_btn));
+                downloadChartButton.setEnabled(true);
+                activateChartCheckBox.setEnabled(false);
+                activateChartCheckBox.setChecked(false);
+                activateChartCheckBox.setBackgroundColor(context.getResources().getColor(R.color.secundaryColorB1));
+                break;
+            }
+            case present:
+            {
+                chartDownloadProgress.setVisibility(View.GONE);
+                downloadChartButton.setImageDrawable(context.getResources().getDrawable(R.drawable.delete_download_btn));
+                downloadChartButton.setEnabled(true);
+                activateChartCheckBox.setEnabled(true);
+                activateChartCheckBox.setChecked(false);
+                activateChartCheckBox.setBackgroundColor(context.getResources().getColor(R.color.secundaryColorA1T));
+                break;
+            }
+            case visible:
+            {
+                chartDownloadProgress.setVisibility(View.GONE);
+                downloadChartButton.setImageDrawable(context.getResources().getDrawable(R.drawable.delete_download_btn));
+                downloadChartButton.setEnabled(true);
+                activateChartCheckBox.setEnabled(true);
+                activateChartCheckBox.setChecked(true);
+                activateChartCheckBox.setBackgroundColor(context.getResources().getColor(R.color.secundaryColorA1T));
+                break;
+            }
+            case downloading:
+            {
+                chartDownloadProgress.setVisibility(View.VISIBLE);
+                chartDownloadProgress.setProgress((int)Math.round(chart.progress));
+                downloadChartButton.setImageDrawable(context.getResources().getDrawable(R.drawable.delete_download_btn));
+                downloadChartButton.setEnabled(false);
+                activateChartCheckBox.setEnabled(false);
+                activateChartCheckBox.setChecked(false);
+                activateChartCheckBox.setBackgroundColor(context.getResources().getColor(R.color.secundaryColorB1));
+                break;
+            }
+
+        }
 
         return view;
     }
