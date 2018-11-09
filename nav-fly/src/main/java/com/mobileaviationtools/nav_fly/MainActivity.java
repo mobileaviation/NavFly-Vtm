@@ -82,8 +82,6 @@ public class MainActivity extends AppCompatActivity {
     NaviadMarkersLayer mNavaidsMarkersLayer;
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
-    GroupLayer chartsGroupLayer;
-    ChartsOverlayLayers chartsOverlayLayers;
 
     //private OfflineTileCache mCache;
     private SettingsObject settingsObject;
@@ -119,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         //getMBTilesMapPerm();
         //getBitmapOverlayPerm();
-        setupChartsOverlayLayers();
+        //setupChartsOverlayLayers();
         //viewportTest();
 
         setupAirspacesLayer();
@@ -172,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         routeListFragment.setChartEvents(new ChartEvents() {
             @Override
             public void OnChartCheckedEvent(Chart chart, Boolean checked) {
-                chartsOverlayLayers.setChart(chart);
+                settingsObject.chartsOverlayLayers.setChart(chart);
             }
 
             @Override
@@ -323,15 +321,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void setupChartsOverlayLayers()
-    {
-//        chartsGroupLayer = new GroupLayer(mMap);
-//        mMap.layers().add(chartsGroupLayer);
-        int index = mMap.layers().size()-1;
-
-        chartsOverlayLayers = new ChartsOverlayLayers(this, mMap, index);
-        chartsOverlayLayers.InitChartsFromDB();
-    }
+//    void setupChartsOverlayLayers()
+//    {
+////        chartsGroupLayer = new GroupLayer(mMap);
+////        mMap.layers().add(chartsGroupLayer);
+//        int index = mMap.layers().size()-1;
+//
+//        chartsOverlayLayers = new ChartsOverlayLayers(this, mMap, index);
+//        chartsOverlayLayers.InitChartsFromDB();
+//    }
 
     void setupMap()
     {

@@ -7,6 +7,7 @@ import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
+import com.mobileaviationtools.nav_fly.Layers.ChartsOverlayLayers;
 import com.mobileaviationtools.nav_fly.Settings.Overlays.ChartSettingsItemAdapter;
 import com.mobileaviationtools.nav_fly.Settings.Overlays.MBTileChart;
 
@@ -37,6 +38,7 @@ public class SettingsObject  {
 
     private final String OSCIMAPURL = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
     private ArrayList<MBTileChart> mbTileCharts;
+    public ChartsOverlayLayers chartsOverlayLayers;
 
     public SettingsObject(Context context, Map map)
     {
@@ -49,6 +51,14 @@ public class SettingsObject  {
 
         mbTileCharts = new ArrayList<>();
         loadMBTileChartsOverlays();
+        setupChartsOverlayLayers();
+    }
+
+    private void setupChartsOverlayLayers()
+    {
+        int index = map.layers().size()-1;
+        chartsOverlayLayers = new ChartsOverlayLayers(context, map, index);
+        chartsOverlayLayers.InitChartsFromDB();
     }
 
     private OfflineTileCache baseCache;
@@ -114,8 +124,8 @@ public class SettingsObject  {
             @Override
             public void OnChanged(MBTileChart chart, MBTileChart.status newStatus) {
                 chart.chartStatus = newStatus;
-                if (newStatus == MBTileChart.status.present) chart.updateChart(false);
-                if (newStatus == MBTileChart.status.visible) chart.updateChart(true);
+                if (newStatus == MBTileChart.status.present) setupOverlayChart(chart, false);
+                if (newStatus == MBTileChart.status.visible) setupOverlayChart(chart,true);
 
                 if (newStatus == MBTileChart.status.gone) chart.deleteChart();
 
@@ -127,6 +137,12 @@ public class SettingsObject  {
                 SettingsObject.this.chartSettingsItemAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    private void setupOverlayChart(MBTileChart chart, boolean active)
+    {
+        chart.updateChart(active);
+        chartsOverlayLayers.setChart(chart.getChart());
     }
 
     public void dispose()

@@ -29,7 +29,7 @@ public class ChartsOverlayLayers {
     public void InitChartsFromDB()
     {
         AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
-        Chart[] dbCharts = db.getCharts().getActiveChartsByType(true, ChartType.png);
+        Chart[] dbCharts = db.getCharts().getActiveChartsByType(true, ChartType.png.toString());
         for (Chart c : dbCharts)
         {
             setChart(c);

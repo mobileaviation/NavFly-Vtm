@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -54,6 +55,7 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
         LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
         view = inflater.inflate(R.layout.chartsetting_item, viewGroup, false);
 
+        ImageView chartSetupImage = (ImageView)view.findViewById(R.id.chartSetupImage);
         CheckBox activateChartCheckBox = (CheckBox)view.findViewById(R.id.activateChartCheckBox);
         TextView chartSetupTxt = (TextView)view.findViewById(R.id.chartSetupTxt);
         ImageButton downloadChartButton = (ImageButton) view.findViewById(R.id.downloadChartButton);
@@ -65,6 +67,24 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
         downloadChartButton.setTag(chart);
 
         chartSetupTxt.setText(chart.getName());
+
+        switch (chart.chartType)
+        {
+            case fsp:{
+                chartSetupImage.setImageDrawable(context.getResources().getDrawable(R.drawable.fsp_charts_header));
+                break;
+            }
+            case ofm:{
+                chartSetupImage.setImageDrawable(context.getResources().getDrawable(R.drawable.ofm_charts_header));
+                break;
+            }
+            case local:
+            {
+                chartSetupImage.setImageDrawable(context.getResources().getDrawable(R.drawable.local_charts_header));
+                break;
+            }
+        }
+
         setupListeners(activateChartCheckBox, downloadChartButton);
 
         switch (chart.chartStatus){
@@ -132,7 +152,8 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
                 }
                 if((chart.chartStatus==MBTileChart.status.present) || (chart.chartStatus==MBTileChart.status.visible))
                 {
-                    // TODO remove the file, reset the status
+                    chart.deleteChart();
+                    chart.chartStatus = MBTileChart.status.gone;
                     ChartSettingsItemAdapter.this.notifyDataSetChanged();
 
                 }
@@ -143,8 +164,9 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 CheckBox checkBox = (CheckBox)compoundButton;
+                checkBox.setChecked(b);
                 MBTileChart chart = (MBTileChart)checkBox.getTag();
-                // TODO add or remove the chart from the map
+                chart.updateChart(b);
                 ChartSettingsItemAdapter.this.notifyDataSetChanged();
             }
         });

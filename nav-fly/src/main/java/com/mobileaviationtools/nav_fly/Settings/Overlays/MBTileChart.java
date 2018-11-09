@@ -72,6 +72,7 @@ public class MBTileChart {
             chartStatus = (chart.active)? status.visible : status.present;
         else chartStatus = status.gone;
     }
+    public Chart getChart(){ return this.chart; }
 
     private void newChartFromTile()
     {
@@ -112,6 +113,9 @@ public class MBTileChart {
         if (this.chart.id>0) {
             AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
             db.getCharts().DeleteChart(this.chart);
+            this.chart.active = false;
+            this.chart.id = 0;
+
             // TODO Remove chart from the map
         }
     }
