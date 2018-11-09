@@ -17,6 +17,8 @@ import java.net.URL;
 public class FileDownloader extends AsyncTask<String, Integer, String> {
     private Context context;
     private PowerManager.WakeLock mWakeLock;
+    private boolean setupWakelock = false;
+    // TODO Ask for permission for WAKELOCK
 
     private String url;
     public void SetUrl(String url){this.url = url;}
@@ -123,10 +125,12 @@ public class FileDownloader extends AsyncTask<String, Integer, String> {
         super.onPreExecute();
         // take CPU lock to prevent CPU from going off if the user
         // presses the power button during download
-        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                getClass().getName());
-        mWakeLock.acquire();
+        if (setupWakelock) {
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                    getClass().getName());
+            mWakeLock.acquire();
+        }
 //        mProgressDialog.show();
     }
 
@@ -139,7 +143,7 @@ public class FileDownloader extends AsyncTask<String, Integer, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        mWakeLock.release();
+        if (setupWakelock) mWakeLock.release();
         if (TextUtils.isEmpty(result))
             if (downloadInfo != null) downloadInfo.OnFinished(url, local_result_file);
             else

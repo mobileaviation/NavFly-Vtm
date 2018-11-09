@@ -3,6 +3,7 @@ package com.mobileaviationtools.nav_fly.Layers;
 import android.content.Context;
 
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
+import com.mobileaviationtools.airnavdata.Classes.ChartType;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 
 import org.oscim.android.tiling.Overlay.OverlayTileSource;
@@ -28,7 +29,7 @@ public class ChartsOverlayLayers {
     public void InitChartsFromDB()
     {
         AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
-        Chart[] dbCharts = db.getCharts().getActiveCharts(true);
+        Chart[] dbCharts = db.getCharts().getActiveChartsByType(true, ChartType.png);
         for (Chart c : dbCharts)
         {
             setChart(c);

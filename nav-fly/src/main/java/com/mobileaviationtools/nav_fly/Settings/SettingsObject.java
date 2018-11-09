@@ -7,6 +7,7 @@ import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
+import com.mobileaviationtools.nav_fly.Settings.Overlays.ChartSettingsItemAdapter;
 import com.mobileaviationtools.nav_fly.Settings.Overlays.MBTileChart;
 
 import org.oscim.android.cache.OfflineTileCache;
@@ -69,6 +70,7 @@ public class SettingsObject  {
 
     private Map map;
     private Context context;
+    public ChartSettingsItemAdapter chartSettingsItemAdapter;
 
     public void DownloadTiles(OfflineTileDownloadEvent callback)
     {
@@ -87,6 +89,7 @@ public class SettingsObject  {
         {
             MBTileChart mbTileChart = new MBTileChart(context);
             mbTileChart.setTile(tile);
+            setupMBTileChartListener(mbTileChart);
             mbTileCharts.add(mbTileChart);
         }
 
@@ -94,13 +97,36 @@ public class SettingsObject  {
         {
             MBTileChart mbTileChart = new MBTileChart(context);
             mbTileChart.setChart(chart);
-            if (!mbTileCharts.contains(mbTileChart))
+            if (!mbTileCharts.contains(mbTileChart)) {
+                setupMBTileChartListener(mbTileChart);
                 mbTileCharts.add(mbTileChart);
+            }
         }
     }
 
     public ArrayList<MBTileChart> getMbTileCharts() {
         return mbTileCharts;
+    }
+
+    private void setupMBTileChartListener(MBTileChart chart)
+    {
+        chart.SetMBTileChartChangedEvent(new MBTileChart.MBTileChartChangedEvent() {
+            @Override
+            public void OnChanged(MBTileChart chart, MBTileChart.status newStatus) {
+                chart.chartStatus = newStatus;
+                if (newStatus == MBTileChart.status.present) chart.updateChart(false);
+                if (newStatus == MBTileChart.status.visible) chart.updateChart(true);
+
+                if (newStatus == MBTileChart.status.gone) chart.deleteChart();
+
+                SettingsObject.this.chartSettingsItemAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void OnChangeInProgress(MBTileChart chart)
+            {
+                SettingsObject.this.chartSettingsItemAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void dispose()

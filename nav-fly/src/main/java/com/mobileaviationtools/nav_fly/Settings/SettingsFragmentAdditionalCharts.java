@@ -45,7 +45,7 @@ public class SettingsFragmentAdditionalCharts extends Fragment {
         View view =  inflater.inflate(R.layout.settings_fragment_addcharts, container, false);
 
         ListView addChartsListView = (ListView) view.findViewById(R.id.addChartsListView);
-        ChartSettingsItemAdapter adapter = new ChartSettingsItemAdapter(context, settingsObject.getMbTileCharts());
+        ChartSettingsItemAdapter adapter = new ChartSettingsItemAdapter(context, settingsObject);
         addChartsListView.setAdapter(adapter);
 
 

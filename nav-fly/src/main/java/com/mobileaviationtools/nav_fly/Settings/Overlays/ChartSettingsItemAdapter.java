@@ -6,32 +6,42 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 
 import java.util.ArrayList;
+import java.util.EventListener;
 
 public class ChartSettingsItemAdapter extends BaseAdapter {
-    private ArrayList<MBTileChart> charts;
-    private Context context;
 
-    public ChartSettingsItemAdapter(Context context, ArrayList<MBTileChart> charts)
+    private SettingsObject settingsObject;
+    private Context context;
+    private EventListener eventListener;
+    public void setEventListener(EventListener eventListener)
     {
-        this.charts = charts;
+        this.eventListener = eventListener;
+    }
+
+    public ChartSettingsItemAdapter(Context context, SettingsObject settingsObject)
+    {
+        this.settingsObject = settingsObject;
+        this.settingsObject.chartSettingsItemAdapter = this;
         this.context = context;
     }
 
     @Override
     public int getCount() {
-        return charts.size();
+        return settingsObject.getMbTileCharts().size();
     }
 
     @Override
     public Object getItem(int i) {
-        return charts.get(i);
+        return settingsObject.getMbTileCharts().get(i);
     }
 
     @Override
@@ -50,16 +60,18 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
         ProgressBar chartDownloadProgress = (ProgressBar) view.findViewById(R.id.chartDownloadProgress);
         chartDownloadProgress.setMax(100);
 
-        MBTileChart chart = charts.get(i);
+        MBTileChart chart = settingsObject.getMbTileCharts().get(i);
         activateChartCheckBox.setTag(chart);
         downloadChartButton.setTag(chart);
 
         chartSetupTxt.setText(chart.getName());
+        setupListeners(activateChartCheckBox, downloadChartButton);
 
         switch (chart.chartStatus){
             case gone:
             {
                 chartDownloadProgress.setVisibility(View.GONE);
+                downloadChartButton.setVisibility(View.VISIBLE);
                 downloadChartButton.setImageDrawable(context.getResources().getDrawable(R.drawable.download_btn));
                 downloadChartButton.setEnabled(true);
                 activateChartCheckBox.setEnabled(false);
@@ -70,6 +82,7 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
             case present:
             {
                 chartDownloadProgress.setVisibility(View.GONE);
+                downloadChartButton.setVisibility(View.VISIBLE);
                 downloadChartButton.setImageDrawable(context.getResources().getDrawable(R.drawable.delete_download_btn));
                 downloadChartButton.setEnabled(true);
                 activateChartCheckBox.setEnabled(true);
@@ -80,6 +93,7 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
             case visible:
             {
                 chartDownloadProgress.setVisibility(View.GONE);
+                downloadChartButton.setVisibility(View.VISIBLE);
                 downloadChartButton.setImageDrawable(context.getResources().getDrawable(R.drawable.delete_download_btn));
                 downloadChartButton.setEnabled(true);
                 activateChartCheckBox.setEnabled(true);
@@ -90,6 +104,7 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
             case downloading:
             {
                 chartDownloadProgress.setVisibility(View.VISIBLE);
+                downloadChartButton.setVisibility(View.GONE);
                 chartDownloadProgress.setProgress((int)Math.round(chart.progress));
                 downloadChartButton.setImageDrawable(context.getResources().getDrawable(R.drawable.delete_download_btn));
                 downloadChartButton.setEnabled(false);
@@ -102,5 +117,36 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
         }
 
         return view;
+    }
+
+    private void setupListeners(CheckBox activateCheckBox, ImageButton actionBtn)
+    {
+        actionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageButton imageButton = (ImageButton)view;
+                MBTileChart chart = (MBTileChart)imageButton.getTag();
+                if (chart.chartStatus==MBTileChart.status.gone) {
+                    chart.startDownload();
+                    ChartSettingsItemAdapter.this.notifyDataSetChanged();
+                }
+                if((chart.chartStatus==MBTileChart.status.present) || (chart.chartStatus==MBTileChart.status.visible))
+                {
+                    // TODO remove the file, reset the status
+                    ChartSettingsItemAdapter.this.notifyDataSetChanged();
+
+                }
+            }
+        });
+
+        activateCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                CheckBox checkBox = (CheckBox)compoundButton;
+                MBTileChart chart = (MBTileChart)checkBox.getTag();
+                // TODO add or remove the chart from the map
+                ChartSettingsItemAdapter.this.notifyDataSetChanged();
+            }
+        });
     }
 }

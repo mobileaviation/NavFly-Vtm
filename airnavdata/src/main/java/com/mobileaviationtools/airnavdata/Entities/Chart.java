@@ -11,7 +11,7 @@ import com.mobileaviationtools.airnavdata.Classes.ChartTypeTypeConverter;
 @Entity(tableName = "tbl_Charts")
 public class Chart {
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
     public String name;
     @TypeConverters({ChartTypeTypeConverter.class})
     public ChartType type;
