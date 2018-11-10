@@ -25,4 +25,5 @@ public class Chart {
     public Double latitude_deg_s;
     public Double longitude_deg_e;
     public Boolean active;
+    public int order;
 }

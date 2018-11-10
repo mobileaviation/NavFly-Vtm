@@ -7,12 +7,15 @@ import com.mobileaviationtools.airnavdata.Classes.ChartType;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 
 import org.oscim.android.tiling.Overlay.OverlayTileSource;
+import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.core.BoundingBox;
 import org.oscim.layers.GroupLayer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.map.Map;
+import org.oscim.tiling.TileSource;
 import org.oscim.utils.pool.Inlist;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,16 +27,6 @@ public class ChartsOverlayLayers {
         this.context = content;
         startIndex = index;
         this.charts = new ArrayList<ChartOverlay>();
-    }
-
-    public void InitChartsFromDB()
-    {
-        AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
-        Chart[] dbCharts = db.getCharts().getActiveChartsByType(true, ChartType.png.toString());
-        for (Chart c : dbCharts)
-        {
-            setChart(c);
-        }
     }
 
     public class ChartOverlay
@@ -53,7 +46,7 @@ public class ChartsOverlayLayers {
             {
                 if (bitmapLayer == null)
                 {
-                    createOverlayLayer();
+                    createSource();
                 }
                 else
                 {
@@ -78,6 +71,15 @@ public class ChartsOverlayLayers {
             updateChart();
         }
 
+        public int getLayerIndex()
+        {
+            if (bitmapLayer != null)
+            {
+                return map.layers().indexOf(bitmapLayer);
+            }
+            else return -1;
+        }
+
         private void updateChart()
         {
             AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
@@ -85,11 +87,56 @@ public class ChartsOverlayLayers {
             //SetChart();
         }
 
-        private void createOverlayLayer()
+        private void createSource()
+        {
+            switch (chart.type)
+            {
+                case mbtiles:
+                {
+                    createMBTilesOverlaySource();
+                    break;
+                }
+                case jpg:
+                {
+                    createOverlaySource();
+                    break;
+                }
+                case png:
+                {
+                    createOverlaySource();
+                    break;
+                }
+                case pdf:
+                {
+                    break;
+                }
+                case unknown:
+                {
+                    break;
+                }
+            }
+        }
+
+        private void createMBTilesOverlaySource()
+        {
+            File f = new File(chart.filelocation);
+            if (f.exists()) {
+                mbTilesTileSource = new MBTilesTileSource(chart.filelocation);
+                mbTilesTileSource.open();
+                createBitmapLayer(mbTilesTileSource);
+            }
+        }
+
+        private void createOverlaySource()
         {
             overlayTileSource = new OverlayTileSource(chart.chart, boundingBox);
             overlayTileSource.open();
-            bitmapLayer = new BitmapTileLayer(map, overlayTileSource);
+            createBitmapLayer(overlayTileSource);
+        }
+
+        private void createBitmapLayer(TileSource source)
+        {
+            bitmapLayer = new BitmapTileLayer(map, source);
             map.layers().add(startIndex, bitmapLayer);
             map.updateMap(true);
         }
@@ -100,14 +147,16 @@ public class ChartsOverlayLayers {
 //        private GroupLayer groupLayer;
         private Chart chart;
         private OverlayTileSource overlayTileSource;
+        private MBTilesTileSource mbTilesTileSource;
         private BitmapTileLayer bitmapLayer;
 
         private void setBoundingBox()
         {
             if (chart != null)
             {
-                boundingBox = new BoundingBox(chart.latitude_deg_s, chart.longitude_deg_w,
-                        chart.latitude_deg_n, chart.longitude_deg_e);
+                if (chart.type != ChartType.mbtiles)
+                    boundingBox = new BoundingBox(chart.latitude_deg_s, chart.longitude_deg_w,
+                            chart.latitude_deg_n, chart.longitude_deg_e);
             }
         }
 

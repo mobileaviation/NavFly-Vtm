@@ -155,7 +155,6 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
                     chart.deleteChart();
                     chart.chartStatus = MBTileChart.status.gone;
                     ChartSettingsItemAdapter.this.notifyDataSetChanged();
-
                 }
             }
         });
@@ -167,7 +166,7 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
                 checkBox.setChecked(b);
                 MBTileChart chart = (MBTileChart)checkBox.getTag();
                 chart.updateChart(b);
-                ChartSettingsItemAdapter.this.notifyDataSetChanged();
+                //ChartSettingsItemAdapter.this.notifyDataSetChanged();
             }
         });
     }

@@ -51,14 +51,17 @@ public class SettingsObject  {
 
         mbTileCharts = new ArrayList<>();
         loadMBTileChartsOverlays();
-        setupChartsOverlayLayers();
     }
 
-    private void setupChartsOverlayLayers()
+    public void setupChartsOverlayLayers()
     {
         int index = map.layers().size()-1;
         chartsOverlayLayers = new ChartsOverlayLayers(context, map, index);
-        chartsOverlayLayers.InitChartsFromDB();
+        AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+        Chart[] dbCharts = db.getCharts().getActiveCharts(true);
+        for (Chart c : dbCharts) {
+            setChart(c);
+        }
     }
 
     private OfflineTileCache baseCache;
@@ -88,21 +91,31 @@ public class SettingsObject  {
         baseCache.DownloadTiles(map.getBoundingBox(0) ,OSCIMAPURL);
     }
 
-    private void loadMBTileChartsOverlays()
+    private Chart[] getChartsFromDB()
+    {
+        AirnavChartsDatabase airnavChartsDatabase = AirnavChartsDatabase.getInstance(context);
+        return airnavChartsDatabase.getCharts().getAllCharts();
+    }
+
+    private MBTile[] getTilesFromDB()
     {
         AirnavDatabase airnavDatabase = AirnavDatabase.getInstance(context);
-        MBTile[] ofmTiles = airnavDatabase.getTiles().getAllMBTiles();
-        AirnavChartsDatabase airnavChartsDatabase = AirnavChartsDatabase.getInstance(context);
-        Chart[] charts = airnavChartsDatabase.getCharts().getAllCharts();
+        return airnavDatabase.getTiles().getAllMBTiles();
+    }
 
-        for (MBTile tile: ofmTiles)
+    private void loadTiles(MBTile[] tiles)
+    {
+        for (MBTile tile: tiles)
         {
             MBTileChart mbTileChart = new MBTileChart(context);
             mbTileChart.setTile(tile);
             setupMBTileChartListener(mbTileChart);
             mbTileCharts.add(mbTileChart);
         }
+    }
 
+    private void loadCharts(Chart[] charts)
+    {
         for (Chart chart: charts)
         {
             MBTileChart mbTileChart = new MBTileChart(context);
@@ -111,7 +124,25 @@ public class SettingsObject  {
                 setupMBTileChartListener(mbTileChart);
                 mbTileCharts.add(mbTileChart);
             }
+            else
+            {
+                MBTileChart exChart = mbTileCharts.get(mbTileCharts.indexOf(mbTileChart));
+                exChart.setChart(chart);
+            }
         }
+    }
+
+    private void loadMBTileChartsOverlays()
+    {
+        MBTile[] ofmTiles = getTilesFromDB();
+        loadTiles(ofmTiles);
+        updateChartsFromDB();
+    }
+
+    public void updateChartsFromDB()
+    {
+        Chart[] charts = getChartsFromDB();
+        loadCharts(charts);
     }
 
     public ArrayList<MBTileChart> getMbTileCharts() {
@@ -122,7 +153,7 @@ public class SettingsObject  {
     {
         chart.SetMBTileChartChangedEvent(new MBTileChart.MBTileChartChangedEvent() {
             @Override
-            public void OnChanged(MBTileChart chart, MBTileChart.status newStatus) {
+            public void OnChanged(MBTileChart chart, MBTileChart.status newStatus, boolean active) {
                 chart.chartStatus = newStatus;
                 if (newStatus == MBTileChart.status.present) setupOverlayChart(chart, false);
                 if (newStatus == MBTileChart.status.visible) setupOverlayChart(chart,true);
@@ -142,7 +173,35 @@ public class SettingsObject  {
     private void setupOverlayChart(MBTileChart chart, boolean active)
     {
         chart.updateChart(active);
-        chartsOverlayLayers.setChart(chart.getChart());
+        setChart(chart.getChart());
+    }
+
+    private void setChart(Chart chart)
+    {
+        switch (chart.type){
+            case jpg:{
+                chartsOverlayLayers.setChart(chart);
+                break;
+            }
+            case pdf:
+            {
+                break;
+            }
+            case png:
+            {
+                chartsOverlayLayers.setChart(chart);
+                break;
+            }
+            case mbtiles:
+            {
+                chartsOverlayLayers.setChart(chart);
+                break;
+            }
+            case unknown:
+            {
+                break;
+            }
+        }
     }
 
     public void dispose()

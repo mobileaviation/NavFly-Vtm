@@ -16,7 +16,7 @@ public class MBTileChart {
     public interface MBTileChartChangedEvent
     {
         public void OnChangeInProgress(MBTileChart chart);
-        public void OnChanged(MBTileChart chart, status newStatus);
+        public void OnChanged(MBTileChart chart, status newStatus, boolean active);
     }
 
     public MBTileChart(Context context)
@@ -65,7 +65,7 @@ public class MBTileChart {
     public void setChart(Chart chart)
     {
         this.chart = chart;
-        this.chartType = type.local;
+        this.chartType = (chart.mbtile_id>0) ? type.ofm : type.local;
         this.localFilename = chart.filelocation;
         this.localfile = new File(this.localFilename);
         if (localfile.exists())
@@ -101,11 +101,15 @@ public class MBTileChart {
 
     public void updateChart(boolean active)
     {
-        this.chart.active = active;
-        AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
-        this.chart.id = db.getCharts().InsertChart(this.chart);
-
-        // TODO make chart visible on, or remove it from the map
+        if (this.chart.active != active) {
+            this.chart.active = active;
+            this.chartStatus = (active) ? status.visible : status.present;
+            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+            this.chart.id = db.getCharts().InsertChart(this.chart);
+            // TODO make chart visible on, or remove it from the map
+            if (mbTileChartChangedEvent != null) mbTileChartChangedEvent.OnChanged(this,
+                    this.chartStatus, this.chart.active);
+        }
     }
 
     public void deleteChart()
@@ -115,8 +119,11 @@ public class MBTileChart {
             db.getCharts().DeleteChart(this.chart);
             this.chart.active = false;
             this.chart.id = 0;
+            this.chartStatus = status.gone;
 
             // TODO Remove chart from the map
+            if (mbTileChartChangedEvent!= null) mbTileChartChangedEvent.OnChanged(this,
+                    this.chartStatus, this.chart.active);
         }
     }
 
@@ -139,14 +146,16 @@ public class MBTileChart {
             @Override
             public void OnError(String url, File result_file, String message) {
                 MBTileChart.this.progress = 0;
-                if (mbTileChartChangedEvent != null) mbTileChartChangedEvent.OnChanged(MBTileChart.this, status.gone);
+                if (mbTileChartChangedEvent != null) mbTileChartChangedEvent.OnChanged(MBTileChart.this,
+                        status.gone, MBTileChart.this.chart.active);
                 // TODO Display download error message
             }
 
             @Override
             public void OnFinished(String url, File result_file) {
                 MBTileChart.this.progress = 100;
-                if (mbTileChartChangedEvent != null) mbTileChartChangedEvent.OnChanged(MBTileChart.this, status.present);
+                if (mbTileChartChangedEvent != null) mbTileChartChangedEvent.OnChanged(MBTileChart.this,
+                        status.present, MBTileChart.this.chart.active);
             }
         });
 
@@ -161,8 +170,9 @@ public class MBTileChart {
     public boolean equals(Object object)
     {
         if (object instanceof MBTileChart) {
-            if (((MBTileChart)object).tile==null) return false;
             if (this.chart == null) return false;
+            if (((MBTileChart)object).tile==null)
+                return (((MBTileChart)object).chart.id == this.chart.id);
 
             return (((MBTileChart)object).tile.id==
                     this.chart.mbtile_id);

@@ -115,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
         setupMap();
         createLayers();
 
+        // add overlay layers
+        settingsObject.setupChartsOverlayLayers();
+
         //getMBTilesMapPerm();
         //getBitmapOverlayPerm();
         //setupChartsOverlayLayers();
@@ -171,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void OnChartCheckedEvent(Chart chart, Boolean checked) {
                 settingsObject.chartsOverlayLayers.setChart(chart);
+                settingsObject.updateChartsFromDB();
             }
 
             @Override
