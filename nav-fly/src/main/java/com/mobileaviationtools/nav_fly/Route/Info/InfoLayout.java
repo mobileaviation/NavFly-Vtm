@@ -29,6 +29,7 @@ import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.airnavdata.Entities.Runway;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
+import com.mobileaviationtools.nav_fly.MainActivity;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteLoadItemAdapter;
@@ -469,69 +470,71 @@ public class InfoLayout extends LinearLayout {
         assignChartbtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                File[] files = downloadFolder.listFiles(new MyFileNameFilter(new String[]{".png", ".pdf"}));
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Assign Chart");
-                View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.chart_assign_list_item, (ViewGroup) InfoLayout.this, false);
-                final ListView filesList = (ListView) viewInflated.findViewById(R.id.list);
-                final EditText latSText = (EditText) viewInflated.findViewById(R.id.latitudeSText);
-                final EditText latNText = (EditText) viewInflated.findViewById(R.id.latitudeNText);
-                final EditText lonEText = (EditText) viewInflated.findViewById(R.id.longitudeEText);
-                final EditText lonWText = (EditText) viewInflated.findViewById(R.id.longitudeWText);
-
-                final ChartLoadItemAdapter chartLoadItemAdapter = new ChartLoadItemAdapter(files, getContext());
-                filesList.setAdapter(chartLoadItemAdapter);
-
-                filesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        filesList.setItemChecked(i, true);
-                    }
-                });
-                builder.setView(viewInflated);
-                builder.setIcon(android.R.drawable.ic_input_get);
-                builder.setMessage("Select Chart from list!");
-                builder.setPositiveButton("Assign", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        int pos = filesList.getCheckedItemPosition();
-                        File file = (File)chartLoadItemAdapter.getItem(pos);
-                        try {
-                            FileInputStream fis = new FileInputStream(file);
-                            byte[] fileBytes = new byte[(int)file.length()];
-                            fis.read(fileBytes, 0, (int)file.length());
-                            Chart chart = new Chart();
-                            chart.filelocation = file.getAbsolutePath();
-                            chart.name = file.getName();
-                            chart.airport_ref = selectedAirport.id;
-                            chart.chart = fileBytes;
-                            chart.type = ChartType.getTypeByExtention(file);
-                            chart.latitude_deg_n = Double.parseDouble(latNText.getText().toString());
-                            chart.latitude_deg_s = Double.parseDouble(latSText.getText().toString());
-                            chart.longitude_deg_e = Double.parseDouble(lonEText.getText().toString());
-                            chart.longitude_deg_w = Double.parseDouble(lonWText.getText().toString());
-                            chart.active = false;
-
-                            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
-                            db.getCharts().InsertChart(chart);
-                            loadCharts();
-                        }
-                        catch (Exception e)
-                        {
-                            Log.e(TAG, "problems reading " + file.getAbsolutePath());
-                        }
-
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
-                builder.show();
+//                File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//                File[] files = downloadFolder.listFiles(new MyFileNameFilter(new String[]{".png", ".pdf"}));
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                builder.setTitle("Assign Chart");
+//                View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.chart_assign_list, (ViewGroup) InfoLayout.this, false);
+//                final ListView filesList = (ListView) viewInflated.findViewById(R.id.list);
+//                final EditText latSText = (EditText) viewInflated.findViewById(R.id.latitudeSText);
+//                final EditText latNText = (EditText) viewInflated.findViewById(R.id.latitudeNText);
+//                final EditText lonEText = (EditText) viewInflated.findViewById(R.id.longitudeEText);
+//                final EditText lonWText = (EditText) viewInflated.findViewById(R.id.longitudeWText);
+//
+//                final ChartLoadItemAdapter chartLoadItemAdapter = new ChartLoadItemAdapter(files, getContext());
+//                filesList.setAdapter(chartLoadItemAdapter);
+//
+//                filesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                        filesList.setItemChecked(i, true);
+//                    }
+//                });
+//                builder.setView(viewInflated);
+//                builder.setIcon(android.R.drawable.ic_input_get);
+//                builder.setMessage("Select Chart from list!");
+//                builder.setPositiveButton("Assign", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        int pos = filesList.getCheckedItemPosition();
+//                        File file = (File)chartLoadItemAdapter.getItem(pos);
+//                        try {
+//                            FileInputStream fis = new FileInputStream(file);
+//                            byte[] fileBytes = new byte[(int)file.length()];
+//                            fis.read(fileBytes, 0, (int)file.length());
+//                            Chart chart = new Chart();
+//                            chart.filelocation = file.getAbsolutePath();
+//                            chart.name = file.getName();
+//                            chart.airport_ref = selectedAirport.id;
+//                            chart.chart = fileBytes;
+//                            chart.type = ChartType.getTypeByExtention(file);
+//                            chart.latitude_deg_n = Double.parseDouble(latNText.getText().toString());
+//                            chart.latitude_deg_s = Double.parseDouble(latSText.getText().toString());
+//                            chart.longitude_deg_e = Double.parseDouble(lonEText.getText().toString());
+//                            chart.longitude_deg_w = Double.parseDouble(lonWText.getText().toString());
+//                            chart.active = false;
+//
+//                            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+//                            db.getCharts().InsertChart(chart);
+//                            loadCharts();
+//                        }
+//                        catch (Exception e)
+//                        {
+//                            Log.e(TAG, "problems reading " + file.getAbsolutePath());
+//                        }
+//
+//                    }
+//                });
+//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.cancel();
+//                    }
+//                });
+//                builder.show();
+                SelectChartDialog dialog = SelectChartDialog.getInstance(context);
+                dialog.show(((MainActivity)context).getSupportFragmentManager(), "");
             }
         });
     }
