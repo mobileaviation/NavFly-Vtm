@@ -533,7 +533,18 @@ public class InfoLayout extends LinearLayout {
 //                    }
 //                });
 //                builder.show();
-                SelectChartDialog dialog = SelectChartDialog.getInstance(context);
+                SelectChartDialog dialog = SelectChartDialog.getInstance(context, selectedAirport);
+//                dialog.onDismiss(new DialogInterface() {
+//                    @Override
+//                    public void cancel() {
+//
+//                    }
+//
+//                    @Override
+//                    public void dismiss() {
+//                        loadCharts();
+//                    }
+//                });
                 dialog.show(((MainActivity)context).getSupportFragmentManager(), "");
             }
         });

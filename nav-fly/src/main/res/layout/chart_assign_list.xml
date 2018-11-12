@@ -33,17 +33,88 @@
                 android:listSelector="@drawable/list_item_selector">
 
 
-            </ListView>
 
-            <com.mobileaviationtools.nav_fly.Classes.TouchImageView
-                android:id="@+id/chartImageView"
+            </ListView>
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_weight=".4"
-                android:adjustViewBounds="true"
-                android:maxHeight="400dp"
-                app:srcCompat="@drawable/vac_ehle" />
+                android:orientation="vertical"
+                android:layout_weight=".4">
+
+                <LinearLayout
+                    android:id="@+id/nwChartSelectLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp">
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Latitude N" />
+
+                    <EditText
+                        android:id="@+id/latitudeNText"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberSigned|numberDecimal" />
+
+                    <TextView
+                        android:id="@+id/textView6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Longitude W" />
+
+                    <EditText
+                        android:id="@+id/longitudeWText"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberSigned|numberDecimal" />
+
+                </LinearLayout>
+
+                <com.mobileaviationtools.nav_fly.Classes.TouchImageView
+                    android:id="@+id/chartImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="false"
+                    app:srcCompat="@drawable/vac_ehle" />
+
+                <LinearLayout
+                    android:id="@+id/seChartSelectLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="right">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Latitude S" />
+
+                    <EditText
+                        android:id="@+id/latitudeSText"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberSigned|numberDecimal" />
+
+                    <TextView
+                        android:id="@+id/textView8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Longitude E" />
+
+                    <EditText
+                        android:id="@+id/longitudeEText"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number|numberSigned|numberDecimal" />
+                </LinearLayout>
+            </LinearLayout>
+
 
             <!--<ImageView-->
                 <!--android:id="@+id/chartImageView"-->
@@ -58,83 +129,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/locationTextLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Latitude S" />
-
-                <EditText
-                    android:id="@+id/latitudeSText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="number|numberSigned|numberDecimal" />
-
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Latitude N" />
-
-                <EditText
-                    android:id="@+id/latitudeNText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="number|numberSigned|numberDecimal" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Longitude W" />
-
-                <EditText
-                    android:id="@+id/longitudeWText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="number|numberSigned|numberDecimal" />
-
-                <TextView
-                    android:id="@+id/textView8"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Longitude E" />
-
-                <EditText
-                    android:id="@+id/longitudeEText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="number|numberSigned|numberDecimal" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -145,13 +139,13 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/saveChartAssignBtn"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:text="Save" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/cancelChartAssignBtn"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:text="Cancel" />
