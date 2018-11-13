@@ -2,6 +2,7 @@ package com.mobileaviationtools.airnavdata.Entities;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
@@ -26,4 +27,20 @@ public class Chart {
     public Double longitude_deg_e;
     public Boolean active;
     public int order;
+
+    @Ignore
+    public boolean validate()
+    {
+        if ((latitude_deg_n != null) && (longitude_deg_e != null)
+                && (longitude_deg_w != null) && (latitude_deg_s != null))
+        {
+            if (latitude_deg_s < -90 && latitude_deg_s > 90) return false;
+            if (latitude_deg_n < -90 && latitude_deg_s > 90) return false;
+            if (longitude_deg_e < -180 && longitude_deg_e > 180) return false;
+            if (longitude_deg_w < -180 && longitude_deg_e > 180) return false;
+            return ((latitude_deg_n>latitude_deg_s) && (longitude_deg_w<longitude_deg_e));
+        }
+        else
+            return false;
+    }
 }

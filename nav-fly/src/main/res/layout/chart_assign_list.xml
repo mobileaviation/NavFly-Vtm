@@ -55,9 +55,10 @@
 
                     <EditText
                         android:id="@+id/latitudeNText"
-                        android:layout_width="100dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:inputType="number|numberSigned|numberDecimal" />
+                        android:inputType="number|numberSigned|numberDecimal"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/textView6"
@@ -67,9 +68,10 @@
 
                     <EditText
                         android:id="@+id/longitudeWText"
-                        android:layout_width="100dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:inputType="number|numberSigned|numberDecimal" />
+                        android:inputType="number|numberSigned|numberDecimal"
+                        android:textSize="14sp" />
 
                 </LinearLayout>
 
@@ -79,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
-                    android:adjustViewBounds="false"
+                    android:adjustViewBounds="true"
                     app:srcCompat="@drawable/vac_ehle" />
 
                 <LinearLayout
@@ -97,9 +99,10 @@
 
                     <EditText
                         android:id="@+id/latitudeSText"
-                        android:layout_width="100dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:inputType="number|numberSigned|numberDecimal" />
+                        android:inputType="number|numberSigned|numberDecimal"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/textView8"
@@ -109,9 +112,10 @@
 
                     <EditText
                         android:id="@+id/longitudeEText"
-                        android:layout_width="100dp"
+                        android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:inputType="number|numberSigned|numberDecimal" />
+                        android:inputType="number|numberSigned|numberDecimal"
+                        android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -142,6 +146,7 @@
                 android:id="@+id/saveChartAssignBtn"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:enabled="false"
                 android:text="Save" />
 
             <Button

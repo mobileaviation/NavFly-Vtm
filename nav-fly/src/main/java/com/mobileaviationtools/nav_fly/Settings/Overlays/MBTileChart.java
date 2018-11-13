@@ -82,6 +82,7 @@ public class MBTileChart {
         this.chart.name = this.localfile.getName();
         this.chart.mbtile_id = tile.id;
         this.chart.id = 0;
+        this.chart.active = false;
     }
 
     private String localFilename;
@@ -115,13 +116,15 @@ public class MBTileChart {
     public void deleteChart()
     {
         if (this.chart.id>0) {
+            this.chart.active = false;
+            this.chartStatus = status.present;
+            if (mbTileChartChangedEvent!= null) mbTileChartChangedEvent.OnChanged(this,
+                    this.chartStatus, this.chart.active);
+
             AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
             db.getCharts().DeleteChart(this.chart);
-            this.chart.active = false;
             this.chart.id = 0;
             this.chartStatus = status.gone;
-
-            // TODO Remove chart from the map
             if (mbTileChartChangedEvent!= null) mbTileChartChangedEvent.OnChanged(this,
                     this.chartStatus, this.chart.active);
         }

@@ -11,7 +11,10 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.Classes.ChartType;
@@ -54,6 +58,14 @@ public class SelectChartDialog extends DialogFragment {
     private Airport selectedAirport;
     private View view;
 
+    private EditText latSText;
+    private EditText latNText;
+    private EditText lonEText;
+    private EditText lonWText;
+
+    private Button saveBtn;
+
+
     @Override
     public void onStart() {
         super.onStart();
@@ -70,6 +82,7 @@ public class SelectChartDialog extends DialogFragment {
 
         setup();
         setupButtons();
+        setupLocationEditText();
 
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         ColorDrawable back = new ColorDrawable(Color.TRANSPARENT);
@@ -110,7 +123,7 @@ public class SelectChartDialog extends DialogFragment {
 
     private void setupButtons()
     {
-        Button saveBtn = (Button) view.findViewById(R.id.saveChartAssignBtn);
+        saveBtn = (Button) view.findViewById(R.id.saveChartAssignBtn);
         Button cancelBtn = (Button) view.findViewById(R.id.cancelChartAssignBtn);
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,6 +139,53 @@ public class SelectChartDialog extends DialogFragment {
                 SelectChartDialog.this.dismiss();
             }
         });
+    }
+
+    private void setupLocationEditText()
+    {
+        latSText = (EditText) view.findViewById(R.id.latitudeSText);
+        latNText = (EditText) view.findViewById(R.id.latitudeNText);
+        lonEText = (EditText) view.findViewById(R.id.longitudeEText);
+        lonWText = (EditText) view.findViewById(R.id.longitudeWText);
+
+        TextWatcher onLocEditChange = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                boolean saveable = false;
+                try {
+                    Chart chart = new Chart();
+                    chart.latitude_deg_n = Double.parseDouble(latNText.getText().toString());
+                    chart.latitude_deg_s = Double.parseDouble(latSText.getText().toString());
+                    chart.longitude_deg_e = Double.parseDouble(lonEText.getText().toString());
+                    chart.longitude_deg_w = Double.parseDouble(lonWText.getText().toString());
+                    saveable = chart.validate();
+                }
+                catch (Exception ee)
+                {
+                    saveable = false;
+                }
+
+                if (selectedFile != null)
+                    if (selectedFile.getName().endsWith("mbtiles"))
+                        saveable = true;
+
+                saveBtn.setEnabled(saveable && (selectedFile != null));
+
+            }
+        };
+
+        latNText.addTextChangedListener(onLocEditChange);
+        latNText.addTextChangedListener(onLocEditChange);
+        lonEText.addTextChangedListener(onLocEditChange);
+        lonWText.addTextChangedListener(onLocEditChange);
     }
 
     private boolean setChart()
@@ -148,11 +208,6 @@ public class SelectChartDialog extends DialogFragment {
 
     private boolean setJpgPngChart()
     {
-         EditText latSText = (EditText) view.findViewById(R.id.latitudeSText);
-         EditText latNText = (EditText) view.findViewById(R.id.latitudeNText);
-         EditText lonEText = (EditText) view.findViewById(R.id.longitudeEText);
-         EditText lonWText = (EditText) view.findViewById(R.id.longitudeWText);
-
         try {
             FileInputStream fis = new FileInputStream(selectedFile);
             byte[] fileBytes = new byte[(int)selectedFile.length()];
