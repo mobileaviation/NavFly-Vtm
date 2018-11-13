@@ -32,6 +32,7 @@ import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.Classes.ChartType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
+import com.mobileaviationtools.nav_fly.Classes.MBTilePreview;
 import com.mobileaviationtools.nav_fly.R;
 
 import java.io.File;
@@ -116,6 +117,12 @@ public class SelectChartDialog extends DialogFragment {
                 {
                     nwLayout.setVisibility(View.GONE);
                     seLayout.setVisibility(View.GONE);
+                    if (selectedFile.getName().endsWith("mbtiles"))
+                    {
+                        MBTilePreview preview = new MBTilePreview(selectedFile.getAbsolutePath());
+                        Bitmap myBitmap = preview.GetBitmap();
+                        chartImage.setImageBitmap(myBitmap);
+                    }
                 }
             }
         });
