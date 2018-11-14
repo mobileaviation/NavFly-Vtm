@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly.Route.Info;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -40,6 +41,7 @@ import com.mobileaviationtools.nav_fly.R;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
@@ -59,13 +61,27 @@ public class SelectChartDialog extends DialogFragment {
         SelectChartDialog settingsDialog = new SelectChartDialog();
         settingsDialog.context = context;
         settingsDialog.selectedAirport = selectedAirport;
+        settingsDialog.basePath = context.getApplicationInfo().dataDir + "/charts/";
         return settingsDialog;
+    }
+
+    public void setDismissListener(DialogInterface.OnDismissListener dismissListener)
+    {
+        this.dismissListener = dismissListener;
+    }
+    private DialogInterface.OnDismissListener dismissListener;
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if(dismissListener != null) dismissListener.onDismiss(dialog);
     }
 
     private Context context;
     private File selectedFile;
     private Airport selectedAirport;
     private View view;
+    private String basePath;
 
     private EditText latSText;
     private EditText latNText;
@@ -73,7 +89,11 @@ public class SelectChartDialog extends DialogFragment {
     private EditText lonWText;
 
     private Button saveBtn;
+    private boolean saved;
 
+    public boolean isSaved() {
+        return saved;
+    }
 
     @Override
     public void onStart() {
@@ -81,6 +101,7 @@ public class SelectChartDialog extends DialogFragment {
         getDialog().getWindow()
                 .setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                         WindowManager.LayoutParams.MATCH_PARENT);
+        saved = false;
     }
 
     @Nullable
@@ -116,6 +137,7 @@ public class SelectChartDialog extends DialogFragment {
 
                 if (selectedFile.getName().toLowerCase().endsWith("png") || selectedFile.getName().toLowerCase().endsWith("jpg"))
                 {
+                    saveBtn.setEnabled(chechChart());
                     Bitmap myBitmap = BitmapFactory.decodeFile(selectedFile.getAbsolutePath());
                     chartImage.setImageBitmap(myBitmap);
                     nwLayout.setVisibility(View.VISIBLE);
@@ -127,17 +149,23 @@ public class SelectChartDialog extends DialogFragment {
                         processKmlFile(kmlFile);
                     }
                 }
-                else
+
+                if (selectedFile.getName().toLowerCase().endsWith("mbtiles"))
                 {
                     nwLayout.setVisibility(View.GONE);
                     seLayout.setVisibility(View.GONE);
-                    if (selectedFile.getName().endsWith("mbtiles"))
-                    {
-                        MBTilePreview preview = new MBTilePreview(selectedFile.getAbsolutePath());
-                        Bitmap myBitmap = preview.GetBitmap();
-                        chartImage.setImageBitmap(myBitmap);
-                    }
+                    MBTilePreview preview = new MBTilePreview(selectedFile.getAbsolutePath());
+                    Bitmap myBitmap = preview.GetBitmap();
+                    chartImage.setImageBitmap(myBitmap);
+                    saveBtn.setEnabled(true);
                 }
+
+                if (selectedFile.getName().toLowerCase().endsWith("pdf"))
+                {
+                    saveBtn.setEnabled(false);
+                    chartImage.setImageDrawable(context.getResources().getDrawable(R.drawable.select_a_file));
+                }
+
             }
         });
     }
@@ -167,6 +195,7 @@ public class SelectChartDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 setChart();
+                saved = true;
                 SelectChartDialog.this.dismiss();
             }
         });
@@ -174,6 +203,7 @@ public class SelectChartDialog extends DialogFragment {
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                saved = false;
                 SelectChartDialog.this.dismiss();
             }
         });
@@ -199,12 +229,7 @@ public class SelectChartDialog extends DialogFragment {
             public void afterTextChanged(Editable editable) {
                 boolean saveable = false;
                 try {
-                    Chart chart = new Chart();
-                    chart.latitude_deg_n = Double.parseDouble(latNText.getText().toString());
-                    chart.latitude_deg_s = Double.parseDouble(latSText.getText().toString());
-                    chart.longitude_deg_e = Double.parseDouble(lonEText.getText().toString());
-                    chart.longitude_deg_w = Double.parseDouble(lonWText.getText().toString());
-                    saveable = chart.validate();
+                    saveable = chechChart();
                 }
                 catch (Exception ee)
                 {
@@ -224,6 +249,16 @@ public class SelectChartDialog extends DialogFragment {
         latNText.addTextChangedListener(onLocEditChange);
         lonEText.addTextChangedListener(onLocEditChange);
         lonWText.addTextChangedListener(onLocEditChange);
+    }
+
+    private boolean chechChart()
+    {
+        Chart chart = new Chart();
+        chart.latitude_deg_n = Double.parseDouble(latNText.getText().toString());
+        chart.latitude_deg_s = Double.parseDouble(latSText.getText().toString());
+        chart.longitude_deg_e = Double.parseDouble(lonEText.getText().toString());
+        chart.longitude_deg_w = Double.parseDouble(lonWText.getText().toString());
+        return  chart.validate();
     }
 
     private boolean setChart()
@@ -276,7 +311,27 @@ public class SelectChartDialog extends DialogFragment {
 
     private boolean setMbTilesChart()
     {
-        return false;
+        Chart chart = new Chart();
+        chart.filelocation = basePath + selectedFile.getName();
+
+        // Copy chart to "Charts" directory
+        try {
+            FileHelpers.copy(selectedFile, new File(chart.filelocation));
+        }
+        catch (IOException ee)
+        {
+            return false;
+        }
+
+        chart.name = selectedFile.getName();
+        chart.airport_ref = selectedAirport.id;
+        chart.type = ChartType.mbtiles;
+        chart.active = false;
+
+        AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+        db.getCharts().InsertChart(chart);
+
+        return true;
     }
 
     private File[] getFiles()

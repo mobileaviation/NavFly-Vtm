@@ -533,7 +533,14 @@ public class InfoLayout extends LinearLayout {
 //                    }
 //                });
 //                builder.show();
-                SelectChartDialog dialog = SelectChartDialog.getInstance(context, selectedAirport);
+                final SelectChartDialog dialog = SelectChartDialog.getInstance(context, selectedAirport);
+                dialog.setDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        if (dialog.isSaved()) loadCharts();
+                    }
+                });
+
 //                dialog.onDismiss(new DialogInterface() {
 //                    @Override
 //                    public void cancel() {
@@ -542,7 +549,7 @@ public class InfoLayout extends LinearLayout {
 //
 //                    @Override
 //                    public void dismiss() {
-//                        loadCharts();
+//                        if (dialog.isSaved()) loadCharts();
 //                    }
 //                });
                 dialog.show(((MainActivity)context).getSupportFragmentManager(), "");

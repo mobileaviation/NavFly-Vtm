@@ -34,5 +34,5 @@ dependencies {
     implementation project(path: ':vtm')
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.google.code.gson:gson:2.8.2'
-    implementation files('C:/GitHub/vtm/Libs/simple-xml-2.3.2.jar')
+    implementation files('../Libs/simple-xml-2.3.2.jar')
 }

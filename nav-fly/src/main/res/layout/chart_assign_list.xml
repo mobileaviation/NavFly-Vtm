@@ -82,7 +82,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
                     android:adjustViewBounds="true"
-                    app:srcCompat="@drawable/vac_ehle" />
+                    app:srcCompat="@drawable/select_a_file" />
 
                 <LinearLayout
                     android:id="@+id/seChartSelectLayout"

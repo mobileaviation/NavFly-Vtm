@@ -53,6 +53,20 @@ public class MBTilePreview {
 
     }
 
+    private Integer getZoomLevel()
+    {
+        Integer zoomlevel = 10;
+        Cursor c = this.mDatabase.rawQuery("SELECT zoom_level FROM (" +
+                "SELECT zoom_level, Count(*) count FROM tiles group by zoom_level) " +
+                "WHERE count > 10 order by zoom_level", null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            zoomlevel = c.getInt(0);
+            c.close();
+        }
+        return zoomlevel;
+    }
+
     private void selectAlltilesByZoomLevel(int zoomlevel)
     {
         tiles = new ArrayList<>();
@@ -80,7 +94,7 @@ public class MBTilePreview {
     {
         if (openDatabase())
         {
-            selectAlltilesByZoomLevel(11);
+            selectAlltilesByZoomLevel(getZoomLevel());
             if (tiles.size()>0) {
                 tile firstTile = tiles.get(0);
                 tile lastTile = tiles.get(tiles.size()-1);

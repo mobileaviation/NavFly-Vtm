@@ -83,5 +83,5 @@ dependencies {
     implementation project(path: ':weater_notam_data')
     implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'org.modelmapper:modelmapper:2.3.0'
-    implementation files('C:/GitHub/vtm/Libs/simple-xml-2.3.2.jar')
+    implementation files('../Libs/simple-xml-2.3.2.jar')
 }
