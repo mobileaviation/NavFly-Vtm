@@ -32,11 +32,19 @@ import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.Classes.ChartType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
+import com.mobileaviationtools.nav_fly.Classes.FileHelpers;
+import com.mobileaviationtools.nav_fly.Classes.Kml;
 import com.mobileaviationtools.nav_fly.Classes.MBTilePreview;
 import com.mobileaviationtools.nav_fly.R;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.Reader;
+import java.io.StringReader;
+
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
 
 import static com.mobileaviationtools.nav_fly.Menus.MenuItemType.loadCharts;
 
@@ -106,12 +114,18 @@ public class SelectChartDialog extends DialogFragment {
                 LinearLayout nwLayout = (LinearLayout) SelectChartDialog.this.getView().findViewById(R.id.nwChartSelectLayout);
                 LinearLayout seLayout = (LinearLayout) SelectChartDialog.this.getView().findViewById(R.id.seChartSelectLayout);
 
-                if (selectedFile.getName().endsWith("png") || selectedFile.getName().endsWith("jpg"))
+                if (selectedFile.getName().toLowerCase().endsWith("png") || selectedFile.getName().toLowerCase().endsWith("jpg"))
                 {
                     Bitmap myBitmap = BitmapFactory.decodeFile(selectedFile.getAbsolutePath());
                     chartImage.setImageBitmap(myBitmap);
                     nwLayout.setVisibility(View.VISIBLE);
                     seLayout.setVisibility(View.VISIBLE);
+
+                    String kmlFile = FileHelpers.replaceExtention(selectedFile.getAbsolutePath(),".kml");
+                    if (new File(kmlFile).exists()) {
+                        // Process kml file and set values in TextEdit boxes
+                        processKmlFile(kmlFile);
+                    }
                 }
                 else
                 {
@@ -126,6 +140,23 @@ public class SelectChartDialog extends DialogFragment {
                 }
             }
         });
+    }
+
+    private void processKmlFile(String kmlFile)
+    {
+        try {
+            Serializer serializer = new Persister();
+            Kml resp = serializer.read(Kml.class, new File(kmlFile), false);
+
+            latSText.setText(Double.toString(resp.groundOverlay.latLonBox.south));
+            latNText.setText(Double.toString(resp.groundOverlay.latLonBox.north));
+            lonEText.setText(Double.toString(resp.groundOverlay.latLonBox.east));
+            lonWText.setText(Double.toString(resp.groundOverlay.latLonBox.west));
+        }
+        catch (Exception e)
+        {
+            int ii=0;
+        }
     }
 
     private void setupButtons()
@@ -181,7 +212,7 @@ public class SelectChartDialog extends DialogFragment {
                 }
 
                 if (selectedFile != null)
-                    if (selectedFile.getName().endsWith("mbtiles"))
+                    if (selectedFile.getName().toLowerCase().endsWith("mbtiles"))
                         saveable = true;
 
                 saveBtn.setEnabled(saveable && (selectedFile != null));
@@ -199,11 +230,12 @@ public class SelectChartDialog extends DialogFragment {
     {
         if (selectedFile != null)
         {
-            if (selectedFile.getName().endsWith("png") || selectedFile.getName().endsWith("jpg"))
+            if (selectedFile.getName().toLowerCase().endsWith("png") ||
+                    selectedFile.getName().toLowerCase().endsWith("jpg"))
             {
                 return setJpgPngChart();
             }
-            if (selectedFile.getName().endsWith("mbtiles"))
+            if (selectedFile.getName().toLowerCase().endsWith("mbtiles"))
             {
                 return setMbTilesChart();
             }
