@@ -28,6 +28,7 @@ import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
 import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
+import com.mobileaviationtools.nav_fly.Network.NetworkDiscovery;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
@@ -122,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
         //getBitmapOverlayPerm();
         //setupChartsOverlayLayers();
         //viewportTest();
+
+        NetworkDiscovery networkDiscovery = new NetworkDiscovery(this);
 
         setupAirspacesLayer();
         addMarkerLayers();
