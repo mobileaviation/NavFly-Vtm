@@ -13,7 +13,7 @@ public class NetworkDiscovery {
         mNsdManager = (NsdManager)context.getSystemService(Context.NSD_SERVICE);
         initializeDiscoveryListener();
         initializeResolveListener();
-        mNsdManager.discoverServices("_http._tcp.", NsdManager.PROTOCOL_DNS_SD, discoveryListener);
+        mNsdManager.discoverServices("_http._tcp", NsdManager.PROTOCOL_DNS_SD, discoveryListener);
     }
 
 
