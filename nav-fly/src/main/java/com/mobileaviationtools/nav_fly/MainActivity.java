@@ -72,6 +72,7 @@ import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 public class MainActivity extends AppCompatActivity {
     final static boolean USE_CACHE = true;
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
+    final static int REQUEST_INTERNET_ACCESS_SETUPAPP = 11;
     final String TAG = "MainActivity";
 
     MapView mMapView;
@@ -101,6 +102,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED)
+        {
+            setupApp();
+        }
+        else
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET_ACCESS_SETUPAPP );
+        }
+    }
+
+    private void setupApp()
+    {
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
 
@@ -124,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         //setupChartsOverlayLayers();
         //viewportTest();
 
-        NetworkDiscovery networkDiscovery = new NetworkDiscovery(this);
+        //NetworkDiscovery networkDiscovery = new NetworkDiscovery(this);
 
         setupAirspacesLayer();
         addMarkerLayers();
@@ -248,16 +261,14 @@ public class MainActivity extends AppCompatActivity {
     private requestType request_Type;
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_EXTERNAL_STORAGE_ACCESS: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    if (request_Type==requestType.mbtiles) getMBTilesMap();
-                    if (request_Type==requestType.bitmap) getBitmapOverlay();
-                }
-            }
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+        {
+            if (requestCode == REQUEST_INTERNET_ACCESS_SETUPAPP)
+                setupApp();
+
             return;
         }
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
@@ -269,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
     void getMBTilesMapPerm()
     {
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
         {
             request_Type = requestType.mbtiles;

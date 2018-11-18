@@ -1,10 +1,14 @@
 package com.mobileaviationtools.nav_fly.Route.Info;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,6 +56,8 @@ import java.util.Date;
 import java.util.List;
 
 public class InfoLayout extends LinearLayout {
+    private final int WRITE_EXTERNAL_STORAGE_REQUEST_INFOLAYOUT = 101;
+
     public InfoLayout(Context context,  AttributeSet attrs) {
         super(context, attrs);
 
@@ -533,13 +539,14 @@ public class InfoLayout extends LinearLayout {
 //                    }
 //                });
 //                builder.show();
-                final SelectChartDialog dialog = SelectChartDialog.getInstance(context, selectedAirport);
-                dialog.setDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialogInterface) {
-                        if (dialog.isSaved()) loadCharts();
-                    }
-                });
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    final SelectChartDialog dialog = SelectChartDialog.getInstance(context, selectedAirport);
+                    dialog.setDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            if (dialog.isSaved()) loadCharts();
+                        }
+                    });
 
 //                dialog.onDismiss(new DialogInterface() {
 //                    @Override
@@ -552,7 +559,12 @@ public class InfoLayout extends LinearLayout {
 //                        if (dialog.isSaved()) loadCharts();
 //                    }
 //                });
-                dialog.show(((MainActivity)context).getSupportFragmentManager(), "");
+                    dialog.show(((MainActivity) context).getSupportFragmentManager(), "");
+                }
+                else
+                {
+                    ActivityCompat.requestPermissions(InfoLayout.this.activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_INFOLAYOUT );
+                }
             }
         });
     }

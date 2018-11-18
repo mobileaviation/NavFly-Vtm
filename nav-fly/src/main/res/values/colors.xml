@@ -26,7 +26,7 @@
 
     <color name="complementaryColor1">#1921b1</color>
     <color name="complementaryColor2">#2f3485</color>
-    <color name="complementaryColor3">#080E73</color>
+    <color name="complementaryColor3">#b4080e73</color>
     <color name="complementaryColor4">#4d54d8</color>
     <color name="complementaryColor5">#7277d8</color>
 </resources>

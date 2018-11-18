@@ -253,12 +253,18 @@ public class SelectChartDialog extends DialogFragment {
 
     private boolean chechChart()
     {
-        Chart chart = new Chart();
-        chart.latitude_deg_n = Double.parseDouble(latNText.getText().toString());
-        chart.latitude_deg_s = Double.parseDouble(latSText.getText().toString());
-        chart.longitude_deg_e = Double.parseDouble(lonEText.getText().toString());
-        chart.longitude_deg_w = Double.parseDouble(lonWText.getText().toString());
-        return  chart.validate();
+        try {
+            Chart chart = new Chart();
+            chart.latitude_deg_n = Double.parseDouble(latNText.getText().toString());
+            chart.latitude_deg_s = Double.parseDouble(latSText.getText().toString());
+            chart.longitude_deg_e = Double.parseDouble(lonEText.getText().toString());
+            chart.longitude_deg_w = Double.parseDouble(lonWText.getText().toString());
+            return chart.validate();
+        }
+        catch (Exception ee)
+        {
+            return false;
+        }
     }
 
     private boolean setChart()
@@ -337,6 +343,7 @@ public class SelectChartDialog extends DialogFragment {
     private File[] getFiles()
     {
         File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        return downloadFolder.listFiles(new InfoLayout.MyFileNameFilter(new String[]{".png", ".pdf", ".mbtiles", ".jpg"}));
+        File[] files =  downloadFolder.listFiles(new InfoLayout.MyFileNameFilter(new String[]{".png", ".pdf", ".mbtiles", ".jpg"}));
+        return files;
     }
 }

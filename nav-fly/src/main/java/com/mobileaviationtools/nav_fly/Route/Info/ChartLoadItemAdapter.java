@@ -25,12 +25,12 @@ public class ChartLoadItemAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return files.length;
+        return (files != null) ? files.length : 0;
     }
 
     @Override
     public Object getItem(int i) {
-        return files[i];
+        return (files != null) ? files[i] : null;
     }
 
     @Override
