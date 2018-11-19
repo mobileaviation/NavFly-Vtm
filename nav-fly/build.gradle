@@ -84,4 +84,6 @@ dependencies {
     implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'org.modelmapper:modelmapper:2.3.0'
     implementation files('../Libs/simple-xml-2.3.2.jar')
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
 }

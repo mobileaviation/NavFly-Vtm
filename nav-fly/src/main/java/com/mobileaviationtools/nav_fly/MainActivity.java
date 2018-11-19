@@ -34,6 +34,8 @@ import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
+import com.mobileaviationtools.nav_fly.SimConnect.FspWebApi;
+import com.mobileaviationtools.nav_fly.SimConnect.Requests.ConnectRequest;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
 
 import org.oscim.android.MapPreferences;
@@ -417,6 +419,13 @@ public class MainActivity extends AppCompatActivity {
                     {
 //                        SelectionLayer s = new SelectionLayer(mMap, MainActivity.this);
 //                        s.setAirportSelected(null);
+                    }
+                    case connectDisconnect:
+                    {
+                        FspWebApi fspWebApi = new FspWebApi("192.168.2.11", 81);
+                        ConnectRequest connectRequest = new ConnectRequest();
+                        connectRequest.name = "fspTest";
+                        fspWebApi.doConnectCall(connectRequest);
                     }
 
                 }
