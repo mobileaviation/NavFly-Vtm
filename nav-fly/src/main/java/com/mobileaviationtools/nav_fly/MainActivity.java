@@ -3,6 +3,7 @@ package com.mobileaviationtools.nav_fly;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Environment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,32 +16,30 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
-import com.mobileaviationtools.nav_fly.Layers.ChartsOverlayLayers;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
+import com.mobileaviationtools.nav_fly.Location.FspGPSLocationProvider;
+import com.mobileaviationtools.nav_fly.Location.FspLocationProvider;
+import com.mobileaviationtools.nav_fly.Location.LocationEvents;
+import com.mobileaviationtools.nav_fly.Location.LocationProviderType;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
 import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
-import com.mobileaviationtools.nav_fly.Network.NetworkDiscovery;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
-import com.mobileaviationtools.nav_fly.SimConnect.FspWebApi;
-import com.mobileaviationtools.nav_fly.SimConnect.Requests.ConnectRequest;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
-import org.oscim.android.cache.OfflineTileCache;
 import org.oscim.android.tiling.Overlay.OverlayTileSource;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
@@ -75,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     final static boolean USE_CACHE = true;
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
     final static int REQUEST_INTERNET_ACCESS_SETUPAPP = 11;
+    final static int REQUEST_LOCATION_GPS = 12;
     final String TAG = "MainActivity";
 
     MapView mMapView;
@@ -422,10 +422,43 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case connectDisconnect:
                     {
-                        FspWebApi fspWebApi = new FspWebApi("192.168.2.11", 81);
-                        ConnectRequest connectRequest = new ConnectRequest();
-                        connectRequest.name = "fspTest";
-                        fspWebApi.doConnectCall(connectRequest);
+//                        FspWebApi fspWebApi = new FspWebApi("192.168.210.60", 81);
+//                        ConnectRequest connectRequest = new ConnectRequest();
+//                        connectRequest.name = "fspTest";
+//                        fspWebApi.SetWebAPIEvents(new WebAPIEvents() {
+//                            @Override
+//                            public void OnVersionRetrieved(VersionResponse version) {
+//                                int i=0;
+//                            }
+//
+//                            @Override
+//                            public void OnConnected(ConnectResponse response) {
+//
+//                            }
+//
+//                            @Override
+//                            public void OnClosed(String response) {
+//
+//                            }
+//
+//                            @Override
+//                            public void OnRetrievedOffsets(List<OffsetResponse> response) {
+//
+//                            }
+//
+//                            @Override
+//                            public void OnFailure(String message) {
+//
+//                            }
+//                        });
+//                        fspWebApi.doVersionCall();
+                        FspLocationProvider locationProvider = new FspLocationProvider(MainActivity.this);
+                        locationProvider.Start(new LocationEvents() {
+                            @Override
+                            public void OnLocationChanged(LocationProviderType type, Location location) {
+                                Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " " + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed() );
+                            }
+                        }, LocationProviderType.gps);
                     }
 
                 }

@@ -4,7 +4,7 @@ import com.mobileaviationtools.nav_fly.SimConnect.Requests.ConnectRequest;
 import com.mobileaviationtools.nav_fly.SimConnect.Requests.OffsetRequest;
 import com.mobileaviationtools.nav_fly.SimConnect.Responses.ConnectResponse;
 import com.mobileaviationtools.nav_fly.SimConnect.Responses.OffsetResponse;
-
+import com.mobileaviationtools.nav_fly.SimConnect.Responses.VersionResponse;
 import java.util.List;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
@@ -19,6 +19,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public class FspWebApi {
+    public static final String  VERSIONENDPOINT = "v1/fsuipc/version";
     public static final String  OPENENDPOINT = "v1/fsuipc/open";
     public static final String  CLOSEENDPOINT = "v1/fsuipc/close";
     public static final String  STATUSENDPOINT = "v1/fsuipc/status";
@@ -30,6 +31,12 @@ public class FspWebApi {
         _url = "http://" + IP + ":" + Integer.toString(Port) + "/";
         setupConnectionBase();
         _isConnected = false;
+    }
+
+    private WebAPIEvents webAPIEvents;
+    public void SetWebAPIEvents(WebAPIEvents webAPIEvents)
+    {
+        this.webAPIEvents = webAPIEvents;
     }
 
     private void setupConnectionBase()
@@ -80,6 +87,29 @@ public class FspWebApi {
         Call<List<OffsetResponse>> ProcessOffsets(@Query("datagroup") String dataGroup);
     }
 
+    public interface VersionService
+    {
+        @GET(VERSIONENDPOINT)
+        Call<VersionResponse> Version();
+    }
+
+    public void doVersionCall()
+    {
+        VersionService versionService = retrofit.create(VersionService.class);
+        Call<VersionResponse> versionCall = versionService.Version();
+        versionCall.enqueue(new Callback<VersionResponse>() {
+            @Override
+            public void onResponse(Call<VersionResponse> call, Response<VersionResponse> response) {
+                if (webAPIEvents != null) webAPIEvents.OnVersionRetrieved(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<VersionResponse> call, Throwable t) {
+                if (webAPIEvents != null) webAPIEvents.OnFailure(t.getMessage());
+            }
+        });
+    }
+
     public void doConnectCall(ConnectRequest request)
     {
         ConnectService connectService = retrofit.create(ConnectService.class);
@@ -87,12 +117,12 @@ public class FspWebApi {
         connectCall.enqueue(new Callback<ConnectResponse>() {
             @Override
             public void onResponse(Call<ConnectResponse> call, Response<ConnectResponse> response) {
-                int i = 0;
+                if (webAPIEvents != null) webAPIEvents.OnConnected(response.body());
             }
 
             @Override
             public void onFailure(Call<ConnectResponse> call, Throwable t) {
-                int i = 0;
+                if (webAPIEvents != null) webAPIEvents.OnFailure(t.getMessage());
             }
         });
     }
@@ -104,12 +134,12 @@ public class FspWebApi {
         closeCall.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-
+                if (webAPIEvents != null) webAPIEvents.OnClosed(response.body());
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-
+                if (webAPIEvents != null) webAPIEvents.OnFailure(t.getMessage());
             }
         });
     }
@@ -121,12 +151,12 @@ public class FspWebApi {
         addOffsetCall.enqueue(new Callback<List<OffsetResponse>>() {
             @Override
             public void onResponse(Call<List<OffsetResponse>> call, Response<List<OffsetResponse>> response) {
-
+                if (webAPIEvents != null) webAPIEvents.OnRetrievedOffsets(response.body());
             }
 
             @Override
             public void onFailure(Call<List<OffsetResponse>> call, Throwable t) {
-
+                if (webAPIEvents != null) webAPIEvents.OnFailure(t.getMessage());
             }
         });
     }
@@ -138,12 +168,12 @@ public class FspWebApi {
         processCall.enqueue(new Callback<List<OffsetResponse>>() {
             @Override
             public void onResponse(Call<List<OffsetResponse>> call, Response<List<OffsetResponse>> response) {
-
+                if (webAPIEvents != null) webAPIEvents.OnRetrievedOffsets(response.body());
             }
 
             @Override
             public void onFailure(Call<List<OffsetResponse>> call, Throwable t) {
-
+                if (webAPIEvents != null) webAPIEvents.OnFailure(t.getMessage());
             }
         });
     }
