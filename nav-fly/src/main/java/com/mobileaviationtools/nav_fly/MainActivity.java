@@ -22,6 +22,7 @@ import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
 import com.mobileaviationtools.nav_fly.Location.FspGPSLocationProvider;
+import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Location.FspLocationProvider;
 import com.mobileaviationtools.nav_fly.Location.LocationEvents;
 import com.mobileaviationtools.nav_fly.Location.LocationProviderType;
@@ -455,12 +456,11 @@ public class MainActivity extends AppCompatActivity {
                         FspLocationProvider locationProvider = new FspLocationProvider(MainActivity.this);
                         locationProvider.Start(new LocationEvents() {
                             @Override
-                            public void OnLocationChanged(LocationProviderType type, Location location) {
+                            public void OnLocationChanged(LocationProviderType type, FspLocation location) {
                                 Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " " + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed() );
                             }
                         }, LocationProviderType.gps);
                     }
-
                 }
 
                 return false;

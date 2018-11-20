@@ -70,7 +70,8 @@ public class FspGPSLocationProvider {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                if (locationEvents != null) locationEvents.OnLocationChanged(LocationProviderType.gps, FspLocation.getInstance(location));
+                if (locationEvents != null) locationEvents.OnLocationChanged(LocationProviderType.gps,
+                        FspLocation.getInstance(location), "New Location", true);
             }
 
             @Override
