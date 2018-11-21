@@ -19,6 +19,7 @@ import android.view.View;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
+import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
 import com.mobileaviationtools.nav_fly.Location.FspGPSLocationProvider;
@@ -98,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
     private RouteListFragment routeListFragment;
     private NavigationButtonFragment menu;
 
+    private ConnectStage connectStage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //AirnavClient.deleteDatabaseFile(this, "room_airnav_chart.db");
@@ -119,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
     {
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
+        connectStage = ConnectStage.disconnected;
 
         createSettingsObject();
 
@@ -423,26 +427,52 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case connectDisconnect:
                     {
-                        FspLocationProvider locationProvider = new FspLocationProvider(MainActivity.this);
-                        locationProvider.Start(new LocationEvents() {
-                            @Override
-                            public void OnLocationChanged(LocationProviderType type, FspLocation location, String message, Boolean success) {
-                                if (location != null) {
-                                    Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " " + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed());
-                                } else
-                                {
-                                    if (success)
-                                        Log.i("OnLocationChanged", "Success Message: " + message);
-                                    else
-                                        Log.i("OnLocationChanged", "Error Message: " + message);
-                                }
-                            }
-                        });
+                        ConnectionProcess();
                     }
                 }
                 return false;
             }
         });
+    }
+
+    private FspLocationProvider locationProvider;
+    private void ConnectionProcess()
+    {
+        if (connectStage == ConnectStage.disconnected) {
+            connectStage = ConnectStage.connecting;
+            menu.SetConnectingIcon();
+            locationProvider = new FspLocationProvider(MainActivity.this);
+            locationProvider.Start(new LocationEvents() {
+                @Override
+                public void OnLocationChanged(LocationProviderType type, FspLocation location, String message, Boolean success) {
+                    if(success)
+                    {
+                        menu.SetConnectDisConnectIcon(true);
+                        connectStage = ConnectStage.connected;
+                        Log.i("OnLocationChanged", "Success Message: " + message);
+                        if (location != null) {
+                            Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " "
+                                    + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed());
+                        }
+                    }
+                    else
+                    {
+                        menu.SetConnectDisConnectIcon(false);
+                        connectStage = ConnectStage.disconnected;
+                        Log.i("OnLocationChanged", "Error Message: " + message);
+                    }
+                }
+            });
+        }
+        if (connectStage == ConnectStage.connected)
+        {
+            menu.SetConnectDisConnectIcon(false);
+            connectStage = ConnectStage.disconnected;
+            if (locationProvider != null)
+            {
+                locationProvider.Stop();
+            }
+        }
     }
 
     @Override
@@ -463,13 +493,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if (locationProvider != null && connectStage==ConnectStage.connected)
+            locationProvider.Stop();
+
         if (mapScaleBar != null)
             mapScaleBar.destroy();
 
         settingsObject.dispose();
-
         mMapView.onDestroy();
-
         super.onDestroy();
     }
 }

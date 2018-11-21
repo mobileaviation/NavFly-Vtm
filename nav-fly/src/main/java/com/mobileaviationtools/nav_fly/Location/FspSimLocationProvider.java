@@ -19,7 +19,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class FspSimLocationProvider implements IFspLocationProvider{
-    private String ipAddress = "192.168.210.60";
+    private String ipAddress = "192.168.2.11";
     private int port = 81;
     private String dataGroup = "attitude";
     private FspWebApi fspWebApi;
@@ -116,10 +116,10 @@ public class FspSimLocationProvider implements IFspLocationProvider{
                 for(OffsetResponse resp: response)
                 {
                     offsetMap.put(resp.Address, resp);
-                    FspLocation location = caculateLocation(offsetMap);
-                    if (locationEvents != null) locationEvents.OnLocationChanged(LocationProviderType.simulator,
-                            location, "Offsets : New Sim Location", true);
                 }
+                FspLocation location = caculateLocation(offsetMap);
+                if (locationEvents != null) locationEvents.OnLocationChanged(LocationProviderType.simulator,
+                        location, "Offsets : New Sim Location", true);
             }
 
             @Override
@@ -175,7 +175,7 @@ public class FspSimLocationProvider implements IFspLocationProvider{
 
         location.setTime((new Date()).getTime());
 
-        return  null;
+        return location;
     }
 
     private void setSpeed(HashMap<Integer, OffsetResponse> offsetMap, FspLocation location)

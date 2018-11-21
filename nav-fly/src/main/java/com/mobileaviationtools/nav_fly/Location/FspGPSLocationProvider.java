@@ -47,6 +47,7 @@ public class FspGPSLocationProvider implements IFspLocationProvider{
 
     public boolean stop()
     {
+        locationManager.removeUpdates(locationListener);
         return true;
     }
 
