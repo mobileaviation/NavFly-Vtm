@@ -423,46 +423,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case connectDisconnect:
                     {
-//                        FspWebApi fspWebApi = new FspWebApi("192.168.210.60", 81);
-//                        ConnectRequest connectRequest = new ConnectRequest();
-//                        connectRequest.name = "fspTest";
-//                        fspWebApi.SetWebAPIEvents(new WebAPIEvents() {
-//                            @Override
-//                            public void OnVersionRetrieved(VersionResponse version) {
-//                                int i=0;
-//                            }
-//
-//                            @Override
-//                            public void OnConnected(ConnectResponse response) {
-//
-//                            }
-//
-//                            @Override
-//                            public void OnClosed(String response) {
-//
-//                            }
-//
-//                            @Override
-//                            public void OnRetrievedOffsets(List<OffsetResponse> response) {
-//
-//                            }
-//
-//                            @Override
-//                            public void OnFailure(String message) {
-//
-//                            }
-//                        });
-//                        fspWebApi.doVersionCall();
                         FspLocationProvider locationProvider = new FspLocationProvider(MainActivity.this);
                         locationProvider.Start(new LocationEvents() {
                             @Override
-                            public void OnLocationChanged(LocationProviderType type, FspLocation location) {
-                                Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " " + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed() );
+                            public void OnLocationChanged(LocationProviderType type, FspLocation location, String message, Boolean success) {
+                                if (location != null) {
+                                    Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " " + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed());
+                                } else
+                                {
+                                    if (success)
+                                        Log.i("OnLocationChanged", "Success Message: " + message);
+                                    else
+                                        Log.i("OnLocationChanged", "Error Message: " + message);
+                                }
                             }
-                        }, LocationProviderType.gps);
+                        });
                     }
                 }
-
                 return false;
             }
         });

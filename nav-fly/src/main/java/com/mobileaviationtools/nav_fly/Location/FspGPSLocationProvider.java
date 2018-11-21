@@ -14,7 +14,7 @@ import android.util.Log;
 
 import com.mobileaviationtools.nav_fly.MainActivity;
 
-public class FspGPSLocationProvider {
+public class FspGPSLocationProvider implements IFspLocationProvider{
     final static int REQUEST_LOCATION_GPS = 12;
     final String TAG = "FspGPSLocationProvider";
 
@@ -23,12 +23,8 @@ public class FspGPSLocationProvider {
     }
 
     private LocationEvents locationEvents;
-    public void SetLocationEvents(LocationEvents locationEvents)
-    {
-        this.locationEvents = locationEvents;
-    }
 
-    public Boolean setupGps() {
+    public boolean setup() {
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         gpsAvailable = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (!gpsAvailable) {
@@ -38,10 +34,20 @@ public class FspGPSLocationProvider {
             return false;
         }
         else
-        {
-            return setupGpsLocation();
-        }
+            return true;
+    }
 
+    public boolean start(LocationEvents locationEvents)
+    {
+        this.locationEvents = locationEvents;
+        if (gpsAvailable)
+            return setupGpsLocation();
+        else return false;
+    }
+
+    public boolean stop()
+    {
+        return true;
     }
 
     private Boolean setupGpsLocation() {
