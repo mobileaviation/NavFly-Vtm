@@ -24,12 +24,14 @@ public class FspSimLocationProvider implements IFspLocationProvider{
     private String dataGroup = "attitude";
     private FspWebApi fspWebApi;
     private String TAG = "FspSimLocationProvider";
+    private Boolean connected;
 
     private Timer offsetsTimer;
 
     public FspSimLocationProvider(Context context)
     {
         this.context = context;
+        this.connected = false;
     }
 
     private Context context;
@@ -53,9 +55,10 @@ public class FspSimLocationProvider implements IFspLocationProvider{
 
     public boolean stop()
     {
+        connected = false;
+        if (offsetsTimer != null) offsetsTimer.cancel();
         ConnectRequest req = new ConnectRequest();
         req.name = "fspConnection";
-        if (offsetsTimer != null) offsetsTimer.cancel();
         fspWebApi.doDisconnectCall(req);
         return true;
     }
@@ -101,13 +104,14 @@ public class FspSimLocationProvider implements IFspLocationProvider{
                     setOffsets();
                     // start timer
                     setupTimer();
+                    connected = true;
                 }
             }
 
             @Override
             public void OnClosed(String response) {
                 if (locationEvents != null) locationEvents.OnLocationChanged(LocationProviderType.simulator,
-                        null, "Closed : " + response, true);
+                        null, "Closed : " + response, false);
             }
 
             @Override
@@ -119,7 +123,7 @@ public class FspSimLocationProvider implements IFspLocationProvider{
                 }
                 FspLocation location = caculateLocation(offsetMap);
                 if (locationEvents != null) locationEvents.OnLocationChanged(LocationProviderType.simulator,
-                        location, "Offsets : New Sim Location", true);
+                        location, "Offsets : New Sim Location", connected);
             }
 
             @Override
@@ -229,6 +233,7 @@ public class FspSimLocationProvider implements IFspLocationProvider{
         try
         {
             OffsetResponse o = offsetMap.get(0x02CC);  //o = connection.ReadOffset(0x02CC);
+            o.Value = o.Value.replace(",", ".");
             double h = (Double.parseDouble(o.Value));
             location.setBearing((float)h);
         }

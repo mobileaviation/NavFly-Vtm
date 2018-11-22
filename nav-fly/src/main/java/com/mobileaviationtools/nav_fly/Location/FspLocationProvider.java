@@ -51,8 +51,8 @@ public class FspLocationProvider {
     private LocationProviderType retrieveType()
     {
         //TODO Build database logic to retrieve the connection type..
-        //return LocationProviderType.simulator;
-        return LocationProviderType.gps;
+        return LocationProviderType.simulator;
+        //return LocationProviderType.gps;
     }
 
 }

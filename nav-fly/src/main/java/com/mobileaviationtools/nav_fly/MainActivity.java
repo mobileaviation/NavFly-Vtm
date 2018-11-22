@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
@@ -469,7 +470,7 @@ public class MainActivity extends AppCompatActivity {
                         if (location != null) {
                             Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " "
                                     + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed());
-                            location.setBearing(90);
+                            //location.setBearing(90);
                             mAircraftLocationLayer.UpdateLocation(location);
                             mMap.render();
 
@@ -480,6 +481,10 @@ public class MainActivity extends AppCompatActivity {
                         menu.SetConnectDisConnectIcon(false);
                         connectStage = ConnectStage.disconnected;
                         Log.i("OnLocationChanged", "Error Message: " + message);
+                        if (message.startsWith("Error")) {
+                            Toast error = Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG);
+                            error.show();
+                        }
                     }
                 }
             });
@@ -487,11 +492,11 @@ public class MainActivity extends AppCompatActivity {
         if (connectStage == ConnectStage.connected)
         {
             menu.SetConnectDisConnectIcon(false);
-            connectStage = ConnectStage.disconnected;
             if (locationProvider != null)
             {
                 locationProvider.Stop();
             }
+            connectStage = ConnectStage.disconnected;
         }
     }
 
