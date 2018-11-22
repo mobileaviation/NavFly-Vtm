@@ -20,6 +20,7 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
+import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
 import com.mobileaviationtools.nav_fly.Location.FspGPSLocationProvider;
@@ -88,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     NaviadMarkersLayer mNavaidsMarkersLayer;
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
+    AircraftLocationLayer mAircraftLocationLayer;
 
     //private OfflineTileCache mCache;
     private SettingsObject settingsObject;
@@ -148,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupAirspacesLayer();
         addMarkerLayers();
+        addAircraftLocationLayer();
 
         mMap.events.bind(new Map.UpdateListener() {
             @Override
@@ -246,6 +249,19 @@ public class MainActivity extends AppCompatActivity {
 
         mAirportSelectionLayer = new SelectionLayer(mMap, null, this);
         mMap.layers().add(mAirportSelectionLayer);
+    }
+
+    public void addAircraftLocationLayer()
+    {
+        GeoPoint curpos = mMap.getMapPosition().getGeoPoint();
+
+        Location location = new Location("InitialLocation");
+        location.setLongitude(curpos.getLongitude());
+        location.setLatitude(curpos.getLatitude());
+        mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(mMap,
+                this, FspLocation.getInstance(location));
+
+        mMap.layers().add(mAircraftLocationLayer);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -453,6 +469,10 @@ public class MainActivity extends AppCompatActivity {
                         if (location != null) {
                             Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " "
                                     + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed());
+                            location.setBearing(90);
+                            mAircraftLocationLayer.UpdateLocation(location);
+                            mMap.render();
+
                         }
                     }
                     else
