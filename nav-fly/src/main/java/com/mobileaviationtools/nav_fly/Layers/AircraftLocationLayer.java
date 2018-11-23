@@ -40,6 +40,6 @@ public class AircraftLocationLayer extends ItemizedLayer {
         item.setLocation(location);
         this.addItem(item);
         this.update();
-
+        map.updateMap(true);
     }
 }

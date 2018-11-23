@@ -29,6 +29,7 @@ import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Location.FspLocationProvider;
 import com.mobileaviationtools.nav_fly.Location.LocationEvents;
 import com.mobileaviationtools.nav_fly.Location.LocationProviderType;
+import com.mobileaviationtools.nav_fly.Location.Tracking;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     NaviadMarkersLayer mNavaidsMarkersLayer;
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
+    Tracking trackingLayer;
     AircraftLocationLayer mAircraftLocationLayer;
 
     //private OfflineTileCache mCache;
@@ -151,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupAirspacesLayer();
         addMarkerLayers();
+        addTrackingLayer();
         addAircraftLocationLayer();
 
         mMap.events.bind(new Map.UpdateListener() {
@@ -250,6 +253,11 @@ public class MainActivity extends AppCompatActivity {
 
         mAirportSelectionLayer = new SelectionLayer(mMap, null, this);
         mMap.layers().add(mAirportSelectionLayer);
+    }
+
+    public void addTrackingLayer()
+    {
+        trackingLayer = new Tracking(this, mMap);
     }
 
     public void addAircraftLocationLayer()
@@ -464,15 +472,19 @@ public class MainActivity extends AppCompatActivity {
                 public void OnLocationChanged(LocationProviderType type, FspLocation location, String message, Boolean success) {
                     if(success)
                     {
-                        menu.SetConnectDisConnectIcon(true);
+                        if (connectStage == ConnectStage.connecting) {
+                            menu.SetConnectDisConnectIcon(true);
+                            trackingLayer.start(routeListFragment.getRoute());
+                        }
                         connectStage = ConnectStage.connected;
                         Log.i("OnLocationChanged", "Success Message: " + message);
                         if (location != null) {
                             Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " "
                                     + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed());
                             //location.setBearing(90);
+                            trackingLayer.setLocation(location);
                             mAircraftLocationLayer.UpdateLocation(location);
-                            mMap.render();
+                            //mMap.render();
 
                         }
                     }
@@ -480,6 +492,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         menu.SetConnectDisConnectIcon(false);
                         connectStage = ConnectStage.disconnected;
+                        trackingLayer.stop();
                         Log.i("OnLocationChanged", "Error Message: " + message);
                         if (message.startsWith("Error")) {
                             Toast error = Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG);
