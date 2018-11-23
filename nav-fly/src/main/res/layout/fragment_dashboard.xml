@@ -15,15 +15,17 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="10dp">
 
             <TextView
                 android:id="@+id/textView7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="To Dest:"
                 android:textColor="@android:color/white"
@@ -33,10 +35,11 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView9"
+                    android:id="@+id/toDestTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-smallcaps"
@@ -62,12 +65,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="10dp">
 
             <TextView
-                android:id="@+id/textView12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="Coarse:"
                 android:textColor="@android:color/white"
@@ -77,10 +80,11 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView13"
+                    android:id="@+id/coarseTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-smallcaps"
@@ -92,7 +96,7 @@
                 <TextView
                     android:id="@+id/textView16"
                     android:layout_width="wrap_content"
-                    android:layout_height="25dp"
+                    android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
                     android:text="º "
                     android:textColor="@android:color/white"
@@ -106,12 +110,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="10dp">
 
             <TextView
-                android:id="@+id/textView10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="Speed:"
                 android:textColor="@android:color/white"
@@ -121,10 +125,11 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView11"
+                    android:id="@+id/speedTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-smallcaps"
@@ -150,12 +155,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="10dp">
 
             <TextView
-                android:id="@+id/textView17"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="Height:"
                 android:textColor="@android:color/white"
@@ -165,10 +170,11 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView19"
+                    android:id="@+id/heightTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-smallcaps"
@@ -194,12 +200,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="10dp">
 
             <TextView
-                android:id="@+id/textView21"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="Nearest QNH:"
                 android:textColor="@android:color/white"
@@ -209,10 +215,11 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView22"
+                    android:id="@+id/qnhTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-smallcaps"
@@ -222,7 +229,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textView23"
+                    android:id="@+id/qnhStationTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-smallcaps"
@@ -238,12 +245,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="10dp">
 
             <TextView
-                android:id="@+id/textView27"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="EET Dest:"
                 android:textColor="@android:color/white"
@@ -251,9 +258,10 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textView26"
+                android:id="@+id/eetTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="XXh:XXm"
                 android:textColor="@android:color/white"
@@ -266,12 +274,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="10dp">
 
             <TextView
-                android:id="@+id/textView24"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="Zulu Time:"
                 android:textColor="@android:color/white"
@@ -279,9 +287,10 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textView25"
+                android:id="@+id/zuluTimeTestView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:fontFamily="sans-serif-smallcaps"
                 android:text="XX:XX"
                 android:textColor="@android:color/white"
