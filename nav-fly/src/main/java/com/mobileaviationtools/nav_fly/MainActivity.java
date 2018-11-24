@@ -21,6 +21,7 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
+import com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment;
 import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
@@ -39,6 +40,7 @@ import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
+import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
@@ -103,8 +105,11 @@ public class MainActivity extends AppCompatActivity {
 
     private RouteListFragment routeListFragment;
     private NavigationButtonFragment menu;
+    private DashboardFragment dashboardFragment;
 
     private ConnectStage connectStage;
+
+    private WeatherStations stations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,9 +139,11 @@ public class MainActivity extends AppCompatActivity {
         menu = (NavigationButtonFragment)getSupportFragmentManager().findFragmentById(R.id.menuFragment);
         setupMenuListerners();
 
+        dashboardFragment = (DashboardFragment)getSupportFragmentManager().findFragmentById(R.id.dashboardFragment);
+
         mPrefs = new MapPreferences(MainActivity.class.getName(), this);
 
-        setupRouteFragment();
+
 
         setupMap();
         createLayers();
@@ -156,6 +163,9 @@ public class MainActivity extends AppCompatActivity {
         addTrackingLayer();
         addAircraftLocationLayer();
 
+        setupWeatherStations();
+        setupRouteFragment();
+
         mMap.events.bind(new Map.UpdateListener() {
             @Override
             public void onMapEvent(Event e, MapPosition mapPosition) {
@@ -169,6 +179,14 @@ public class MainActivity extends AppCompatActivity {
                 //if (mAirportSelectionLayer.getSelected()) mAirportSelectionLayer.unSelectItem();
             }
         });
+    }
+
+    private void setupWeatherStations()
+    {
+        stations = new WeatherStations(this);
+        FspLocation loc = new FspLocation(mMap.getMapPosition().getGeoPoint(), "weatherLoc");
+        stations.getWeatherData(loc, 100l);
+        // TODO start a timer to get weather data for current location each 30 mins
     }
 
     private void createSettingsObject()
@@ -200,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupRouteFragment() {
         routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
         routeListFragment.setMap(mMap);
+        routeListFragment.setWeatherStations(stations);
+
         routeListFragment.setChartEvents(new ChartEvents() {
             @Override
             public void OnChartCheckedEvent(Chart chart, Boolean checked) {
@@ -484,6 +504,7 @@ public class MainActivity extends AppCompatActivity {
                             //location.setBearing(90);
                             trackingLayer.setLocation(location);
                             mAircraftLocationLayer.UpdateLocation(location);
+                            dashboardFragment.setLocation(location);
                             //mMap.render();
 
                         }

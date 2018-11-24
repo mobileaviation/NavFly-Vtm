@@ -28,10 +28,16 @@ public class Station {
             airport.runways = db.getRunways().getRunwaysByAirport(airport.id);
     }
     public String station_id;
+    public Double latitude;
+    public Double longitude;
+    public Double distance_to_org;
     public Metar metar;
 
     public void setMetar(Metar metar) {
         this.metar = metar;
+        this.latitude = (double)metar.latitude;
+        this.longitude = (double)metar.longitude;
+        this.distance_to_org = (double)metar.distance_to_org_m;
         if (metar != null) {
             com.mobileaviationtools.airnavdata.Entities.Metar
                     db_metar = MapperHelper.getMetarEntity(metar, airport);
@@ -51,4 +57,11 @@ public class Station {
     }
 
     public Airport airport;
+
+    @Override
+    public boolean equals(Object station)
+    {
+        return (station instanceof Station) ?
+                (((Station) station).station_id.equals(this.station_id)) : false;
+    }
 }

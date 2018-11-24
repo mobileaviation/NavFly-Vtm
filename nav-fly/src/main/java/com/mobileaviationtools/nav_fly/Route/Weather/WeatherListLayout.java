@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
 import com.mobileaviationtools.weater_notam_data.services.WeatherServices;
@@ -28,14 +29,14 @@ public class WeatherListLayout extends LinearLayout {
     private String TAG = "WeatherListLayout";
     private Map map;
     private Context context;
-    private Activity activity;
+    //private Activity activity;
     private ImageButton weatherRefreshBtn;
     private WeatherResponseEvent weatherResponseEvent;
     private ListView weatherStationsList;
 
-    private List<Metar> metars;
-    private List<Taf> tafs;
-    private List<Station> stations;
+//    private List<Metar> metars;
+//    private List<Taf> tafs;
+    private WeatherStations stations;
 
     public WeatherListLayout(Context context) {
         super(context);
@@ -49,108 +50,115 @@ public class WeatherListLayout extends LinearLayout {
         this.map = map;
     }
 
-    public void init(Context context, Activity activity)
+    public void init(Context context)
     {
         this.context = context;
-        this.activity = activity;
+        //this.activity = activity;
         weatherRefreshBtn = (ImageButton) findViewById(R.id.weatherRefreshBtn);
         weatherStationsList = (ListView) findViewById(R.id.weatherAirportsListView);
-        setWeatherResponse();
+//        setWeatherResponse();
         setWeatherListOnItemClick();
         setWeatherRefreshBtnClick();
     }
 
-    private void setWeatherResponse()
+//    private void setWeatherResponse()
+//    {
+//        weatherResponseEvent = new WeatherResponseEvent() {
+//            @Override
+//            public void OnMetarsResponse(List<Metar> metars, String message) {
+//                WeatherListLayout.this.metars = metars;
+//                setWeatherData();
+//            }
+//
+//            @Override
+//            public void OnTafsResponse(List<Taf> tafs, String message) {
+//                WeatherListLayout.this.tafs = tafs;
+//                setWeatherData();
+//            }
+//
+//            @Override
+//            public void OnFailure(String message) {
+//
+//            }
+//        };
+//    }
+
+    public void setWeatherData(WeatherStations stations)
     {
-        weatherResponseEvent = new WeatherResponseEvent() {
-            @Override
-            public void OnMetarsResponse(List<Metar> metars, String message) {
-                WeatherListLayout.this.metars = metars;
-                setWeatherData();
-            }
-
-            @Override
-            public void OnTafsResponse(List<Taf> tafs, String message) {
-                WeatherListLayout.this.tafs = tafs;
-                setWeatherData();
-            }
-
-            @Override
-            public void OnFailure(String message) {
-
-            }
-        };
-    }
-
-    private void setWeatherData()
-    {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if ((metars != null) && (tafs != null)) {
-                    stations = new ArrayList<>();
-                    if (metars.size() > tafs.size()) {
-                        for (Metar m : metars)
-                        {
-                            Station station = new Station(getContext());
-                            station.setStation_id(m.station_id);
-                            station.setMetar(m);
-                            Taf testTaf = new Taf();
-                            testTaf.station_id = m.station_id;
-                            int tafIndex = tafs.indexOf(testTaf);
-                            station.setTaf((tafIndex>-1) ? tafs.get(tafIndex) : null);
-                            stations.add(station);
-                        }
-                    } else {
-                        for (Taf t : tafs){
-                            Station station = new Station(getContext());
-                            station.setStation_id(t.station_id);
-                            station.setTaf(t);
-                            Metar testMetar = new Metar();
-                            testMetar.station_id = t.station_id;
-                            int metarIndex = metars.indexOf(testMetar);
-                            station.setMetar((metarIndex>-1) ? metars.get(metarIndex) : null);
-                            stations.add(station);
-                        }
-                    }
-                    WeatherAirportItemAdapter weatherAirportItemAdapter = new WeatherAirportItemAdapter(stations, getContext());
-                    weatherStationsList.setAdapter(weatherAirportItemAdapter);
-                }
-            }
-        });
-    }
-
-    public void weatherBtnClick()
-    {
-        if (stations == null)
-        {
-            getWeatherData();
+//        activity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                if ((metars != null) && (tafs != null)) {
+//                    stations = new ArrayList<>();
+//                    if (metars.size() > tafs.size()) {
+//                        for (Metar m : metars)
+//                        {
+//                            Station station = new Station(getContext());
+//                            station.setStation_id(m.station_id);
+//                            station.setMetar(m);
+//                            Taf testTaf = new Taf();
+//                            testTaf.station_id = m.station_id;
+//                            int tafIndex = tafs.indexOf(testTaf);
+//                            station.setTaf((tafIndex>-1) ? tafs.get(tafIndex) : null);
+//                            stations.add(station);
+//                        }
+//                    } else {
+//                        for (Taf t : tafs){
+//                            Station station = new Station(getContext());
+//                            station.setStation_id(t.station_id);
+//                            station.setTaf(t);
+//                            Metar testMetar = new Metar();
+//                            testMetar.station_id = t.station_id;
+//                            int metarIndex = metars.indexOf(testMetar);
+//                            station.setMetar((metarIndex>-1) ? metars.get(metarIndex) : null);
+//                            stations.add(station);
+//                        }
+//                    }
+        this.stations = stations;
+        if (stations != null) {
+            WeatherAirportItemAdapter weatherAirportItemAdapter = new WeatherAirportItemAdapter(stations, getContext());
+            weatherStationsList.setAdapter(weatherAirportItemAdapter);
         }
+//                }
+//            }
+//        });
     }
+
+//    public void weatherBtnClick()
+//    {
+//        if (stations == null)
+//        {
+////            getWeatherData();
+//        }
+//    }
 
     private void setWeatherRefreshBtnClick()
     {
         weatherRefreshBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                getWeatherData();
+                if (stations != null) {
+                    FspLocation loc = new FspLocation(map.getMapPosition().getGeoPoint(), "weatherLoc");
+                    stations.getWeatherData(loc, 100l);
+                    // TODO Add event with updated weather data
+                }
             }
         });
     }
 
-    private void getWeatherData()
-    {
-        metars = null;
-        tafs = null;
-        stations = null;
-
-        MapPosition pos = map.getMapPosition();
-        WeatherServices weatherServices = new WeatherServices();
-        weatherServices.GetTafsByLocationAndRadius(pos.getGeoPoint(), 100l,
-                weatherResponseEvent);
-        weatherServices.GetMetarsByLocationAndRadius(pos.getGeoPoint(), 100l,
-                weatherResponseEvent);
-    }
+//    private void getWeatherData()
+//    {
+//        metars = null;
+//        tafs = null;
+//        stations = null;
+//
+//        MapPosition pos = map.getMapPosition();
+//        WeatherServices weatherServices = new WeatherServices();
+//        weatherServices.GetTafsByLocationAndRadius(pos.getGeoPoint(), 100l,
+//                weatherResponseEvent);
+//        weatherServices.GetMetarsByLocationAndRadius(pos.getGeoPoint(), 100l,
+//                weatherResponseEvent);
+//    }
 
     private void setWeatherListOnItemClick()
     {

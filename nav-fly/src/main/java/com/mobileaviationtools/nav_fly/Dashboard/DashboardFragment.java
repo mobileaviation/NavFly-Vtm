@@ -13,6 +13,11 @@ import com.mobileaviationtools.nav_fly.R;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 
 public class DashboardFragment extends Fragment {
     public DashboardFragment() {
@@ -20,6 +25,11 @@ public class DashboardFragment extends Fragment {
     }
 
     private View view;
+    private SpeedType speedType = SpeedType.knots;
+
+    private Float toKnots = 1.94384449f;
+    private Float toKm = 3.6f;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,6 +43,14 @@ public class DashboardFragment extends Fragment {
         return view;
     }
 
+    private String getZuluTime()
+    {
+        String DATEFORMAT = "HH:mm"; //"yyyy-MM-dd HH:mm:ss"
+        final SimpleDateFormat sdf = new SimpleDateFormat(DATEFORMAT);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(new Date());
+    }
+
     public void setLocation(FspLocation location)
     {
         TextView toDestTextView = (TextView) view.findViewById(R.id.toDestTextView);
@@ -43,6 +61,12 @@ public class DashboardFragment extends Fragment {
         TextView eetTextView = (TextView) view.findViewById(R.id.eetTextView);
         TextView zuluTimeTestView = (TextView) view.findViewById(R.id.zuluTimeTestView);
 
+        coarseTextView.setText(String.format("%03d", Math.round(location.getBearing())));
+        Float sf = (speedType == SpeedType.knots) ? toKnots : toKm;
+        speedTextView.setText(String.format("%03d", Math.round(location.getSpeed() * sf)));
+        heightTextView.setText(String.format("%05d", Math.round(location.getAltitude())));
+
+        zuluTimeTestView.setText(getZuluTime());
     }
 
 }

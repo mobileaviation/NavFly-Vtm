@@ -25,6 +25,7 @@ import com.mobileaviationtools.nav_fly.Route.Info.InfoLayout;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsAirportItemAdapter;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamsListLayout;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherListLayout;
+import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
@@ -81,6 +82,12 @@ public class RouteListFragment extends Fragment {
 
     private ListView airportsList;
 
+    private WeatherStations weatherStations;
+    public void setWeatherStations(WeatherStations stations)
+    {
+        this.weatherStations = stations;
+    }
+
     private Map map;
 
     public void setMap(Map map) {
@@ -117,7 +124,7 @@ public class RouteListFragment extends Fragment {
 
         weatherLayout = (WeatherListLayout) view.findViewById(R.id.weatherListLayout);
         weatherLayout.setVisibility(View.GONE);
-        weatherLayout.init(getContext(), getActivity());
+        weatherLayout.init(getContext());
 
         infoLayout = (InfoLayout) view.findViewById(R.id.infoLayout);
         infoLayout.init(getContext(), getActivity());
@@ -241,7 +248,7 @@ public class RouteListFragment extends Fragment {
             public void onClick(View view) {
                 if (setLayoutVisiblity(layoutType.weather, false)){
                     weatherLayout.setMap(map);
-                    weatherLayout.weatherBtnClick();
+                    weatherLayout.setWeatherData(weatherStations);
                 }
             }
         });

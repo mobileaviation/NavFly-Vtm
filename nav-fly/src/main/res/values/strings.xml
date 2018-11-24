@@ -108,7 +108,5 @@
     <string name="action_isnew">What is new?</string>
     <string name="action_loadtrack">Load previous track</string>
     <string name="action_downloaddatabase">Download Data</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

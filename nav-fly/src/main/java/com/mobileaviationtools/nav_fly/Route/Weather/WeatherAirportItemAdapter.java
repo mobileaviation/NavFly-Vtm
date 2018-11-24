@@ -16,13 +16,13 @@ import com.mobileaviationtools.nav_fly.R;
 import java.util.List;
 
 public class WeatherAirportItemAdapter extends BaseAdapter {
-    public WeatherAirportItemAdapter(List<Station> stations, Context context)
+    public WeatherAirportItemAdapter(WeatherStations stations, Context context)
     {
         this.context = context;
         this.stations = stations;
     }
 
-    private List<Station> stations;
+    private WeatherStations stations;
     private Context context;
 
     @Override
