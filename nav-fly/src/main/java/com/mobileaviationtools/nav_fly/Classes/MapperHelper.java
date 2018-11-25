@@ -55,6 +55,19 @@ public class MapperHelper {
         return res_metar;
     }
 
+    public static com.mobileaviationtools.weater_notam_data.weather.Metar getMetar(Metar metar)
+    {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
+                .setMatchingStrategy(MatchingStrategies.STRICT);
+        com.mobileaviationtools.weater_notam_data.weather.Metar m =
+            modelMapper.map(metar, com.mobileaviationtools.weater_notam_data.weather.Metar.class);
+        m.raw_text = metar.raw_text;
+        return m;
+    }
+
     public static Taf getTafEntity(com.mobileaviationtools.weater_notam_data.weather.Taf taf, Airport airport)
     {
         ModelMapper modelMapper = new ModelMapper();

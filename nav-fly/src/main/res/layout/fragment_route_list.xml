@@ -215,24 +215,41 @@
                         android:background="@color/secundaryColorB5"
                         android:orientation="vertical">
 
-                        <TextView
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="match_parent"
                             android:layout_weight="10"
-                            android:text="Metar:"
-                            android:textSize="16sp"
-                            android:textStyle="bold|italic" />
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:layout_weight="1"
+                                android:text="Metar:"
+                                android:textSize="16sp"
+                                android:textStyle="bold|italic" />
+
+                            <TextView
+                                android:id="@+id/metarDateTxt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginRight="5dp"
+                                android:layout_weight="1"
+                                android:gravity="right|center_vertical"
+                                android:text="..."
+                                android:textSize="13sp" />
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/metarItemTxt"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="0dp"
                             android:layout_marginLeft="5dp"
                             android:layout_marginTop="0dp"
-                            android:layout_marginBottom="0dp"
                             android:gravity="center_vertical"
-                            android:text="TextView"
+                            android:text="..."
                             android:textSize="13sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -245,24 +262,41 @@
                         android:background="@color/secundaryColorB5"
                         android:orientation="vertical">
 
-                        <TextView
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_height="match_parent"
                             android:layout_weight="10"
-                            android:text="Taf:"
-                            android:textSize="16sp"
-                            android:textStyle="bold|italic" />
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="5dp"
+                                android:layout_weight="1"
+                                android:text="Taf:"
+                                android:textSize="16sp"
+                                android:textStyle="bold|italic" />
+
+                            <TextView
+                                android:id="@+id/tafDateTxt"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
+                                android:layout_weight="1"
+                                android:gravity="right|center_vertical"
+                                android:text="..."
+                                android:textSize="13sp" />
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/tafItemTxt"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginBottom="0dp"
                             android:layout_marginLeft="5dp"
                             android:layout_marginTop="0dp"
-                            android:layout_marginBottom="0dp"
                             android:gravity="center_vertical"
-                            android:text="TextView"
+                            android:text="..."
                             android:textSize="13sp"
                             android:textStyle="bold" />
                     </LinearLayout>

@@ -170,12 +170,16 @@ public class WeatherListLayout extends LinearLayout {
 
                 if (station.metar != null) {
                     TextView metarText = (TextView)findViewById(R.id.metarItemTxt);
+                    TextView metarDateText = (TextView)findViewById(R.id.metarDateTxt);
                     metarText.setText(station.metar.raw_text);
+                    metarDateText.setText(station.metar.observation_time);
                 }
 
                 if (station.taf != null) {
                     TextView tafText = (TextView)findViewById(R.id.tafItemTxt);
+                    TextView tafDateText = (TextView) findViewById(R.id.tafDateTxt);
                     tafText.setText(station.taf.raw_text);
+                    tafDateText.setText(station.taf.valid_time_from);
                 }
             }
         });

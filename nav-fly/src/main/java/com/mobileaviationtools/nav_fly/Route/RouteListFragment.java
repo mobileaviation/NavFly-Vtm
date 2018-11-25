@@ -68,7 +68,9 @@ public class RouteListFragment extends Fragment {
 
     private ImageButton routeBtn;
     private ImageButton weatherBtn;
+    public Boolean weatherBtnEnabled = false;
     private ImageButton notamsBtn;
+    public Boolean notamsBtnEnabled = true;
     private ImageButton infoBtn;
 
     private ImageButton routeNewBtn;
@@ -85,6 +87,7 @@ public class RouteListFragment extends Fragment {
     private WeatherStations weatherStations;
     public void setWeatherStations(WeatherStations stations)
     {
+        weatherBtnEnabled = true;
         this.weatherStations = stations;
     }
 
@@ -246,9 +249,11 @@ public class RouteListFragment extends Fragment {
         weatherBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (setLayoutVisiblity(layoutType.weather, false)){
-                    weatherLayout.setMap(map);
-                    weatherLayout.setWeatherData(weatherStations);
+                if (weatherBtnEnabled) {
+                    if (setLayoutVisiblity(layoutType.weather, false)) {
+                        weatherLayout.setMap(map);
+                        weatherLayout.setWeatherData(weatherStations);
+                    }
                 }
             }
         });
@@ -260,9 +265,11 @@ public class RouteListFragment extends Fragment {
         notamsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (setLayoutVisiblity(layoutType.notams, false)) {
-                    notamsLayout.setMap(map);
-                    notamsLayout.notamBtnClick();
+                if (notamsBtnEnabled) {
+                    if (setLayoutVisiblity(layoutType.notams, false)) {
+                        notamsLayout.setMap(map);
+                        notamsLayout.notamBtnClick();
+                    }
                 }
             }
         });

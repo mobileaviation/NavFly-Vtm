@@ -10,13 +10,17 @@ import com.mobileaviationtools.weater_notam_data.weather.Metar;
 import com.mobileaviationtools.weater_notam_data.weather.Taf;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
-import org.oscim.utils.pool.Inlist;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WeatherStations extends ArrayList<Station> {
+    public interface WeatherDataReceivedEvent
+    {
+        public void Received(WeatherStations stations);
+    }
+
+
     public WeatherStations(Context context)
     {
         this.context = context;
@@ -27,6 +31,11 @@ public class WeatherStations extends ArrayList<Station> {
 
     private Context context;
     private WeatherResponseEvent weatherResponseEvent;
+    private WeatherDataReceivedEvent weatherDataReceivedEvent;
+    public void SetWeatherDataReceivedEvent(WeatherDataReceivedEvent weatherDataReceivedEvent)
+    {
+        this.weatherDataReceivedEvent = weatherDataReceivedEvent;
+    }
     private Integer fireEvent;
 
 
@@ -48,8 +57,10 @@ public class WeatherStations extends ArrayList<Station> {
             }
 
             @Override
-            public void OnFailure(String message) {
-
+            public void OnFailure(String message, GeoPoint location, Long distance) {
+                Log.e(TAG, "Error retrieving weather: " + message);
+                Log.i(TAG, "get stored weather data from the database..");
+                getDatabaseWeather(location, distance);
             }
         };
     }
@@ -97,8 +108,16 @@ public class WeatherStations extends ArrayList<Station> {
         if (fireEvent>1)
         {
             Log.i(TAG, "Received both Metars and Tafs");
+            if(weatherDataReceivedEvent != null) weatherDataReceivedEvent.Received(this);
             // TODO add event handler for weather data
         }
+    }
+
+    private void getDatabaseWeather(GeoPoint location, long distance)
+    {
+        DatabaseWeatherServices databaseWeatherServices = new DatabaseWeatherServices(context);
+        databaseWeatherServices.GetMetarsByLocationAndRadius(location, distance, weatherResponseEvent);
+        databaseWeatherServices.GetTafsByLocationAndRadius(location, distance, weatherResponseEvent);
     }
 
     public void getWeatherData(FspLocation location, Long distance)
@@ -106,9 +125,13 @@ public class WeatherStations extends ArrayList<Station> {
         fireEvent = 0;
         this.clear();
         GeoPoint pos = new GeoPoint(location.getLatitude(), location.getLongitude());
+
         WeatherServices weatherServices = new WeatherServices();
         weatherServices.GetTafsByLocationAndRadius(pos, distance, weatherResponseEvent);
         weatherServices.GetMetarsByLocationAndRadius(pos, distance, weatherResponseEvent);
+
+        //DatabaseWeatherServices databaseWeatherServices = new DatabaseWeatherServices(context);
+        //databaseWeatherServices.GetMetarsByLocationAndRadius(pos, distance, weatherResponseEvent);
     }
 
     public Integer getStationNearestToOrg()

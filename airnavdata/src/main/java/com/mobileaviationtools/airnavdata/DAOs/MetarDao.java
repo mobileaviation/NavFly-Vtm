@@ -25,4 +25,9 @@ public abstract class MetarDao {
 
     @Query("SELECT * FROM tbl_Metars WHERE station_id=:station_id")
     public abstract Metar[] getMetarsByStationId(String station_id);
+
+    @Query("SELECT * FROM tbl_Metars WHERE (longitude BETWEEN :Wlon AND :Elon AND latitude BETWEEN :Slat AND :Nlat) " +
+            " AND id in (SELECT MAX(id) FROM tbl_Metars GROUP BY station_id)" +
+            "ORDER BY id DESC")
+    public abstract List<Metar> getMetarsWithinBounds(double Wlon, double Elon, double Nlat, double Slat);
 }

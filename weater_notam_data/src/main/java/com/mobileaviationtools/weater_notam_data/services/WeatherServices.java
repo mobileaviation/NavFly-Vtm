@@ -24,6 +24,9 @@ public class WeatherServices {
 
     private String TAG = "WeatherServices";
 
+    private GeoPoint location;
+    private Long distance;
+
     public void GetMetarsByLocationAndRadius(GeoPoint location, Long distance, WeatherResponseEvent weatherResponseEvent)
     {
         String cmd = "metars";
@@ -42,6 +45,9 @@ public class WeatherServices {
 
     private Request getDataByLocationAndRadius(GeoPoint location, Long distance, HttpUrl.Builder urlBuilder)
     {
+        this.location = location;
+        this.distance = distance;
+
         String command = "#DIS#;#LON#,#LAT#";
         command = command.replace("#DIS#", Long.toString(distance));
         command = command.replace("#LON#", Double.toString(location.getLongitude()));
@@ -87,7 +93,7 @@ public class WeatherServices {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if (event != null) event.OnFailure(e.getMessage());
+                if (event != null) event.OnFailure(e.getMessage(), location, distance);
             }
 
             @Override
@@ -112,7 +118,8 @@ public class WeatherServices {
         }
         catch (Exception e)
         {
-            if (event != null) event.OnFailure(e.getMessage() + "Metar Response: " + responseMessage + " XML: " + xml);
+            if (event != null) event.OnFailure(e.getMessage() + "Metar Response: "
+                    + responseMessage + " XML: " + xml, location, distance);
         }
     }
 
@@ -127,7 +134,8 @@ public class WeatherServices {
         }
         catch (Exception e)
         {
-            if (event != null) event.OnFailure(e.getMessage() + "TAF Response: " + responseMessage + " XML: " + xml);
+            if (event != null) event.OnFailure(e.getMessage() + "TAF Response: "
+                    + responseMessage + " XML: " + xml, location, distance);
         }
     }
 }

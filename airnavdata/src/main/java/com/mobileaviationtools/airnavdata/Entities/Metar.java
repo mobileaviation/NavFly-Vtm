@@ -1,6 +1,7 @@
 package com.mobileaviationtools.airnavdata.Entities;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
@@ -20,4 +21,7 @@ public class Metar {
     public float latitude;
     public float longitude;
     public float elevation_m;
+
+    @Ignore
+    public Double distance_to_org_m;
 }

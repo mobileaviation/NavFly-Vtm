@@ -40,6 +40,7 @@ import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
+import com.mobileaviationtools.nav_fly.Route.Weather.DatabaseWeatherServices;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
@@ -163,8 +164,9 @@ public class MainActivity extends AppCompatActivity {
         addTrackingLayer();
         addAircraftLocationLayer();
 
-        setupWeatherStations();
         setupRouteFragment();
+        setupWeatherStations();
+
 
         mMap.events.bind(new Map.UpdateListener() {
             @Override
@@ -184,6 +186,12 @@ public class MainActivity extends AppCompatActivity {
     private void setupWeatherStations()
     {
         stations = new WeatherStations(this);
+        stations.SetWeatherDataReceivedEvent(new WeatherStations.WeatherDataReceivedEvent() {
+            @Override
+            public void Received(WeatherStations stations) {
+                routeListFragment.setWeatherStations(stations);
+            }
+        });
         FspLocation loc = new FspLocation(mMap.getMapPosition().getGeoPoint(), "weatherLoc");
         stations.getWeatherData(loc, 100l);
         // TODO start a timer to get weather data for current location each 30 mins
@@ -218,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
     private void setupRouteFragment() {
         routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
         routeListFragment.setMap(mMap);
-        routeListFragment.setWeatherStations(stations);
 
         routeListFragment.setChartEvents(new ChartEvents() {
             @Override
@@ -469,10 +476,14 @@ public class MainActivity extends AppCompatActivity {
                     {
 //                        SelectionLayer s = new SelectionLayer(mMap, MainActivity.this);
 //                        s.setAirportSelected(null);
+                        DatabaseWeatherServices test = new DatabaseWeatherServices(MainActivity.this);
+                        test.GetMetarsByLocationAndRadius(mMap.getMapPosition().getGeoPoint(), 100l, null);
+                        break;
                     }
                     case connectDisconnect:
                     {
                         ConnectionProcess();
+                        break;
                     }
                 }
                 return false;

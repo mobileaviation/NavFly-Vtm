@@ -44,11 +44,13 @@ public class WeatherItemAdapter extends BaseAdapter {
 
         TextView typeTextView = (TextView) rowView.findViewById(R.id.weatherTypeTxt);
         TextView infoTextView = (TextView) rowView.findViewById(R.id.weatherItemTxt);
+        TextView dateView = (TextView) rowView.findViewById(R.id.metarDateTextView);
 
         Station station = tafMetar.get(i);
         typeTextView.setText((station.metar != null) ? "Metar:" : "Taf:");
 
         infoTextView.setText((station.metar != null) ? station.metar.raw_text : station.taf.raw_text);
+        dateView.setText((station.metar != null) ? station.metar.observation_time : station.taf.valid_time_from);
 
         return rowView;
     }
