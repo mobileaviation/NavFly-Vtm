@@ -43,14 +43,14 @@ public class WeatherStations extends ArrayList<Station> {
     {
         weatherResponseEvent = new WeatherResponseEvent() {
             @Override
-            public void OnMetarsResponse(List<Metar> metars, String message) {
+            public void OnMetarsResponse(List<Metar> metars, GeoPoint location, String message) {
                 fireEvent++;
-                setMetars(metars);
+                setMetars(metars, location);
                 fireEvent();
             }
 
             @Override
-            public void OnTafsResponse(List<Taf> tafs, String message) {
+            public void OnTafsResponse(List<Taf> tafs, GeoPoint location, String message) {
                 fireEvent++;
                 setTafs(tafs);
                 fireEvent();
@@ -65,7 +65,7 @@ public class WeatherStations extends ArrayList<Station> {
         };
     }
 
-    private void setMetars(List<Metar> metars)
+    private void setMetars(List<Metar> metars, GeoPoint location)
     {
         for (Metar m : metars)
         {
@@ -80,6 +80,7 @@ public class WeatherStations extends ArrayList<Station> {
             {
                 this.add(station);
             }
+            m.distance_to_org_m = (float) location.sphericalDistance(new GeoPoint(m.latitude, m.longitude));
             station.setMetar(m);
         }
     }
@@ -131,17 +132,33 @@ public class WeatherStations extends ArrayList<Station> {
         weatherServices.GetMetarsByLocationAndRadius(pos, distance, weatherResponseEvent);
     }
 
-    public Integer getStationNearestToOrg()
+    private Integer getStationNearestToOrg(GeoPoint location)
     {
         Double min = Double.MAX_VALUE;
         int index = -1;
         for (int i = 0; i < this.size(); i++) {
             Station s = this.get(i);
-            if (Double.compare(s.distance_to_org, min) < 0) {
-                min = s.distance_to_org;
-                index = i;
+            if (s.metar != null) {
+                Double d = s.GetDistanceTo(location);
+                if (Double.compare(d, min) < 0) {
+                    min = d;
+                    index = i;
+                }
             }
         }
         return index;
+    }
+
+    public String[] getQNHInfo(GeoPoint location)
+    {
+        int index = getStationNearestToOrg(location);
+        Metar metar = this.get(index).metar;
+        String raw = metar.raw_text;
+        String qnh = "UNK";
+        String ident = metar.station_id;
+        int qindex = raw.indexOf("Q");
+        if (qindex>-1)
+            qnh = raw.substring(qindex+1, qindex+5);
+        return new String[]{ident, qnh};
     }
 }

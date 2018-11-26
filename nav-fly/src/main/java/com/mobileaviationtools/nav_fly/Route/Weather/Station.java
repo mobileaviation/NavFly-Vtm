@@ -9,6 +9,8 @@ import com.mobileaviationtools.nav_fly.Classes.MapperHelper;
 import com.mobileaviationtools.weater_notam_data.weather.Metar;
 import com.mobileaviationtools.weater_notam_data.weather.Taf;
 
+import org.oscim.core.GeoPoint;
+
 public class Station {
     public Station(Context context)
     {
@@ -54,6 +56,11 @@ public class Station {
                     db_taf = MapperHelper.getTafEntity(taf, airport);
             a_db.getTaf().InsertTaf(db_taf);
         }
+    }
+
+    public Double GetDistanceTo(GeoPoint location)
+    {
+        return location.sphericalDistance(new GeoPoint(metar.latitude, metar.longitude));
     }
 
     public Airport airport;

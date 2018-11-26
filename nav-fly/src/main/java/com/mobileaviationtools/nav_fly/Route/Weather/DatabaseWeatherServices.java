@@ -52,7 +52,7 @@ public class DatabaseWeatherServices {
                 wMetars.add(MapperHelper.getMetar(me));
             }
 
-            if (weatherDataResponseEvent != null) weatherDataResponseEvent.OnMetarsResponse(wMetars, "Received DatabaseMetars");
+            if (weatherDataResponseEvent != null) weatherDataResponseEvent.OnMetarsResponse(wMetars, position, "Received DatabaseMetars");
         }
     }
 

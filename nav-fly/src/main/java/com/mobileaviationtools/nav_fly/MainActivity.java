@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Environment;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -74,6 +76,8 @@ import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
     final static int REQUEST_INTERNET_ACCESS_SETUPAPP = 11;
     final static int REQUEST_LOCATION_GPS = 12;
+    final static int REQUEST_WAKELOCK_SETUPAPP = 13;
     final String TAG = "MainActivity";
 
     MapView mMapView;
@@ -96,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
     AirspaceLayer mAirspaceLayer;
     Tracking trackingLayer;
     AircraftLocationLayer mAircraftLocationLayer;
+    Timer clockTimer;
+    Timer weatherTimer;
 
     //private OfflineTileCache mCache;
     private SettingsObject settingsObject;
@@ -119,13 +126,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED )
         {
             setupApp();
         }
         else
         {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET_ACCESS_SETUPAPP );
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET_ACCESS_SETUPAPP );
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED )
+        {
+            // set wakelock
+            setupWakeLock();
+        }
+        else
+        {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WAKE_LOCK}, REQUEST_WAKELOCK_SETUPAPP );
         }
     }
 
@@ -166,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupRouteFragment();
         setupWeatherStations();
+        setupTimers();
 
 
         mMap.events.bind(new Map.UpdateListener() {
@@ -183,6 +203,32 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void setupTimers()
+    {
+        clockTimer = new Timer();
+        clockTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dashboardFragment.setZuluTime();
+                    }
+                });
+            }
+        }, 30000, 30000);
+
+        weatherTimer = new Timer();
+        weatherTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                FspLocation location = new FspLocation(mMap.getMapPosition().getGeoPoint(), "Weatherlocation");
+                stations.getWeatherData(location, 100l);
+            }
+        }, 1800000, 1800000);
+        dashboardFragment.setZuluTime();
+    }
+
     private void setupWeatherStations()
     {
         routeListFragment.ToggleWeatherProgressVisibility(true);
@@ -192,6 +238,13 @@ public class MainActivity extends AppCompatActivity {
             public void Received(WeatherStations stations) {
                 routeListFragment.setWeatherStations(stations);
                 routeListFragment.ToggleWeatherProgressVisibility(false);
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dashboardFragment.setQnh(MainActivity.this.stations.getQNHInfo(mMap.getMapPosition().getGeoPoint()));
+                    }
+                });
+
             }
         });
         FspLocation loc = new FspLocation(mMap.getMapPosition().getGeoPoint(), "weatherLoc");
@@ -327,6 +380,9 @@ public class MainActivity extends AppCompatActivity {
             if (requestCode == REQUEST_INTERNET_ACCESS_SETUPAPP)
                 setupApp();
 
+            if (requestCode == REQUEST_WAKELOCK_SETUPAPP)
+                setupWakeLock();
+
             return;
         }
 
@@ -336,6 +392,11 @@ public class MainActivity extends AppCompatActivity {
     void setupAirspacesLayer()
     {
         mAirspaceLayer = new AirspaceLayer(mMap, this);
+    }
+
+    private void setupWakeLock()
+    {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
 
@@ -476,10 +537,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case search:
                     {
-//                        SelectionLayer s = new SelectionLayer(mMap, MainActivity.this);
-//                        s.setAirportSelected(null);
-                        DatabaseWeatherServices test = new DatabaseWeatherServices(MainActivity.this);
-                        test.GetMetarsByLocationAndRadius(mMap.getMapPosition().getGeoPoint(), 100l, null);
+                        String[] qnh = stations.getQNHInfo(mMap.getMapPosition().getGeoPoint());
                         break;
                     }
                     case connectDisconnect:

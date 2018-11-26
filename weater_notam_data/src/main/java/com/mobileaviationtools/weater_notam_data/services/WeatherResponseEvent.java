@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface WeatherResponseEvent {
-    void OnMetarsResponse(List<Metar> metars, String message);
-    void OnTafsResponse(List<Taf> tafs, String message);
+    void OnMetarsResponse(List<Metar> metars, GeoPoint location, String message);
+    void OnTafsResponse(List<Taf> tafs, GeoPoint location, String message);
     void OnFailure(String message, GeoPoint position, Long distance);
 }

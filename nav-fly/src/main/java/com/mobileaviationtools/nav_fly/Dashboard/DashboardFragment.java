@@ -57,15 +57,33 @@ public class DashboardFragment extends Fragment {
         TextView coarseTextView = (TextView) view.findViewById(R.id.coarseTextView);
         TextView speedTextView = (TextView) view.findViewById(R.id.speedTextView);
         TextView heightTextView = (TextView) view.findViewById(R.id.heightTextView);
-        TextView qnhStationTextView = (TextView) view.findViewById(R.id.qnhStationTextView);
         TextView eetTextView = (TextView) view.findViewById(R.id.eetTextView);
-        TextView zuluTimeTestView = (TextView) view.findViewById(R.id.zuluTimeTestView);
+
 
         coarseTextView.setText(String.format("%03d", Math.round(location.getBearing())));
         Float sf = (speedType == SpeedType.knots) ? toKnots : toKm;
         speedTextView.setText(String.format("%03d", Math.round(location.getSpeed() * sf)));
         heightTextView.setText(String.format("%05d", Math.round(location.getAltitude())));
 
+
+    }
+
+    public void setQnh(String[] qnh)
+    {
+        if (qnh != null) {
+            if (qnh.length==2) {
+                TextView qnhStationTextView = (TextView) view.findViewById(R.id.qnhStationTextView);
+                TextView qnhTextView = (TextView) view.findViewById(R.id.qnhTextView);
+
+                qnhStationTextView.setText(qnh[0]);
+                qnhTextView.setText(qnh[1]);
+            }
+        }
+    }
+
+    public void setZuluTime()
+    {
+        TextView zuluTimeTestView = (TextView) view.findViewById(R.id.zuluTimeTestView);
         zuluTimeTestView.setText(getZuluTime());
     }
 

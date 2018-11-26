@@ -114,7 +114,7 @@ public class WeatherServices {
             Reader reader = new StringReader(xml);
             MetarsResponse resp =
                     serializer.read(MetarsResponse.class, reader, false);
-            if (event != null) event.OnMetarsResponse(resp.data, responseMessage);
+            if (event != null) event.OnMetarsResponse(resp.data, location, responseMessage);
         }
         catch (Exception e)
         {
@@ -130,7 +130,7 @@ public class WeatherServices {
             Reader reader = new StringReader(xml);
             TafsResponse resp =
                     serializer.read(TafsResponse.class, reader, false);
-            if (event != null) event.OnTafsResponse(resp.data, responseMessage);
+            if (event != null) event.OnTafsResponse(resp.data, location, responseMessage);
         }
         catch (Exception e)
         {
