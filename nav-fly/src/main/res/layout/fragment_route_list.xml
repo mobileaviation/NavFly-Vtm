@@ -12,74 +12,107 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/routeButtonsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/secundaryColorB5"
-            android:orientation="horizontal">
+            app:layout_constraintEnd_toStartOf="@+id/notamsTabBtn"
+            app:layout_constraintStart_toStartOf="@+id/notamsTabBtn">
 
             <ImageButton
                 android:id="@+id/routeTabBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_weight="1"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
                 android:background="@color/primaryColor1"
-                android:paddingBottom="5dp"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:paddingTop="5dp"
-                android:src="@drawable/routebtn" />
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:src="@drawable/routebtn"
+                app:layout_constraintEnd_toStartOf="@+id/weatherTabBtn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/weatherTabBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_weight="1"
+                android:layout_marginEnd="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@color/secundaryColorB1"
-                android:paddingBottom="5dp"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:paddingTop="5dp"
-                android:src="@drawable/weather_routebtn" />
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:src="@drawable/weather_routebtn"
+                app:layout_constraintEnd_toStartOf="@+id/notamsTabBtn"
+                app:layout_constraintStart_toEndOf="@+id/routeTabBtn"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/notamsTabBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
+                android:background="@color/secundaryColorA1"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:src="@drawable/notam_routebtn"
+                app:layout_constraintEnd_toStartOf="@+id/infoTabBtn"
+                app:layout_constraintStart_toEndOf="@+id/weatherTabBtn"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ProgressBar
+                android:id="@+id/notamsProgressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_weight="1"
-                android:background="@color/secundaryColorA1"
-                android:paddingBottom="5dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="5dp"
-                android:src="@drawable/notam_routebtn" />
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:theme="@style/progressBarGreen"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/infoTabBtn"
+                app:layout_constraintStart_toStartOf="@+id/notamsTabBtn"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0" />
 
             <ImageButton
                 android:id="@+id/infoTabBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
                 android:layout_marginRight="2dp"
-                android:layout_marginBottom="2dp"
-                android:layout_weight="1"
                 android:background="@color/complementaryColor5"
                 android:paddingLeft="10dp"
                 android:paddingTop="5dp"
                 android:paddingRight="10dp"
                 android:paddingBottom="5dp"
-                android:src="@drawable/infobtn" />
-        </LinearLayout>
+                android:src="@drawable/infobtn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/notamsTabBtn"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ProgressBar
+                android:id="@+id/weatherProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:theme="@style/progressBarGreen"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/notamsTabBtn"
+                app:layout_constraintStart_toStartOf="@+id/weatherTabBtn"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/ListLayout"

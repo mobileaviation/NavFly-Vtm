@@ -129,9 +129,6 @@ public class WeatherStations extends ArrayList<Station> {
         WeatherServices weatherServices = new WeatherServices();
         weatherServices.GetTafsByLocationAndRadius(pos, distance, weatherResponseEvent);
         weatherServices.GetMetarsByLocationAndRadius(pos, distance, weatherResponseEvent);
-
-        //DatabaseWeatherServices databaseWeatherServices = new DatabaseWeatherServices(context);
-        //databaseWeatherServices.GetMetarsByLocationAndRadius(pos, distance, weatherResponseEvent);
     }
 
     public Integer getStationNearestToOrg()

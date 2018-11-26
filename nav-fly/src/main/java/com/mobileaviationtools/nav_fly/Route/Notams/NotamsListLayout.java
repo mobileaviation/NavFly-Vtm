@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.mobileaviationtools.airnavdata.AirnavAirportInfoDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -35,6 +36,8 @@ public class NotamsListLayout extends LinearLayout {
     private ListView notamsList;
     private Context context;
     private Activity activity;
+    private ProgressBar notamsProgressBar;
+
 
     public NotamsListLayout(Context context) {
         super(context);
@@ -50,12 +53,25 @@ public class NotamsListLayout extends LinearLayout {
         this.map = map;
     }
 
-    public void init(Context context, Activity activity) {
+    public void init(Context context, Activity activity, ProgressBar notamsProgressBar) {
         this.context = context;
         this.activity = activity;
+        this.notamsProgressBar = notamsProgressBar;
+        toggleNotamsProgressVisibility(false);
         notamsRefreshBtn = (ImageButton) findViewById(R.id.notamsRefreshBtn);
         setNotamsRefreshBtn();
         setNotamResponseEvent();
+    }
+
+    private void toggleNotamsProgressVisibility(final Boolean visible)
+    {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (notamsProgressBar != null) notamsProgressBar.setVisibility(
+                        (visible) ? View.VISIBLE : View.INVISIBLE);
+            }
+        });
     }
 
     private NotamResponseEvent notamResponseEvent;
@@ -81,6 +97,8 @@ public class NotamsListLayout extends LinearLayout {
                         notamsList.setAdapter(notamsItemAdapter);
                     }
                 });
+
+                toggleNotamsProgressVisibility(false);
             }
 
             @Override
@@ -96,11 +114,13 @@ public class NotamsListLayout extends LinearLayout {
                         setNotamItemListClickItem();
                     }
                 });
+                toggleNotamsProgressVisibility(false);
             }
 
             @Override
             public void OnFailure(String message) {
                 Log.i(TAG, "Failure: " + message);
+                toggleNotamsProgressVisibility(false);
             }
         };
     }
@@ -110,6 +130,7 @@ public class NotamsListLayout extends LinearLayout {
             MapPosition pos = map.getMapPosition();
             NotamService notamService = new NotamService();
             notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
+            toggleNotamsProgressVisibility(true);
         }
     }
 
@@ -121,6 +142,7 @@ public class NotamsListLayout extends LinearLayout {
                 MapPosition pos = map.getMapPosition();
                 NotamService notamService = new NotamService();
                 notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
+                toggleNotamsProgressVisibility(true);
             }
         });
     }
@@ -134,6 +156,7 @@ public class NotamsListLayout extends LinearLayout {
                 Airport airport = adapter.getAirport(i);
                 NotamService notamService = new NotamService();
                 notamService.GetNotamsByICAO(airport.ident, notamResponseEvent);
+                toggleNotamsProgressVisibility(true);
             }
         });
     }

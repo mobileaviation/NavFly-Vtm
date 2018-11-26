@@ -185,11 +185,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupWeatherStations()
     {
+        routeListFragment.ToggleWeatherProgressVisibility(true);
         stations = new WeatherStations(this);
         stations.SetWeatherDataReceivedEvent(new WeatherStations.WeatherDataReceivedEvent() {
             @Override
             public void Received(WeatherStations stations) {
                 routeListFragment.setWeatherStations(stations);
+                routeListFragment.ToggleWeatherProgressVisibility(false);
             }
         });
         FspLocation loc = new FspLocation(mMap.getMapPosition().getGeoPoint(), "weatherLoc");

@@ -4,6 +4,7 @@ package com.mobileaviationtools.nav_fly.Route;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.transition.Visibility;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -77,6 +79,9 @@ public class RouteListFragment extends Fragment {
     private ImageButton routeOpenBtn;
     private ImageButton routeSaveBtn;
 
+    private ProgressBar weatherProgressBar;
+    private ProgressBar notamsProgressBar;
+
     private LinearLayout routeLayout;
     private NotamsListLayout notamsLayout;
     private WeatherListLayout weatherLayout;
@@ -89,6 +94,30 @@ public class RouteListFragment extends Fragment {
     {
         weatherBtnEnabled = true;
         this.weatherStations = stations;
+        weatherLayout.setMap(map);
+        weatherLayout.setWeatherData(weatherStations);
+    }
+
+    public void ToggleWeatherProgressVisibility(final Boolean visible)
+    {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (weatherProgressBar != null) weatherProgressBar.setVisibility(
+                        (visible) ? View.VISIBLE : View.INVISIBLE);
+            }
+        });
+    }
+
+    public void ToggleNotamsProgressVisibility(final Boolean visible)
+    {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (notamsProgressBar != null) notamsProgressBar.setVisibility(
+                        (visible) ? View.VISIBLE : View.INVISIBLE);
+            }
+        });
     }
 
     private Map map;
@@ -114,6 +143,9 @@ public class RouteListFragment extends Fragment {
         notamsBtn = (ImageButton) view.findViewById(R.id.notamsTabBtn);
         infoBtn = (ImageButton) view.findViewById(R.id.infoTabBtn);
 
+        weatherProgressBar = (ProgressBar) view.findViewById(R.id.weatherProgressBar);
+        notamsProgressBar = (ProgressBar) view.findViewById(R.id.notamsProgressBar);
+
         routeNewBtn = (ImageButton) view.findViewById(R.id.routeNewBtn);
         routeOpenBtn = (ImageButton) view.findViewById(R.id.routeLoadBtn);
         routeSaveBtn = (ImageButton) view.findViewById(R.id.routeSaveBtn);
@@ -123,11 +155,11 @@ public class RouteListFragment extends Fragment {
 
         notamsLayout = (NotamsListLayout) view.findViewById(R.id.notamsListLayout);
         notamsLayout.setVisibility(View.GONE);
-        notamsLayout.init(getContext(), getActivity());
+        notamsLayout.init(getContext(), getActivity(), notamsProgressBar);
 
         weatherLayout = (WeatherListLayout) view.findViewById(R.id.weatherListLayout);
         weatherLayout.setVisibility(View.GONE);
-        weatherLayout.init(getContext());
+        weatherLayout.init(getContext(), getActivity(), weatherProgressBar);
 
         infoLayout = (InfoLayout) view.findViewById(R.id.infoLayout);
         infoLayout.init(getContext(), getActivity());
@@ -251,8 +283,8 @@ public class RouteListFragment extends Fragment {
             public void onClick(View view) {
                 if (weatherBtnEnabled) {
                     if (setLayoutVisiblity(layoutType.weather, false)) {
-                        weatherLayout.setMap(map);
-                        weatherLayout.setWeatherData(weatherStations);
+//                        weatherLayout.setMap(map);
+//                        weatherLayout.setWeatherData(weatherStations);
                     }
                 }
             }
