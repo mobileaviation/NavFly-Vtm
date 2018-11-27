@@ -9,6 +9,8 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
+import com.mobileaviationtools.nav_fly.Info.Cities;
+import com.mobileaviationtools.nav_fly.Info.City;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
 
@@ -243,6 +245,11 @@ public class Route extends ArrayList<Waypoint> {
                         {
                             // Test
                             //routePathLayer.SelectLeg(selectedLeg);
+                            Cities cities = new Cities(context, point);
+                            for (City c : cities)
+                            {
+                                Log.i(TAG, "Found City : " + c.name + " distance: " + c.distance.toString());
+                            }
 
                             Waypoint newWaypoint = InsertnewWaypoint(point, selectedLeg);
                             createLegs();
