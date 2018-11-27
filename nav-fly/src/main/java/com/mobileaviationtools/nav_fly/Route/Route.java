@@ -9,6 +9,7 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
+import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -240,6 +241,9 @@ public class Route extends ArrayList<Waypoint> {
                         Leg selectedLeg = findLeg(point);
                         if (selectedLeg != null)
                         {
+                            // Test
+                            //routePathLayer.SelectLeg(selectedLeg);
+
                             Waypoint newWaypoint = InsertnewWaypoint(point, selectedLeg);
                             createLegs();
                             setupRouteVariables();
@@ -413,5 +417,16 @@ public class Route extends ArrayList<Waypoint> {
         DrawRoute(mMap);
 
         if (routeEvents != null) routeEvents.RouteUpdated(this);
+    }
+
+    public Long GetTotalDistanceFromLocation(FspLocation location)
+    {
+        // Find the nearest waypoint
+        // Check the coarse to the waypoint
+            // may not differ more than 180 compared to current flight heading
+            // if os check the second nearest waypoint and do the same heading check
+        // calculate the distance to the found waypoint
+        // add the distance from the found waypoint up to the destibation
+        return  0l;
     }
 }

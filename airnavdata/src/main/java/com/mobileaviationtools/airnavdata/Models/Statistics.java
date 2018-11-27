@@ -10,5 +10,6 @@ public class Statistics {
     public Integer RegionsCount;
     public Integer FirsCount;
     public Integer AirspacesCount;
+    public Integer CitiesCount;
     public Integer Version;
 }

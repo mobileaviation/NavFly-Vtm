@@ -56,6 +56,9 @@ public class AirnavClient {
             @Override
             public void OnFinished(Statistics statistics) {
                 if (responseStatus!= null) responseStatus.OnStatistics(statistics);
+
+                // TODO clear databases
+
                 retrieveDatabases(statistics);
             }
 
@@ -100,6 +103,10 @@ public class AirnavClient {
         MBTilesAPIDataSource mbTilesAPIDataSource= new MBTilesAPIDataSource(context, retrofit);
         mbTilesAPIDataSource.SetStatusEvent(clientStatus);
         mbTilesAPIDataSource.loadTiles(statistics.MBTilesCount);
+
+        CitiesAPIDataSource citiesAPIDataSource = new CitiesAPIDataSource(context, retrofit);
+        citiesAPIDataSource.SetStatusEvent(clientStatus);
+        citiesAPIDataSource.loadcities(statistics.CitiesCount);
     }
 
     private void setClientDownloadStatus()

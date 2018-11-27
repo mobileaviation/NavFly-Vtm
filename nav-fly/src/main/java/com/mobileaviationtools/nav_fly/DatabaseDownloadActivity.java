@@ -27,6 +27,7 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
     private ProgressBar fixesProgressBar;
     private ProgressBar airspacesProgressBar;
     private ProgressBar chartsProgressBar;
+    private ProgressBar citiesProgressBar;
 
     private Integer finishedCount;
 
@@ -46,6 +47,7 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
         firsProgressBar = (ProgressBar)this.findViewById(R.id.firsProgress);
         airspacesProgressBar = (ProgressBar)this.findViewById(R.id.airspacesProgress);
         chartsProgressBar = (ProgressBar)this.findViewById(R.id.chartsProgress);
+        citiesProgressBar = (ProgressBar)this.findViewById(R.id.citiesProgress);
 
         actionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +86,9 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
                                 case mbtiles:
                                     bar = chartsProgressBar;
                                     break;
+                                case cities:
+                                    bar = citiesProgressBar;
+                                    break;
                             }
 
                             if (bar != null) {
@@ -95,7 +100,7 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
                         @Override
                         public void OnFinished(TableType tableType) {
                             finishedCount++;
-                            if (finishedCount == 8) {
+                            if (finishedCount == 9) {
                                 actionBtn.setText("Close");
                                 actionBtn.setTag(true);
                                 actionBtn.setEnabled(true);
@@ -117,6 +122,7 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
                             ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.fixesCountTxt)).setText(statistics.FixesCount.toString());
                             ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.navaidsCountTxt)).setText(statistics.NavaidsCount.toString());
                             ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.chartsCountTxt)).setText(statistics.MBTilesCount.toString());
+                            ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.citiesCountTxt)).setText(statistics.CitiesCount.toString());
 
                         }
 

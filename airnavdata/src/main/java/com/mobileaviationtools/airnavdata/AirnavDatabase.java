@@ -17,6 +17,7 @@ import com.mobileaviationtools.airnavdata.DAOs.ActiveDaysDao;
 import com.mobileaviationtools.airnavdata.DAOs.ActivePeriodsDao;
 import com.mobileaviationtools.airnavdata.DAOs.AirportsDao;
 import com.mobileaviationtools.airnavdata.DAOs.AirspacesDao;
+import com.mobileaviationtools.airnavdata.DAOs.CitiesDao;
 import com.mobileaviationtools.airnavdata.DAOs.CountriesDao;
 import com.mobileaviationtools.airnavdata.DAOs.FirsDao;
 import com.mobileaviationtools.airnavdata.DAOs.FixesDao;
@@ -30,6 +31,7 @@ import com.mobileaviationtools.airnavdata.Entities.ActiveDay;
 import com.mobileaviationtools.airnavdata.Entities.ActivePeriod;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
+import com.mobileaviationtools.airnavdata.Entities.City;
 import com.mobileaviationtools.airnavdata.Entities.Country;
 import com.mobileaviationtools.airnavdata.Entities.Fir;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
@@ -43,7 +45,7 @@ import java.io.FileReader;
 
 @Database(entities = {Airport.class, Runway.class, Frequency.class, Navaid.class,
         Country.class, Region.class, Fix.class, Fir.class, Airspace.class, MBTile.class,
-        ActivePeriod.class, ActiveDay.class, ATCStation.class},
+        ActivePeriod.class, ActiveDay.class, ATCStation.class, City.class},
         version = 1)
 public abstract class AirnavDatabase extends RoomDatabase {
     private static  final String DB_NAME = "room_airnav.db";
@@ -78,5 +80,6 @@ public abstract class AirnavDatabase extends RoomDatabase {
     public abstract ATCStationsDao getAtcStations();
     public abstract ActiveDaysDao getActiveDays();
     public abstract ActivePeriodsDao getActivePeriods();
+    public abstract CitiesDao getCities();
 
 }

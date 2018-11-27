@@ -9,5 +9,6 @@ public enum TableType {
     mbtiles,
     firs,
     airspaces,
-    statistics
+    statistics,
+    cities
 }
