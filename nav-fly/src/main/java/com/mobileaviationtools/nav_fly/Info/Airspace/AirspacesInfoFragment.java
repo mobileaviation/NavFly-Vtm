@@ -22,6 +22,7 @@ public class AirspacesInfoFragment extends Fragment {
 
     private View view;
     private AirspaceAdapter airspaceAdapter;
+    private ListView airspacesListView;
 
 
     @Override
@@ -29,26 +30,29 @@ public class AirspacesInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         this.view = inflater.inflate(R.layout.fragment_airspaces_info, container, false);
+        airspacesListView = (ListView) view.findViewById(R.id.airspacesList);
+        setListViewOnClick();
         return view;
+    }
+
+    private void setListViewOnClick()
+    {
+        airspacesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                airspacesListView.setAdapter(null);
+            }
+        });
     }
 
     public void ShowAirspacesInfo(Airspace[] airspaces)
     {
-        ListView airspacesListView = (ListView) view.findViewById(R.id.airspacesList);
-
-        airspacesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Airspace airspace = (Airspace) adapterView.getAdapter().getItem(i);
-            }
-        });
-
-        if (airspaceAdapter == null) {
+        if (airspaceAdapter == null) 
             airspaceAdapter = new AirspaceAdapter(airspaces);
-            airspacesListView.setAdapter(airspaceAdapter);
-        }
         else airspaceAdapter.setAirspaces(airspaces);
 
+        airspacesListView.setAdapter(airspaceAdapter);
         airspaceAdapter.notifyDataSetChanged();
     }
 }
