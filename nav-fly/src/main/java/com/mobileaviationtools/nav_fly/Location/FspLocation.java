@@ -16,8 +16,7 @@ public class FspLocation extends Location {
     public FspLocation(GeoPoint g, String provider)
     {
         super("provider");
-        this.setLatitude(g.getLatitude());
-        this.setLongitude(g.getLongitude());
+        setGeopoint(g);
     }
 
     public static FspLocation getInstance(Location location)
@@ -25,5 +24,22 @@ public class FspLocation extends Location {
         return new FspLocation(location);
     }
 
+    public void setGeopoint(GeoPoint geopoint)
+    {
+        this.setLatitude(geopoint.getLatitude());
+        this.setLongitude(geopoint.getLongitude());
+    }
+
+    public void Assign(FspLocation location)
+    {
+        this.setLongitude(location.getLongitude());
+        this.setLatitude(location.getLatitude());
+        this.setAltitude(location.getAltitude());
+        this.setBearing(location.getBearing());
+        this.setSpeed(location.getSpeed());
+        this.setAccuracy(location.getAccuracy());
+
+        //FspLocation l = (FspLocation)location.clone();
+    }
 
 }

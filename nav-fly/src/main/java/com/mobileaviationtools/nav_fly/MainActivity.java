@@ -106,6 +106,11 @@ public class MainActivity extends AppCompatActivity {
     Timer clockTimer;
     Timer weatherTimer;
 
+    FspLocation airplaneLocation;
+    FspLocation mapCenterLocation;
+    FspLocation doDeviationLineFromLocation;
+
+
     //private OfflineTileCache mCache;
     private SettingsObject settingsObject;
     TileSource mTileSource;
@@ -155,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
         mMapView = (MapView) findViewById(R.id.mapView);
         mMap = mMapView.map();
         connectStage = ConnectStage.disconnected;
+        doDeviationLineFromLocation = new FspLocation("DeviationFromLocation");
 
         createSettingsObject();
 
@@ -193,6 +199,10 @@ public class MainActivity extends AppCompatActivity {
         mMap.events.bind(new Map.UpdateListener() {
             @Override
             public void onMapEvent(Event e, MapPosition mapPosition) {
+                if (mapCenterLocation == null) mapCenterLocation = new FspLocation(mapPosition.getGeoPoint(),
+                        "MapCenterLocation");
+                else mapCenterLocation.setGeopoint(mapPosition.getGeoPoint());
+
                 if (checkMap == null) checkMap = new CheckMap(mMap);
                 if(checkMap.Changed()) {
                     mAirportMarkersLayer.UpdateAirports();
@@ -346,13 +356,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void addAircraftLocationLayer()
     {
-        GeoPoint curpos = mMap.getMapPosition().getGeoPoint();
+        airplaneLocation = new FspLocation(mMap.getMapPosition().getGeoPoint(), "AirplaneLocation");
 
-        Location location = new Location("InitialLocation");
-        location.setLongitude(curpos.getLongitude());
-        location.setLatitude(curpos.getLatitude());
         mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(mMap,
-                this, FspLocation.getInstance(location));
+                this, airplaneLocation);
 
         mMap.layers().add(mAircraftLocationLayer);
     }
@@ -580,14 +587,15 @@ public class MainActivity extends AppCompatActivity {
                         connectStage = ConnectStage.connected;
                         Log.i("OnLocationChanged", "Success Message: " + message);
                         if (location != null) {
-                            Log.i("OnLocationChanged", "Location Changed: " + location.getLatitude() + " "
-                                    + location.getLongitude() + " " + location.getBearing() + " " + location.getSpeed());
+                            airplaneLocation.Assign(location);
+                            doDeviationLineFromLocation.Assign(location);
+                            Log.i("OnLocationChanged", "Location Changed: " + airplaneLocation.getLatitude() + " "
+                                    + airplaneLocation.getLongitude() + " " + airplaneLocation.getBearing() + " " + airplaneLocation.getSpeed());
                             //location.setBearing(90);
-                            trackingLayer.setLocation(location);
-                            mAircraftLocationLayer.UpdateLocation(location);
-                            dashboardFragment.setLocation(location);
+                            trackingLayer.setLocation(airplaneLocation);
+                            mAircraftLocationLayer.UpdateLocation(airplaneLocation);
+                            dashboardFragment.setLocation(airplaneLocation);
                             //mMap.render();
-
                         }
                     }
                     else
