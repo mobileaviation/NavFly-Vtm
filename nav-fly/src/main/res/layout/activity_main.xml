@@ -36,8 +36,27 @@
         android:name="com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="right"
+        app:layout_constraintBottom_toTopOf="@+id/dashboardFragment"
+        app:layout_constraintEnd_toStartOf="@id/menuFragment">
+
+        <fragment
+            android:id="@+id/airspacesInfoFragment"
+            android:name="com.mobileaviationtools.nav_fly.Info.Airspace.AirspacesInfoFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
 
     <fragment
         android:name="com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment"

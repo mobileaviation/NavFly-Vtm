@@ -37,6 +37,11 @@ import java.util.List;
 
 
 public class AirspaceLayer extends VectorLayer {
+    public interface FoundAirspacesEvent
+    {
+        public void OnAirspaces(Airspace[] airspaces);
+    }
+
     public AirspaceLayer(Map map, Context context)
     {
         super(map);
@@ -47,10 +52,17 @@ public class AirspaceLayer extends VectorLayer {
         airspaces = new AirspaceList();
     }
 
+    public void SetFoundAirspacesEvent(FoundAirspacesEvent foundAirspacesEvent)
+    {
+        this.foundAirspacesEvent = foundAirspacesEvent;
+    }
+
     private Map mMap;
     private Context context;
     private AirnavDatabase db;
     private AirspaceList airspaces;
+    private FoundAirspacesEvent foundAirspacesEvent;
+
 
     private String TAG = "AirspaceLayer";
 
@@ -71,6 +83,7 @@ public class AirspaceLayer extends VectorLayer {
             GeoPoint p = mMap.viewport().fromScreenPoint(e.getX(), e.getY());
             Log.i(TAG,"AirspaceLayer tap\n" + p);
             Airspace[] airspaces = db.getAirpaces().getAirspacesSurroundedBy(p.getLatitude(), p.getLongitude());
+            if (foundAirspacesEvent != null) foundAirspacesEvent.OnAirspaces(airspaces);
             for(Airspace a : airspaces)
             {
 

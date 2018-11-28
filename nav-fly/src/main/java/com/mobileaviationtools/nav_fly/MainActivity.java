@@ -20,10 +20,12 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
 import com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment;
+import com.mobileaviationtools.nav_fly.Info.Airspace.AirspacesInfoFragment;
 import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
@@ -392,6 +394,14 @@ public class MainActivity extends AppCompatActivity {
     void setupAirspacesLayer()
     {
         mAirspaceLayer = new AirspaceLayer(mMap, this);
+        mAirspaceLayer.SetFoundAirspacesEvent(new AirspaceLayer.FoundAirspacesEvent() {
+            @Override
+            public void OnAirspaces(Airspace[] airspaces) {
+                AirspacesInfoFragment airspacesInfoFragment =
+                        (AirspacesInfoFragment)getSupportFragmentManager().findFragmentById(R.id.airspacesInfoFragment);
+                airspacesInfoFragment.ShowAirspacesInfo(airspaces);
+            }
+        });
     }
 
     private void setupWakeLock()
