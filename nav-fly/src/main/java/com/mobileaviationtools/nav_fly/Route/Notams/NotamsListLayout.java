@@ -17,6 +17,7 @@ import com.mobileaviationtools.airnavdata.AirnavAirportInfoDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Notam;
 import com.mobileaviationtools.nav_fly.Classes.MapperHelper;
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
@@ -47,10 +48,16 @@ public class NotamsListLayout extends LinearLayout {
         super(context, attrs);
     }
 
-    private Map map;
+    //private Map map;
 
-    public void setMap(Map map) {
-        this.map = map;
+    //public void setMap(Map map) {
+//        this.map = map;
+//    }
+
+    private GlobalVars vars;
+    public void setGlobalVars(GlobalVars vars)
+    {
+        this.vars = vars;
     }
 
     public void init(Context context, Activity activity, ProgressBar notamsProgressBar) {
@@ -127,7 +134,7 @@ public class NotamsListLayout extends LinearLayout {
 
     public void notamBtnClick() {
         if (notamsAirportItemAdapter == null) {
-            MapPosition pos = map.getMapPosition();
+            MapPosition pos = vars.map.getMapPosition();
             NotamService notamService = new NotamService();
             notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
             toggleNotamsProgressVisibility(true);
@@ -139,7 +146,7 @@ public class NotamsListLayout extends LinearLayout {
         notamsRefreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MapPosition pos = map.getMapPosition();
+                MapPosition pos = vars.map.getMapPosition();
                 NotamService notamService = new NotamService();
                 notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
                 toggleNotamsProgressVisibility(true);

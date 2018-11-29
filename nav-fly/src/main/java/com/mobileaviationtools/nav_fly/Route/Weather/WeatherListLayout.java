@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
@@ -28,9 +29,10 @@ import java.util.List;
 
 public class WeatherListLayout extends LinearLayout {
     private String TAG = "WeatherListLayout";
-    private Map map;
-    private Context context;
-    private Activity activity;
+//    private Map map;
+//    private Context context;
+//    private Activity activity;
+    private GlobalVars vars;
     private ImageButton weatherRefreshBtn;
     private WeatherResponseEvent weatherResponseEvent;
     private ListView weatherStationsList;
@@ -46,14 +48,13 @@ public class WeatherListLayout extends LinearLayout {
         super(context, attrs);
     }
 
-    public void setMap(Map map) {
-        this.map = map;
-    }
+//    public void setMap(Map map) {
+//        this.map = map;
+//    }
 
-    public void init(Context context, Activity activity, ProgressBar weatherProgressBar)
+    public void init(GlobalVars vars, ProgressBar weatherProgressBar)
     {
-        this.context = context;
-        this.activity = activity;
+        this.vars = vars;
         this.weatherProgressBar = weatherProgressBar;
         weatherRefreshBtn = (ImageButton) findViewById(R.id.weatherRefreshBtn);
         weatherStationsList = (ListView) findViewById(R.id.weatherAirportsListView);
@@ -61,12 +62,13 @@ public class WeatherListLayout extends LinearLayout {
         setWeatherRefreshBtnClick();
     }
 
-    public void setWeatherData(WeatherStations stations)
+    public void setWeatherData(GlobalVars vars, WeatherStations stations)
     {
+        this.vars = vars;
         this.stations = stations;
         if (stations != null) {
 
-            activity.runOnUiThread(new Runnable() {
+            vars.mainActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     WeatherAirportItemAdapter weatherAirportItemAdapter =
@@ -86,7 +88,7 @@ public class WeatherListLayout extends LinearLayout {
             public void onClick(View view) {
                 if (stations != null) {
                     if (weatherProgressBar != null) weatherProgressBar.setVisibility(VISIBLE);
-                    FspLocation loc = new FspLocation(map.getMapPosition().getGeoPoint(), "weatherLoc");
+                    FspLocation loc = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "weatherLoc");
                     stations.getWeatherData(loc, 100l);
                 }
             }

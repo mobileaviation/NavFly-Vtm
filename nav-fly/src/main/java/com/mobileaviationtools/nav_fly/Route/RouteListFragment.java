@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.MainActivity;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
@@ -37,6 +38,7 @@ import com.mobileaviationtools.weater_notam_data.services.WeatherServices;
 import com.mobileaviationtools.weater_notam_data.weather.Metar;
 import com.mobileaviationtools.weater_notam_data.weather.Taf;
 
+import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.map.Map;
 
@@ -62,8 +64,8 @@ public class RouteListFragment extends Fragment {
 
     private String TAG = "RouteListFragment";
 
-    private Route route;
-    public Route getRoute() {return route;}
+//    private Route route;
+//    public Route getRoute() {return route;}
 
     private RouteItemAdapter routeItemAdapter;
     private NotamsAirportItemAdapter notamsAirportItemAdapter;
@@ -90,12 +92,13 @@ public class RouteListFragment extends Fragment {
     private ListView airportsList;
 
     private WeatherStations weatherStations;
-    public void setWeatherStations(WeatherStations stations)
+    public void setWeatherStations(GlobalVars vars, WeatherStations stations)
     {
+        this.vars = vars;
         weatherBtnEnabled = true;
         this.weatherStations = stations;
-        weatherLayout.setMap(map);
-        weatherLayout.setWeatherData(weatherStations);
+        //weatherLayout.setMap(vars.map);
+        weatherLayout.setWeatherData(vars, weatherStations);
     }
 
     public void ToggleWeatherProgressVisibility(final Boolean visible)
@@ -120,10 +123,16 @@ public class RouteListFragment extends Fragment {
         });
     }
 
-    private Map map;
+//    private Map map;
+//
+//    public void setMap(Map map) {
+//        this.map = map;
+//    }
 
-    public void setMap(Map map) {
-        this.map = map;
+    private GlobalVars vars;
+    public void setGlobalVars(GlobalVars vars)
+    {
+        this.vars = vars;
     }
 
     private ChartEvents chartEvents;
@@ -159,10 +168,10 @@ public class RouteListFragment extends Fragment {
 
         weatherLayout = (WeatherListLayout) view.findViewById(R.id.weatherListLayout);
         weatherLayout.setVisibility(View.GONE);
-        weatherLayout.init(getContext(), getActivity(), weatherProgressBar);
+        weatherLayout.init(vars, weatherProgressBar);
 
         infoLayout = (InfoLayout) view.findViewById(R.id.infoLayout);
-        infoLayout.init(getContext(), getActivity());
+        infoLayout.init();
         infoLayout.setVisibility(View.GONE);
         setupInfoLayoutEvents();
 
@@ -178,8 +187,19 @@ public class RouteListFragment extends Fragment {
     private void SetRoute()
     {
         ListView routeListView = (ListView) this.getView().findViewById(R.id.routeListView);
-        routeItemAdapter = new RouteItemAdapter(route, this.getContext());
-        setupRouteEvents(route);
+        routeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                RouteItemAdapter adapter = (RouteItemAdapter)adapterView.getAdapter();
+                Waypoint waypoint = adapter.getItem(i);
+                MapPosition position = vars.map.getMapPosition();
+                position.setPosition(waypoint.point);
+                vars.map.setMapPosition(position);
+                vars.doDeviationLineFromLocation.setGeopoint(waypoint.point);
+            }
+        });
+        routeItemAdapter = new RouteItemAdapter(vars.route, this.getContext());
+        setupRouteEvents(vars.route);
         routeListView.setAdapter(routeItemAdapter);
         setLayoutVisiblity(layoutType.route, true);
     }
@@ -192,8 +212,7 @@ public class RouteListFragment extends Fragment {
     public void ShowAirportInfo(Airport airport)
     {
         setLayoutVisiblity(layoutType.info, true);
-        infoLayout.setMap(map);
-        infoLayout.setRoute(route);
+        infoLayout.setGlobalVars(vars);
         infoLayout.ShowAirportInfo(airport);
     }
 
@@ -299,7 +318,7 @@ public class RouteListFragment extends Fragment {
             public void onClick(View view) {
                 if (notamsBtnEnabled) {
                     if (setLayoutVisiblity(layoutType.notams, false)) {
-                        notamsLayout.setMap(map);
+                        notamsLayout.setGlobalVars(vars);
                         notamsLayout.notamBtnClick();
                     }
                 }
@@ -313,8 +332,7 @@ public class RouteListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (setLayoutVisiblity(layoutType.info, false)){
-                    infoLayout.setMap(map);
-                    infoLayout.setRoute(route);
+                    infoLayout.setGlobalVars(vars);
                     infoLayout.LoadList();
                 }
             }
@@ -344,7 +362,7 @@ public class RouteListFragment extends Fragment {
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        route = new Route("Route: " + new Date().toString(), getActivity());
+                        vars.route = new Route("Route: " + new Date().toString(), getActivity());
                         SetRoute();
                     }
                 })                 //Do nothing on no
@@ -356,14 +374,14 @@ public class RouteListFragment extends Fragment {
         routeNewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (route != null) {
+                if (vars.route != null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle("Clear route..")
                             .setMessage("Are you sure you want to close the current route?")
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    route.ClearRoute(map);
+                                    vars.route.ClearRoute(vars.map);
                                     setupNewRoute();
                                 }
                             })
@@ -405,13 +423,13 @@ public class RouteListFragment extends Fragment {
 
                         dialogInterface.dismiss();
                         if (selectedRoute != null) {
-                            if (route != null) route.ClearRoute(map);
-                            route = new Route(selectedRoute.name, getActivity());
+                            if (vars.route != null) vars.route.ClearRoute(vars.map);
+                            vars.route = new Route(selectedRoute.name, getActivity());
 
-                            route.createdDate = new Date(selectedRoute.createdDate);
-                            route.modifiedDate = new Date(selectedRoute.modifiedDate);
+                            vars.route.createdDate = new Date(selectedRoute.createdDate);
+                            vars.route.modifiedDate = new Date(selectedRoute.modifiedDate);
                             SetRoute();
-                            route.openRoute(selectedRoute.id, map);
+                            vars.route.openRoute(selectedRoute.id, vars.map);
                         }
                     }
                 });
@@ -429,7 +447,7 @@ public class RouteListFragment extends Fragment {
         routeSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (route != null)
+                if (vars.route != null)
                 {
                     saveRouteDialogs();
                 }
@@ -443,7 +461,7 @@ public class RouteListFragment extends Fragment {
         builder.setTitle("Save Route");
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.text_input, (ViewGroup) getView(), false);
         final EditText input = (EditText) viewInflated.findViewById(R.id.input);
-        input.setText(route.name);
+        input.setText(vars.route.name);
         builder.setView(viewInflated);
         builder.setIcon(android.R.drawable.ic_input_get);
         builder.setMessage("Save this route with name:?");
@@ -455,7 +473,7 @@ public class RouteListFragment extends Fragment {
                 final com.mobileaviationtools.airnavdata.Entities.Route r = db.getRoute().getRouteByName(routeName);
                 if (r == null) {
                     dialogInterface.dismiss();
-                    route.saveRoute(routeName);
+                    vars.route.saveRoute(routeName);
                 } else
                 {
                     AlertDialog.Builder ov_builder = new AlertDialog.Builder(getContext());
@@ -469,7 +487,7 @@ public class RouteListFragment extends Fragment {
                             dialogInterface.dismiss();
                             db.getWaypoint().DeleteWaypointsByRouteID(r.id);
                             db.getRoute().DeleteRoute(r);
-                            route.saveRoute(routeName);
+                            vars.route.saveRoute(routeName);
                         }
                     });
                     ov_builder.setNegativeButton("Rename", new DialogInterface.OnClickListener() {

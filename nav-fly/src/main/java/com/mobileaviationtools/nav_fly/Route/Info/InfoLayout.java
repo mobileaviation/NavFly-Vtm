@@ -33,6 +33,7 @@ import com.mobileaviationtools.airnavdata.Entities.Frequency;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.airnavdata.Entities.Runway;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.MainActivity;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Route;
@@ -94,10 +95,7 @@ public class InfoLayout extends LinearLayout {
     }
 
     private String TAG = "InfoLayout";
-    private Map map;
-    private Route route;
-    private Context context;
-    private Activity activity;
+    private GlobalVars vars;
     private ListView itemsList;
     private ListView airportChartsListView;
     private InfoItemAdapter infoItemAdapter;
@@ -134,25 +132,17 @@ public class InfoLayout extends LinearLayout {
         fixes;
     }
 
-
-
     private ChartEvents chartEvent;
     public void setChartEvent(ChartEvents chartEvent){
         this.chartEvent = chartEvent;
     }
 
-    public void setMap(Map map) {
-        this.map = map;
-    }
-
-    public void setRoute(Route route)
+    public void setGlobalVars(GlobalVars vars)
     {
-        this.route = route;
+        this.vars = vars;
     }
 
-    public void init(Context context, Activity activity) {
-        this.context = context;
-        this.activity = activity;
+    public void init() {
         stationsType = StationsType.airports;
         setInfoTitleText();
     }
@@ -207,7 +197,7 @@ public class InfoLayout extends LinearLayout {
 
     public void LoadList()
     {
-        loadItemsList(route, map.getMapPosition().getGeoPoint());
+        loadItemsList(vars.route, vars.map.getMapPosition().getGeoPoint());
         switch (stationsType){
             case airports:{
                 infoItemAdapter.setAirports(airportItems);
@@ -288,7 +278,7 @@ public class InfoLayout extends LinearLayout {
         Geometry checkBuf = getAreaCheckBuffer(route, curPosition);
         Geometry envelop = checkBuf.getEnvelope();
 
-        AirnavDatabase db = AirnavDatabase.getInstance(context);
+        AirnavDatabase db = AirnavDatabase.getInstance(vars.context);
         Coordinate[] corners = envelop.getCoordinates();
         Coordinate c1 = corners[0];
         Coordinate c2 = corners[2];
@@ -338,10 +328,11 @@ public class InfoLayout extends LinearLayout {
                 {
                     setAirportInfo((Airport)item);
 
-                    if ((map != null) && setPosition) {
-                        MapPosition position = map.getMapPosition();
+                    if ((vars.map != null) && setPosition) {
+                        MapPosition position = vars.map.getMapPosition();
                         position.setPosition(new GeoPoint(((Airport) item).latitude_deg, ((Airport) item).longitude_deg));
-                        map.setMapPosition(position);
+                        vars.map.setMapPosition(position);
+                        vars.doDeviationLineFromLocation.setGeopoint(new GeoPoint(((Airport) item).latitude_deg, ((Airport) item).longitude_deg));
                     }
                     else
                     {
@@ -353,10 +344,10 @@ public class InfoLayout extends LinearLayout {
                 {
                     setNavaidInfo((Navaid) item);
 
-                    if ((map != null) && setPosition) {
-                        MapPosition position = map.getMapPosition();
+                    if ((vars.map != null) && setPosition) {
+                        MapPosition position = vars.map.getMapPosition();
                         position.setPosition(new GeoPoint(((Navaid) item).latitude_deg, ((Navaid) item).longitude_deg));
-                        map.setMapPosition(position);
+                        vars.map.setMapPosition(position);
                     }
                     else
                     {
@@ -368,10 +359,10 @@ public class InfoLayout extends LinearLayout {
                 {
                     // setFixInfo
 
-                    if ((map != null) && setPosition) {
-                        MapPosition position = map.getMapPosition();
+                    if ((vars.map != null) && setPosition) {
+                        MapPosition position = vars.map.getMapPosition();
                         position.setPosition(new GeoPoint(((Fix) item).latitude_deg, ((Fix) item).longitude_deg));
-                        map.setMapPosition(position);
+                        vars.map.setMapPosition(position);
                     }
                     else
                     {
@@ -451,9 +442,9 @@ public class InfoLayout extends LinearLayout {
     {
         if (selectedAirport != null)
         {
-            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
             Chart[] charts = db.getCharts().getChartsByAirportRef(selectedAirport.id);
-            chartItemAdapter = new ChartItemAdapter(context, charts);
+            chartItemAdapter = new ChartItemAdapter(vars.context, charts);
             chartItemAdapter.setChartCheckedEvent(new ChartEvents() {
                 @Override
                 public void OnChartCheckedEvent(Chart chart, Boolean checked) {
@@ -539,8 +530,8 @@ public class InfoLayout extends LinearLayout {
 //                    }
 //                });
 //                builder.show();
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    final SelectChartDialog dialog = SelectChartDialog.getInstance(context, selectedAirport);
+                if (ContextCompat.checkSelfPermission(vars.context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    final SelectChartDialog dialog = SelectChartDialog.getInstance(vars.context, selectedAirport);
                     dialog.setDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialogInterface) {
@@ -559,11 +550,11 @@ public class InfoLayout extends LinearLayout {
 //                        if (dialog.isSaved()) loadCharts();
 //                    }
 //                });
-                    dialog.show(((MainActivity) context).getSupportFragmentManager(), "");
+                    dialog.show(((MainActivity) vars.context).getSupportFragmentManager(), "");
                 }
                 else
                 {
-                    ActivityCompat.requestPermissions(InfoLayout.this.activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_INFOLAYOUT );
+                    ActivityCompat.requestPermissions(vars.mainActivity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_INFOLAYOUT );
                 }
             }
         });

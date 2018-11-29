@@ -92,8 +92,9 @@ public class MainActivity extends AppCompatActivity {
     final static int REQUEST_WAKELOCK_SETUPAPP = 13;
     final String TAG = "MainActivity";
 
+    public GlobalVars vars;
+
     MapView mMapView;
-    Map mMap;
     CheckMap checkMap;
     MapPreferences mPrefs;
     VectorTileLayer mBaseLayer;
@@ -105,11 +106,6 @@ public class MainActivity extends AppCompatActivity {
     AircraftLocationLayer mAircraftLocationLayer;
     Timer clockTimer;
     Timer weatherTimer;
-
-    FspLocation airplaneLocation;
-    FspLocation mapCenterLocation;
-    FspLocation doDeviationLineFromLocation;
-
 
     //private OfflineTileCache mCache;
     private SettingsObject settingsObject;
@@ -132,6 +128,9 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        vars = new GlobalVars();
+        vars.mainActivity = this;
+        vars.context = this;
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED )
         {
@@ -158,9 +157,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupApp()
     {
         mMapView = (MapView) findViewById(R.id.mapView);
-        mMap = mMapView.map();
+        vars.map = mMapView.map();
         connectStage = ConnectStage.disconnected;
-        doDeviationLineFromLocation = new FspLocation("DeviationFromLocation");
+        vars.doDeviationLineFromLocation = new FspLocation("DeviationFromLocation");
 
         createSettingsObject();
 
@@ -196,14 +195,14 @@ public class MainActivity extends AppCompatActivity {
         setupTimers();
 
 
-        mMap.events.bind(new Map.UpdateListener() {
+        vars.map.events.bind(new Map.UpdateListener() {
             @Override
             public void onMapEvent(Event e, MapPosition mapPosition) {
-                if (mapCenterLocation == null) mapCenterLocation = new FspLocation(mapPosition.getGeoPoint(),
+                if (vars.mapCenterLocation == null) vars.mapCenterLocation = new FspLocation(mapPosition.getGeoPoint(),
                         "MapCenterLocation");
-                else mapCenterLocation.setGeopoint(mapPosition.getGeoPoint());
+                else vars.mapCenterLocation.setGeopoint(mapPosition.getGeoPoint());
 
-                if (checkMap == null) checkMap = new CheckMap(mMap);
+                if (checkMap == null) checkMap = new CheckMap(vars.map);
                 if(checkMap.Changed()) {
                     mAirportMarkersLayer.UpdateAirports();
                     mNavaidsMarkersLayer.UpdateNavaids();
@@ -234,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         weatherTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                FspLocation location = new FspLocation(mMap.getMapPosition().getGeoPoint(), "Weatherlocation");
+                FspLocation location = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "Weatherlocation");
                 stations.getWeatherData(location, 100l);
             }
         }, 1800000, 1800000);
@@ -248,25 +247,25 @@ public class MainActivity extends AppCompatActivity {
         stations.SetWeatherDataReceivedEvent(new WeatherStations.WeatherDataReceivedEvent() {
             @Override
             public void Received(WeatherStations stations) {
-                routeListFragment.setWeatherStations(stations);
+                routeListFragment.setWeatherStations(vars, stations);
                 routeListFragment.ToggleWeatherProgressVisibility(false);
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dashboardFragment.setQnh(MainActivity.this.stations.getQNHInfo(mMap.getMapPosition().getGeoPoint()));
+                        dashboardFragment.setQnh(MainActivity.this.stations.getQNHInfo(vars.map.getMapPosition().getGeoPoint()));
                     }
                 });
 
             }
         });
-        FspLocation loc = new FspLocation(mMap.getMapPosition().getGeoPoint(), "weatherLoc");
+        FspLocation loc = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "weatherLoc");
         stations.getWeatherData(loc, 100l);
         // TODO start a timer to get weather data for current location each 30 mins
     }
 
     private void createSettingsObject()
     {
-        settingsObject = new SettingsObject(this, mMap);
+        settingsObject = new SettingsObject(this, vars.map);
         settingsObject.SetSettingsEvent(new SettingsObject.SettingsEvent() {
             @Override
             public void OnSettingChanged(SettingsObject.SettingType type, SettingsObject object) {
@@ -292,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupRouteFragment() {
         routeListFragment = (RouteListFragment)getSupportFragmentManager().findFragmentById(R.id.routeListFragment);
-        routeListFragment.setMap(mMap);
+        routeListFragment.setGlobalVars(vars);
 
         routeListFragment.setChartEvents(new ChartEvents() {
             @Override
@@ -309,27 +308,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addMarkerLayers() {
-        mAirportMarkersLayer = new AirportMarkersLayer(mMap, null, this);
+        mAirportMarkersLayer = new AirportMarkersLayer(vars.map, null, this);
         mAirportMarkersLayer.SetOnAirportSelected(new AirportSelected() {
             @Override
             public void Selected(Airport airport, GeoPoint geoPoint) {
                 Log.i(TAG, "Airport selected: " + airport.ident);
                 mAirportSelectionLayer.setAirportSelected(airport);
-                Route route = routeListFragment.getRoute();
-                if (route != null)
+                if (vars.route != null)
                 {
-                    if (!route.isStartAirportSet())
+                    if (!vars.route.isStartAirportSet())
                     {
-                        route.setSelectedStartAirport(airport);
+                        vars.route.setSelectedStartAirport(airport);
                         Log.i(TAG, "Route Start Airport selected: " + airport.ident);
                         return;
                     }
 
-                    if (!route.isEndAirportSet())
+                    if (!vars.route.isEndAirportSet())
                     {
-                        route.setSelectedEndAirport(airport);
+                        vars.route.setSelectedEndAirport(airport);
                         Log.i(TAG, "Route Start Airport selected: " + airport.ident);
-                        route.DrawRoute(mMap);
+                        vars.route.DrawRoute(vars.map);
                         return;
                     }
 
@@ -340,28 +338,28 @@ public class MainActivity extends AppCompatActivity {
                 routeListFragment.ShowAirportInfo(airport);
             }
         });
-        mMap.layers().add(mAirportMarkersLayer);
+        vars.map.layers().add(mAirportMarkersLayer);
 
-        mNavaidsMarkersLayer = new NaviadMarkersLayer(mMap, null, this);
-        mMap.layers().add(mNavaidsMarkersLayer);
+        mNavaidsMarkersLayer = new NaviadMarkersLayer(vars.map, null, this);
+        vars.map.layers().add(mNavaidsMarkersLayer);
 
-        mAirportSelectionLayer = new SelectionLayer(mMap, null, this);
-        mMap.layers().add(mAirportSelectionLayer);
+        mAirportSelectionLayer = new SelectionLayer(vars.map, null, this);
+        vars.map.layers().add(mAirportSelectionLayer);
     }
 
     public void addTrackingLayer()
     {
-        trackingLayer = new Tracking(this, mMap);
+        trackingLayer = new Tracking(this, vars.map);
     }
 
     public void addAircraftLocationLayer()
     {
-        airplaneLocation = new FspLocation(mMap.getMapPosition().getGeoPoint(), "AirplaneLocation");
+        vars.airplaneLocation = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "AirplaneLocation");
 
-        mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(mMap,
-                this, airplaneLocation);
+        mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(vars.map,
+                this, vars.airplaneLocation);
 
-        mMap.layers().add(mAircraftLocationLayer);
+        vars.map.layers().add(mAircraftLocationLayer);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -400,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
 
     void setupAirspacesLayer()
     {
-        mAirspaceLayer = new AirspaceLayer(mMap, this);
+        mAirspaceLayer = new AirspaceLayer(vars.map, this);
         mAirspaceLayer.SetFoundAirspacesEvent(new AirspaceLayer.FoundAirspacesEvent() {
             @Override
             public void OnAirspaces(Airspace[] airspaces) {
@@ -450,8 +448,8 @@ public class MainActivity extends AppCompatActivity {
 
         OverlayTileSource overlayTileSource = new OverlayTileSource(folder, bb);
         overlayTileSource.open();
-        mBitmapLayer = new BitmapTileLayer(mMap, overlayTileSource);
-        mMap.layers().add(mBitmapLayer);
+        mBitmapLayer = new BitmapTileLayer(vars.map, overlayTileSource);
+        vars.map.layers().add(mBitmapLayer);
     }
 
     void viewportTest()
@@ -473,8 +471,8 @@ public class MainActivity extends AppCompatActivity {
         if (f.exists()) {
             MBTilesTileSource mbTilesTileSource = new MBTilesTileSource(folder);
             mbTilesTileSource.open();
-            mBitmapLayer = new BitmapTileLayer(mMap, mbTilesTileSource);
-            mMap.layers().add(mBitmapLayer);
+            mBitmapLayer = new BitmapTileLayer(vars.map, mbTilesTileSource);
+            vars.map.layers().add(mBitmapLayer);
 
         }
     }
@@ -496,35 +494,35 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         settingsObject.setBaseCache(mTileSource);
-        mBaseLayer = mMap.setBaseMap(mTileSource);
+        mBaseLayer = vars.map.setBaseMap(mTileSource);
 
         /* set initial position on first run */
         MapPosition pos = new MapPosition();
-        mMap.getMapPosition(pos);
+        vars.map.getMapPosition(pos);
         if (pos.x == 0.5 && pos.y == 0.5)
-            mMap.setMapPosition(52.4603, 5.5272, Math.pow(2, 14));
+            vars.map.setMapPosition(52.4603, 5.5272, Math.pow(2, 14));
     }
 
     void createLayers() {
-        GroupLayer groupLayer = new GroupLayer(mMap);
-        groupLayer.layers.add(new BuildingLayer(mMap, mBaseLayer));
-        groupLayer.layers.add(new LabelLayer(mMap, mBaseLayer));
-        mMap.layers().add(groupLayer);
+        GroupLayer groupLayer = new GroupLayer(vars.map);
+        groupLayer.layers.add(new BuildingLayer(vars.map, mBaseLayer));
+        groupLayer.layers.add(new LabelLayer(vars.map, mBaseLayer));
+        vars.map.layers().add(groupLayer);
 
-        mapScaleBar = new DefaultMapScaleBar(mMap);
+        mapScaleBar = new DefaultMapScaleBar(vars.map);
         mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
         mapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
         mapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
         mapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
 
-        MapScaleBarLayer mapScaleBarLayer = new MapScaleBarLayer(mMap, mapScaleBar);
+        MapScaleBarLayer mapScaleBarLayer = new MapScaleBarLayer(vars.map, mapScaleBar);
         BitmapRenderer renderer = mapScaleBarLayer.getRenderer();
         renderer.setPosition(GLViewport.Position.BOTTOM_LEFT);
         renderer.setOffset(5 * CanvasAdapter.getScale(), 0);
-        mMap.layers().add(mapScaleBarLayer);
+        vars.map.layers().add(mapScaleBarLayer);
 
 
-        mMap.setTheme(VtmThemes.DEFAULT);
+        vars.map.setTheme(VtmThemes.DEFAULT);
     }
 
     private void setupMenuListerners()
@@ -543,18 +541,11 @@ public class MainActivity extends AppCompatActivity {
                     {
                         SettingsDialog settingsDialog = SettingsDialog.getInstance(MainActivity.this, settingsObject);
                         settingsDialog.show(getSupportFragmentManager(), "test");
-                        //
-
-
-//                        String url = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
-//                        BoundingBox box = mMap.getBoundingBox(5);
-//                        OfflineTileCache offlineTileCache = new OfflineTileCache(MainActivity.this, null, "testTile.db");
-//                        offlineTileCache.DownloadTiles(box, url);
                         break;
                     }
                     case search:
                     {
-                        String[] qnh = stations.getQNHInfo(mMap.getMapPosition().getGeoPoint());
+                        String[] qnh = stations.getQNHInfo(vars.map.getMapPosition().getGeoPoint());
                         break;
                     }
                     case connectDisconnect:
@@ -582,19 +573,19 @@ public class MainActivity extends AppCompatActivity {
                     {
                         if (connectStage == ConnectStage.connecting) {
                             menu.SetConnectDisConnectIcon(true);
-                            trackingLayer.start(routeListFragment.getRoute());
+                            trackingLayer.start(vars.route);
                         }
                         connectStage = ConnectStage.connected;
                         Log.i("OnLocationChanged", "Success Message: " + message);
                         if (location != null) {
-                            airplaneLocation.Assign(location);
-                            doDeviationLineFromLocation.Assign(location);
-                            Log.i("OnLocationChanged", "Location Changed: " + airplaneLocation.getLatitude() + " "
-                                    + airplaneLocation.getLongitude() + " " + airplaneLocation.getBearing() + " " + airplaneLocation.getSpeed());
+                            vars.airplaneLocation.Assign(location);
+                            vars.doDeviationLineFromLocation.Assign(location);
+                            Log.i("OnLocationChanged", "Location Changed: " + vars.airplaneLocation.getLatitude() + " "
+                                    + vars.airplaneLocation.getLongitude() + " " + vars.airplaneLocation.getBearing() + " " + vars.airplaneLocation.getSpeed());
                             //location.setBearing(90);
-                            trackingLayer.setLocation(airplaneLocation);
-                            mAircraftLocationLayer.UpdateLocation(airplaneLocation);
-                            dashboardFragment.setLocation(airplaneLocation);
+                            trackingLayer.setLocation(vars.airplaneLocation);
+                            mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
+                            dashboardFragment.setLocation(vars.airplaneLocation);
                             //mMap.render();
                         }
                     }

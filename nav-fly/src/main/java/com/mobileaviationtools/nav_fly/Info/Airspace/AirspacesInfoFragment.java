@@ -48,7 +48,7 @@ public class AirspacesInfoFragment extends Fragment {
 
     public void ShowAirspacesInfo(Airspace[] airspaces)
     {
-        if (airspaceAdapter == null) 
+        if (airspaceAdapter == null)
             airspaceAdapter = new AirspaceAdapter(airspaces);
         else airspaceAdapter.setAirspaces(airspaces);
 
