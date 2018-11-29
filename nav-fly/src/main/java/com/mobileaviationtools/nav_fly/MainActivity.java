@@ -28,6 +28,7 @@ import com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment;
 import com.mobileaviationtools.nav_fly.Info.Airspace.AirspacesInfoFragment;
 import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
+import com.mobileaviationtools.nav_fly.Layers.DeviationLineLayer;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
 import com.mobileaviationtools.nav_fly.Location.FspGPSLocationProvider;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
@@ -104,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
     AirspaceLayer mAirspaceLayer;
     Tracking trackingLayer;
     AircraftLocationLayer mAircraftLocationLayer;
+    DeviationLineLayer deviationLineLayer;
+
     Timer clockTimer;
     Timer weatherTimer;
 
@@ -189,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         addMarkerLayers();
         addTrackingLayer();
         addAircraftLocationLayer();
+        addDeviationLineLayer();
 
         setupRouteFragment();
         setupWeatherStations();
@@ -208,6 +212,8 @@ public class MainActivity extends AppCompatActivity {
                     mNavaidsMarkersLayer.UpdateNavaids();
                     mAirspaceLayer.UpdateAirspaces();
                 }
+
+                deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
 
                 //if (mAirportSelectionLayer.getSelected()) mAirportSelectionLayer.unSelectItem();
             }
@@ -356,10 +362,18 @@ public class MainActivity extends AppCompatActivity {
     {
         vars.airplaneLocation = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "AirplaneLocation");
 
+
         mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(vars.map,
                 this, vars.airplaneLocation);
 
         vars.map.layers().add(mAircraftLocationLayer);
+    }
+
+    public void addDeviationLineLayer()
+    {
+        vars.doDeviationLineFromLocation = new FspLocation(vars.airplaneLocation);
+        deviationLineLayer = new DeviationLineLayer(vars.map);
+        deviationLineLayer.setupLayers(vars);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)

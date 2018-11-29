@@ -12,6 +12,7 @@ import com.mobileaviationtools.nav_fly.Route.Leg;
 import org.oscim.android.canvas.AndroidBitmap;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
+import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.MarkerSymbol;
 
 public class RouteLegSymbol extends MarkerSymbol {

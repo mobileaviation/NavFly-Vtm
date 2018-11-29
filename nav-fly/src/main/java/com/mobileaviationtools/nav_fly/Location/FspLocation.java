@@ -30,6 +30,11 @@ public class FspLocation extends Location {
         this.setLongitude(geopoint.getLongitude());
     }
 
+    public GeoPoint getGeopoint()
+    {
+        return new GeoPoint(this.getLatitude(), this.getLongitude());
+    }
+
     public void Assign(FspLocation location)
     {
         this.setLongitude(location.getLongitude());

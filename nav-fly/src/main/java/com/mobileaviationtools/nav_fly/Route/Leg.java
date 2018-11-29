@@ -12,6 +12,16 @@ import org.oscim.core.GeoPoint;
 public class Leg {
     private Context context;
 
+    public Leg(GeoPoint start, GeoPoint end, Context context)
+    {
+        startWaypoint = new Waypoint(start);
+        endWaypoint = new Waypoint(end);
+        startWaypoint.afterLeg = this;
+        endWaypoint.beforeLeg = this;
+        this.context = context;
+        setupRouteVariables(null);
+    }
+
     public Leg(GeoPoint start, GeoPoint end, Route route)
     {
         startWaypoint = new Waypoint(start);
@@ -32,10 +42,12 @@ public class Leg {
 
     public void setupRouteVariables(Route route)
     {
-        this.indicatedAirspeed = route.getIndicatedAirspeed();
-        this.windSpeed = route.getWindSpeed();
-        this.windDirection = route.getWindDirection();
-        this.context = route.context;
+        if (route != null) {
+            this.indicatedAirspeed = route.getIndicatedAirspeed();
+            this.windSpeed = route.getWindSpeed();
+            this.windDirection = route.getWindDirection();
+            this.context = route.context;
+        }
         calculateLegVariables();
         createRouteSymbol();
     }
