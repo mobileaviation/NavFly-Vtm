@@ -104,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
     Tracking trackingLayer;
-    AircraftLocationLayer mAircraftLocationLayer;
-    DeviationLineLayer deviationLineLayer;
 
     Timer clockTimer;
     Timer weatherTimer;
@@ -119,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RouteListFragment routeListFragment;
     private NavigationButtonFragment menu;
-    private DashboardFragment dashboardFragment;
+
 
     private ConnectStage connectStage;
 
@@ -169,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         menu = (NavigationButtonFragment)getSupportFragmentManager().findFragmentById(R.id.menuFragment);
         setupMenuListerners();
 
-        dashboardFragment = (DashboardFragment)getSupportFragmentManager().findFragmentById(R.id.dashboardFragment);
+        vars.dashboardFragment = (DashboardFragment)getSupportFragmentManager().findFragmentById(R.id.dashboardFragment);
 
         mPrefs = new MapPreferences(MainActivity.class.getName(), this);
 
@@ -213,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                     mAirspaceLayer.UpdateAirspaces();
                 }
 
-                deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
+                vars.deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
 
                 //if (mAirportSelectionLayer.getSelected()) mAirportSelectionLayer.unSelectItem();
             }
@@ -229,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dashboardFragment.setZuluTime();
+                        vars.dashboardFragment.setZuluTime();
                     }
                 });
             }
@@ -243,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                 stations.getWeatherData(location, 100l);
             }
         }, 1800000, 1800000);
-        dashboardFragment.setZuluTime();
+        vars.dashboardFragment.setZuluTime();
     }
 
     private void setupWeatherStations()
@@ -258,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        dashboardFragment.setQnh(MainActivity.this.stations.getQNHInfo(vars.map.getMapPosition().getGeoPoint()));
+                        vars.dashboardFragment.setQnh(MainActivity.this.stations.getQNHInfo(vars.map.getMapPosition().getGeoPoint()));
                     }
                 });
 
@@ -363,17 +361,17 @@ public class MainActivity extends AppCompatActivity {
         vars.airplaneLocation = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "AirplaneLocation");
 
 
-        mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(vars.map,
+        vars.mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(vars.map,
                 this, vars.airplaneLocation);
 
-        vars.map.layers().add(mAircraftLocationLayer);
+        vars.map.layers().add(vars.mAircraftLocationLayer);
     }
 
     public void addDeviationLineLayer()
     {
         vars.doDeviationLineFromLocation = new FspLocation(vars.airplaneLocation);
-        deviationLineLayer = new DeviationLineLayer(vars.map);
-        deviationLineLayer.setupLayers(vars);
+        vars.deviationLineLayer = new DeviationLineLayer(vars.map);
+        vars.deviationLineLayer.setupLayers(vars);
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -598,8 +596,8 @@ public class MainActivity extends AppCompatActivity {
                                     + vars.airplaneLocation.getLongitude() + " " + vars.airplaneLocation.getBearing() + " " + vars.airplaneLocation.getSpeed());
                             //location.setBearing(90);
                             trackingLayer.setLocation(vars.airplaneLocation);
-                            mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
-                            dashboardFragment.setLocation(vars.airplaneLocation);
+                            vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
+                            vars.dashboardFragment.setLocation(vars.airplaneLocation);
                             //mMap.render();
                         }
                     }

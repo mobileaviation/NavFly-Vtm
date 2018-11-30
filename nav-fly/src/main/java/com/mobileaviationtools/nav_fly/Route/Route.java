@@ -9,6 +9,7 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Info.Cities;
 import com.mobileaviationtools.nav_fly.Info.City;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
@@ -33,11 +34,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Route extends ArrayList<Waypoint> {
-    public Route(String name, Context context)
+    public Route(String name, GlobalVars vars)
     {
         this.name = name;
         this.id = -1l;
-        this.context = context;
+        this.vars = vars;
         this.createdDate = new Date();
         legs = new ArrayList<>();
     }
@@ -48,7 +49,7 @@ public class Route extends ArrayList<Waypoint> {
     public Long id;
     public Date createdDate;
     public Date modifiedDate;
-    public Context context;
+    public GlobalVars vars;
 
     private Airport SelectedStartAirport;
 
@@ -135,6 +136,7 @@ public class Route extends ArrayList<Waypoint> {
     {
         Waypoint startWaypoint = Waypoint.CreateWaypoint(SelectedStartAirport);
         this.add(startWaypoint);
+        setAirplaneStartLocation();
 
         if (routeEvents != null) routeEvents.NewRouteCreated(this);
     }
@@ -188,7 +190,7 @@ public class Route extends ArrayList<Waypoint> {
 
     private void createNewMarkerLayer(Map map)
     {
-        waypointLayer = new WaypointLayer(map, null, context);
+        waypointLayer = new WaypointLayer(map, null, vars.context);
         map.layers().add(waypointLayer);
         setupWaypointDragging();
         waypointLayer.setMarkerDragEvent(onWaypointDrag);
@@ -216,6 +218,7 @@ public class Route extends ArrayList<Waypoint> {
                     updateLegs(item.getWaypoint());
                     setupRouteVariables();
                     DrawRoute(mMap);
+                    setDeviationLineStartLocation(newLocation);
 
                     if (routeEvents != null) routeEvents.WaypointUpdated(Route.this, item.getWaypoint());
                 }
@@ -245,7 +248,7 @@ public class Route extends ArrayList<Waypoint> {
                         {
                             // Test
                             //routePathLayer.SelectLeg(selectedLeg);
-                            Cities cities = new Cities(context, point);
+                            Cities cities = new Cities(vars.context, point);
                             for (City c : cities)
                             {
                                 Log.i(TAG, "Found City : " + c.name + " distance: " + c.distance.toString());
@@ -256,6 +259,7 @@ public class Route extends ArrayList<Waypoint> {
                             setupRouteVariables();
                             clearPathLayer();
                             DrawRoute(mMap);
+                            setDeviationLineStartLocation(point);
                             if (routeEvents != null) routeEvents.NewWaypointInserted(Route.this, newWaypoint);
                         }
 
@@ -277,6 +281,7 @@ public class Route extends ArrayList<Waypoint> {
         newWaypoint.type = WaypointType.waypoint;
         Integer index = indexOf(selectedLeg.endWaypoint);
         Route.this.add(index, newWaypoint);
+
         return  newWaypoint;
     }
 
@@ -321,7 +326,7 @@ public class Route extends ArrayList<Waypoint> {
 
     public void saveRoute(String name)
     {
-        AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(context);
+        AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(vars.context);
 
         com.mobileaviationtools.airnavdata.Entities.Route routeEntity = new
                 com.mobileaviationtools.airnavdata.Entities.Route();
@@ -375,8 +380,8 @@ public class Route extends ArrayList<Waypoint> {
     public void openRoute(Long routeId, Map map)
     {
         mMap = map;
-        AirnavDatabase a_db = AirnavDatabase.getInstance(context);
-        AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(context);
+        AirnavDatabase a_db = AirnavDatabase.getInstance(vars.context);
+        AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(vars.context);
         com.mobileaviationtools.airnavdata.Entities.Waypoint[] waypoints = db.getWaypoint().GetWaypointsByRouteID(routeId);
 
         for (com.mobileaviationtools.airnavdata.Entities.Waypoint db_waypoint : waypoints)
@@ -422,8 +427,24 @@ public class Route extends ArrayList<Waypoint> {
         createLegs();
         setupRouteVariables();
         DrawRoute(mMap);
+        setAirplaneStartLocation();
 
         if (routeEvents != null) routeEvents.RouteUpdated(this);
+    }
+
+    private void setAirplaneStartLocation()
+    {
+        vars.airplaneLocation.setGeopoint(this.get(0).point);
+        vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
+        vars.dashboardFragment.setLocation(vars.airplaneLocation);
+
+        setDeviationLineStartLocation(this.get(0).point);
+    }
+
+    private void setDeviationLineStartLocation(GeoPoint point)
+    {
+        vars.doDeviationLineFromLocation.setGeopoint(point);
+        vars.deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
     }
 
     public Long GetTotalDistanceFromLocation(FspLocation location)

@@ -46,7 +46,7 @@ public class Leg {
             this.indicatedAirspeed = route.getIndicatedAirspeed();
             this.windSpeed = route.getWindSpeed();
             this.windDirection = route.getWindDirection();
-            this.context = route.context;
+            this.context = route.vars.context;
         }
         calculateLegVariables();
         createRouteSymbol();

@@ -362,7 +362,7 @@ public class RouteListFragment extends Fragment {
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        vars.route = new Route("Route: " + new Date().toString(), getActivity());
+                        vars.route = new Route("Route: " + new Date().toString(), vars);
                         SetRoute();
                     }
                 })                 //Do nothing on no
@@ -424,7 +424,7 @@ public class RouteListFragment extends Fragment {
                         dialogInterface.dismiss();
                         if (selectedRoute != null) {
                             if (vars.route != null) vars.route.ClearRoute(vars.map);
-                            vars.route = new Route(selectedRoute.name, getActivity());
+                            vars.route = new Route(selectedRoute.name, vars);
 
                             vars.route.createdDate = new Date(selectedRoute.createdDate);
                             vars.route.modifiedDate = new Date(selectedRoute.modifiedDate);
