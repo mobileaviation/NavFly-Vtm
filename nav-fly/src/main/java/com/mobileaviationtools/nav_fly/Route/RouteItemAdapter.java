@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkerItem;
@@ -64,8 +65,36 @@ public class RouteItemAdapter extends BaseAdapter {
         Waypoint waypoint = route.get(i);
         waypointNameTextView.setText(waypoint.name);
 
-        waypointLatText.setText(StringFormatter.convertLatitude(waypoint.point.getLatitude()));
-        waypointLonText.setText(StringFormatter.convertLongitude(waypoint.point.getLongitude()));
+        if (waypoint.ref != null)
+        {
+            if (waypoint.ref instanceof Airport)
+            {
+                Airport a = (Airport)waypoint.ref;
+                AirnavDatabase db = AirnavDatabase.getInstance(context);
+                a.frequencies = db.getFrequency().getFrequenciesByAirport(a.id);
+                if (a.frequencies != null) {
+                    if (a.frequencies.size() > 0)
+                        waypointLatText.setText(a.frequencies.get(0).frequency_mhz.toString() + " " +
+                                a.frequencies.get(0).description);
+                    else
+                        waypointLatText.setText(StringFormatter.convertLatitude(waypoint.point.getLatitude()));
+                    if (a.frequencies.size() > 1)
+                        waypointLonText.setText(a.frequencies.get(1).frequency_mhz.toString() + " " +
+                                a.frequencies.get(1).description);
+                    else
+                        waypointLonText.setText(StringFormatter.convertLongitude(waypoint.point.getLongitude()));
+                }
+                else
+                {
+                    waypointLatText.setText(StringFormatter.convertLatitude(waypoint.point.getLatitude()));
+                    waypointLonText.setText(StringFormatter.convertLongitude(waypoint.point.getLongitude()));
+                }
+            }
+        }
+        else {
+            waypointLatText.setText(StringFormatter.convertLatitude(waypoint.point.getLatitude()));
+            waypointLonText.setText(StringFormatter.convertLongitude(waypoint.point.getLongitude()));
+        }
 
         ImageView icon = (ImageView) rowView.findViewById(R.id.waypointIconImage);
         if (waypoint.type == WaypointType.airport) {

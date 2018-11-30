@@ -48,35 +48,50 @@ public class DeviationLineLayer extends VectorLayer {
     public void drawDeviationLine(FspLocation startPoint, FspLocation endPoint)
     {
         clearLine();
-        Style lineStyle1 = Style.builder()
-                .fixed(true)
-                .strokeColor(selectedLegColor)
-                .strokeWidth(lineWidth)
-                .build();
 
-        ArrayList<GeoPoint> points = new ArrayList<>();
-        points.add(startPoint.getGeopoint());
-        points.add(endPoint.getGeopoint());
-        deviationLineDrawable1 = new LineDrawable(points, lineStyle1);
+        if (startPoint.distanceTo(endPoint)>10000) {
 
-        Style lineStyle2 = Style.builder()
-                .fixed(true)
-                .strokeColor(Color.DKGRAY)
-                .strokeWidth(lineWidth + 4)
-                .build();
-        deviationLineDrawable2 = new LineDrawable(points, lineStyle2);
+            Style lineStyle1 = Style.builder()
+                    .fixed(true)
+                    .strokeColor(selectedLegColor)
+                    .strokeWidth(lineWidth)
+                    .build();
 
-        if (legSymbolItem != null) symbolLayer.removeItem(legSymbolItem);
+            ArrayList<GeoPoint> points = new ArrayList<>();
+            points.add(startPoint.getGeopoint());
+            points.add(endPoint.getGeopoint());
+            deviationLineDrawable1 = new LineDrawable(points, lineStyle1);
 
-        deviationLeg = new Leg(startPoint.getGeopoint(), endPoint.getGeopoint(), vars.context);
-        legSymbolItem = new MarkerItem("DeviationSymbol", "DeviationSymbol", endPoint.getGeopoint());
-        legSymbolItem.setMarker(deviationLeg.symbol);
-        legSymbolItem.setRotation((float)deviationLeg.getBearing()+90);
-        symbolLayer.addItem(legSymbolItem);
-        symbolLayer.update();
+            Style lineStyle2 = Style.builder()
+                    .fixed(true)
+                    .strokeColor(Color.DKGRAY)
+                    .strokeWidth(lineWidth + 4)
+                    .build();
+            deviationLineDrawable2 = new LineDrawable(points, lineStyle2);
 
-        this.add(deviationLineDrawable1);
-        this.add(deviationLineDrawable2);
+            //if (legSymbolItem != null) symbolLayer.removeItem(legSymbolItem);
+
+            if (legSymbolItem == null) {
+                legSymbolItem = new MarkerItem("DeviationSymbol", "DeviationSymbol", endPoint.getGeopoint());
+                symbolLayer.addItem(legSymbolItem);
+            }
+
+            deviationLeg = new Leg(startPoint.getGeopoint(), endPoint.getGeopoint(), vars.context);
+            legSymbolItem.setMarker(deviationLeg.symbol);
+            legSymbolItem.setRotation((float) deviationLeg.getBearing() + 90);
+            legSymbolItem.geoPoint = endPoint.getGeopoint();
+
+            this.add(deviationLineDrawable1);
+            this.add(deviationLineDrawable2);
+
+            symbolLayer.populate();
+            symbolLayer.update();
+        }
+        else
+        {
+            symbolLayer.removeAllItems(true);
+            legSymbolItem = null;
+        }
     }
 
     private void clearLine()
