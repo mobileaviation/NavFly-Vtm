@@ -215,6 +215,7 @@ public class Route extends ArrayList<Waypoint> {
                 {
                     WaypointMarkerItem item = (WaypointMarkerItem)markerItem;
                     item.UpdateWaypointLocation(newLocation);
+                    item.getWaypoint().name = waypointName(newLocation);
                     updateLegs(item.getWaypoint());
                     setupRouteVariables();
                     DrawRoute(mMap);
@@ -248,11 +249,7 @@ public class Route extends ArrayList<Waypoint> {
                         {
                             // Test
                             //routePathLayer.SelectLeg(selectedLeg);
-                            Cities cities = new Cities(vars.context, point);
-                            for (City c : cities)
-                            {
-                                Log.i(TAG, "Found City : " + c.name + " distance: " + c.distance.toString());
-                            }
+
 
                             Waypoint newWaypoint = InsertnewWaypoint(point, selectedLeg);
                             createLegs();
@@ -277,12 +274,29 @@ public class Route extends ArrayList<Waypoint> {
     private Waypoint InsertnewWaypoint(GeoPoint point, Leg selectedLeg)
     {
         Waypoint newWaypoint = new Waypoint(point);
-        newWaypoint.name = "LON"+point.longitudeE6 + " LAT"+ point.latitudeE6;
+        newWaypoint.name = waypointName(point);
         newWaypoint.type = WaypointType.waypoint;
         Integer index = indexOf(selectedLeg.endWaypoint);
         Route.this.add(index, newWaypoint);
 
         return  newWaypoint;
+    }
+
+    private String waypointName(GeoPoint point)
+    {
+        Cities cities = new Cities(vars.context, point);
+        String name = "LON"+point.longitudeE6 + " LAT"+ point.latitudeE6;
+        if (cities.size()>0)
+        {
+            City nearestCity = cities.get(cities.getNearestCity());
+            name = nearestCity.name + " " + nearestCity.getDistanceNMStr() + ", " + nearestCity.getBearingStr();
+        }
+
+//        for (City c : cities)
+//        {
+//            Log.i(TAG, "Found City : " + c.name + " distance: " + c.distance.toString());
+//        }
+        return name;
     }
 
     private Leg findLeg(GeoPoint point)

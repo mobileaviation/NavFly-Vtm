@@ -105,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
     AirspaceLayer mAirspaceLayer;
     Tracking trackingLayer;
 
+
+
     Timer clockTimer;
     Timer weatherTimer;
 

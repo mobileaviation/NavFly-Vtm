@@ -24,7 +24,7 @@ public class Cities extends ArrayList<City> {
     private void getCities(GeoPoint location)
     {
         AirnavDatabase db = AirnavDatabase.getInstance(context);
-        Long m = 20l * 1609l;
+        Long m = 40l * 1609l;
         Geometry c = GeometryHelpers.getCircle(location, m);
         Geometry b = c.getEnvelope();
         List<com.mobileaviationtools.airnavdata.Entities.City> entitiesCities = null;
@@ -44,7 +44,7 @@ public class Cities extends ArrayList<City> {
         }
     }
 
-    private Integer getNearestCity()
+    public Integer getNearestCity()
     {
         Double min = Double.MAX_VALUE;
         int index = -1;

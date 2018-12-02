@@ -9,6 +9,8 @@ public class City {
     public Double distance;
     public Double heading;
 
+    private double meterToNMile = 0.000539956803d;
+
     public static City newInstance(com.mobileaviationtools.airnavdata.Entities.City city, GeoPoint location)
     {
         City c = new City();
@@ -18,6 +20,19 @@ public class City {
         c.distance = location.sphericalDistance(new GeoPoint(c.latitude, c.longitude));
         c.heading = location.bearingTo(new GeoPoint(c.latitude, c.longitude));
         return c;
+    }
+
+    public String getBearingStr()
+    {
+        Long h = Math.round(heading);
+        return h.toString()+ "º";
+    }
+
+    public String getDistanceNMStr()
+    {
+        Double dNm = distance * meterToNMile;
+        Long h = Math.round(dNm);
+        return h.toString()+ "NM";
     }
 
 //    @Override
