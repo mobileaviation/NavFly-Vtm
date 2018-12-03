@@ -58,8 +58,8 @@ public class SearchDialog extends DialogFragment {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 
         // Add Fragments to adapter one by one
-        adapter.addFragment(SearchAirportFragment.getInstance(vars), "Text Search");
-//        adapter.addFragment(SettingsFragmentBaseChart.getInstance(context, settingsObject), "Base Chart");
+        adapter.addFragment(SearchAirnavItemsFragment.getInstance(vars), "Text Search");
+        adapter.addFragment(SearchMapFragment.getInstance(vars), "Map Search");
 //        adapter.addFragment(SettingsFragmentAdditionalCharts.getInstance(context, settingsObject), "Extra Charts");
 //        adapter.addFragment(SettingsFragmentOffline.getInstance(context, settingsObject), "Offline");
 //        adapter.addFragment(SettingsFragmentOverlays.getInstance(context, settingsObject), "Overlays");
