@@ -28,4 +28,10 @@ public abstract class NavaidsDao {
 
     @Query("SELECT * FROM tbl_Navaids WHERE id=:id")
     public abstract Navaid getNavaidByID(Long id);
+
+    @Query("SELECT * FROM tbl_Navaids WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat) ORDER BY name LIMIT :limit")
+    public abstract List<Navaid> getNavaidsListWithinBoundsLimit(double Wlon, double Elon, double Nlat, double Slat, Long limit);
+
+    @Query("SELECT * FROM tbl_Navaids WHERE name like :name OR ident like :name ORDER BY name LIMIT :limit")
+    public abstract List<Navaid> searchNaviadsByNameOrIdentLimit(String name, Long limit);
 }

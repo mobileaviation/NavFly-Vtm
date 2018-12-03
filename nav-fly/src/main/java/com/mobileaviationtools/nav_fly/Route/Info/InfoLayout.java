@@ -288,8 +288,8 @@ public class InfoLayout extends LinearLayout {
             Airport[] airports = db.getAirport().getAirportsWithinBoundsByTypes(c1.x, c2.x, c2.y, c1.y, visibleTypes);
             for (Airport a : airports) {
                 if (checkBuf.contains(new GeometryFactory().createPoint(new Coordinate(a.longitude_deg, a.latitude_deg)))) {
-                    a.runways = db.getRunways().getRunwaysByAirport(a.id);
-                    a.frequencies = db.getFrequency().getFrequenciesByAirport(a.id);
+//                    a.runways = db.getRunways().getRunwaysByAirport(a.id);
+//                    a.frequencies = db.getFrequency().getFrequenciesByAirport(a.id);
 
                     airportItems.add(a);
                 }

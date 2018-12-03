@@ -47,6 +47,7 @@ import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
 import com.mobileaviationtools.nav_fly.Route.Weather.DatabaseWeatherServices;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
+import com.mobileaviationtools.nav_fly.Search.SearchDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
@@ -554,12 +555,13 @@ public class MainActivity extends AppCompatActivity {
                     case maptype:
                     {
                         SettingsDialog settingsDialog = SettingsDialog.getInstance(MainActivity.this, settingsObject);
-                        settingsDialog.show(getSupportFragmentManager(), "test");
+                        settingsDialog.show(getSupportFragmentManager(), "Settings");
                         break;
                     }
                     case search:
                     {
-                        String[] qnh = stations.getQNHInfo(vars.map.getMapPosition().getGeoPoint());
+                        SearchDialog searchDialog = SearchDialog.getInstance(vars);
+                        searchDialog.show(getSupportFragmentManager(), "Search");
                         break;
                     }
                     case connectDisconnect:

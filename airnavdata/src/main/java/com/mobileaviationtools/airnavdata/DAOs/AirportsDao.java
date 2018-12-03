@@ -38,4 +38,10 @@ public abstract class AirportsDao {
 
     @Query("SELECT * FROM tbl_Airports WHERE id=:id")
     public abstract Airport getAirportByID(Long id);
+
+    @Query("SELECT * FROM tbl_Airports WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat) ORDER BY name LIMIT :limit")
+    public abstract List<Airport> getAirportListWithinBoundsLimit(double Wlon, double Elon, double Nlat, double Slat, Long limit);
+
+    @Query("SELECT * FROM tbl_Airports WHERE name like :name OR ident like :name ORDER BY name LIMIT :limit")
+    public abstract List<Airport> searchAirportsByNameOrIdentLimit(String name, Long limit);
 }

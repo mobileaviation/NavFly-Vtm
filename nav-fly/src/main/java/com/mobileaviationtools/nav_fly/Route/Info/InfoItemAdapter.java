@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
@@ -83,6 +84,7 @@ public class InfoItemAdapter extends BaseAdapter {
 
         if (station instanceof Airport) {
             Airport a = (Airport)station;
+            getRunwaysAndFrequencies(a);
             icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
             infoNameTextView.setText(a.name);
             infoCodeText.setText(a.ident + ((a.iata_code.isEmpty()) ? "" : " (" + a.iata_code + ")"));
@@ -110,5 +112,12 @@ public class InfoItemAdapter extends BaseAdapter {
 
 
         return rowView;
+    }
+
+    private void getRunwaysAndFrequencies(Airport airport)
+    {
+        AirnavDatabase airnavDatabase = AirnavDatabase.getInstance(context);
+        airport.runways = airnavDatabase.getRunways().getRunwaysByAirport(airport.id);
+        airport.frequencies = airnavDatabase.getFrequency().getFrequenciesByAirport(airport.id);
     }
 }

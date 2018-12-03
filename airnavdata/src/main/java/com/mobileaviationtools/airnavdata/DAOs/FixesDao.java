@@ -30,4 +30,10 @@ public abstract class FixesDao {
 
     @Query("SELECT * FROM tbl_Fixes WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat)")
     public abstract Fix[] getFixessWithinBoundsByTypes(double Wlon, double Elon, double Nlat, double Slat);
+
+    @Query("SELECT * FROM tbl_Fixes WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat) ORDER BY name LIMIT :limit")
+    public abstract List<Fix> getFixesListWithinBoundsLimit(double Wlon, double Elon, double Nlat, double Slat, Long limit);
+
+    @Query("SELECT * FROM tbl_Fixes WHERE name like :name OR ident like :name ORDER BY name LIMIT :limit")
+    public abstract List<Fix> searchFixesByNameOrIdentLimit(String name, Long limit);
 }
