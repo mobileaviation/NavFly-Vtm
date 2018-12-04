@@ -1,11 +1,14 @@
 package com.mobileaviationtools.nav_fly.Search;
 
+import android.support.v4.app.FragmentActivity;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +51,15 @@ public class SearchDialog extends DialogFragment {
         getDialog().getWindow()
                 .setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                         WindowManager.LayoutParams.MATCH_PARENT);
+    }
+
+    @Override
+    public void onDismiss(final DialogInterface dialog) {
+        super.onDismiss(dialog);
+        final FragmentActivity activity = getActivity();
+        if (activity instanceof DialogInterface.OnDismissListener) {
+            ((DialogInterface.OnDismissListener) activity).onDismiss(dialog);
+        }
     }
 
     private GlobalVars vars;

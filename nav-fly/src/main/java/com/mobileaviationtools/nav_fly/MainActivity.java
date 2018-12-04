@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -86,7 +87,7 @@ import java.util.TimerTask;
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DialogInterface.OnDismissListener {
     final static boolean USE_CACHE = true;
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
     final static int REQUEST_INTERNET_ACCESS_SETUPAPP = 11;
@@ -560,7 +561,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case search:
                     {
+                        mPrefs.save(mMapView.map());
+                        mMapView.onPause();
                         SearchDialog searchDialog = SearchDialog.getInstance(vars);
+
                         searchDialog.show(getSupportFragmentManager(), "Search");
                         break;
                     }
@@ -573,6 +577,12 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    public void onDismiss(final DialogInterface dialog) {
+        mPrefs.load(mMapView.map());
+        mMapView.onResume();
     }
 
     private FspLocationProvider locationProvider;

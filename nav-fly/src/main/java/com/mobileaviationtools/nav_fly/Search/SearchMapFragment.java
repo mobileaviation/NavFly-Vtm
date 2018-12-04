@@ -1,33 +1,29 @@
 package com.mobileaviationtools.nav_fly.Search;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
+import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Route.Info.InfoItemAdapter;
 
 import org.oscim.android.MapView;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
-import org.oscim.event.EventDispatcher;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
-import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.map.Map;
-import org.oscim.theme.VtmThemes;
-import org.oscim.tiling.TileSource;
-import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.bitmap.BitmapTileSource;
 import org.oscim.tiling.source.bitmap.DefaultSources;
-import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
+
+import java.util.List;
 
 
 public class SearchMapFragment extends Fragment {
@@ -41,6 +37,9 @@ public class SearchMapFragment extends Fragment {
     private Map map;
     private BitmapTileSource tileSource;
     protected BitmapTileLayer bitmapLayer;
+    private InfoItemAdapter infoItemAdapter;
+    private SearchService service;
+    private ListView searchMapItemsList;
 
     private String TAG = "SearchMapFragment";
 
@@ -72,7 +71,10 @@ public class SearchMapFragment extends Fragment {
         mapView = (MapView) view.findViewById(R.id.searchMapView);
         map = mapView.map();
 
+        searchMapItemsList = (ListView) view.findViewById(R.id.searchMapItemsList);
+
         setupMap();
+        setListViewItemsInit(vars.airplaneLocation.getGeopoint());
 
         return view;
     }
@@ -96,6 +98,7 @@ public class SearchMapFragment extends Fragment {
             public void onInputEvent(Event e, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     GeoPoint point = map.viewport().fromScreenPoint(motionEvent.getX(), motionEvent.getY());
+                    setListViewItemsInit(point);
                     Log.i(TAG, point.toString());
                 }
             }
@@ -109,6 +112,17 @@ public class SearchMapFragment extends Fragment {
             }
         });
     }
+
+    private void setListViewItemsInit(GeoPoint point)
+    {
+        if (service == null) service = new SearchService(vars);
+        if (infoItemAdapter == null) infoItemAdapter = new InfoItemAdapter(vars.context);
+        infoItemAdapter.setAirports(service.getAirportsByLocationLimit(point, 50l));
+        searchMapItemsList.setAdapter(infoItemAdapter);
+        infoItemAdapter.notifyDataSetChanged();
+    }
+
+
 
 
 }

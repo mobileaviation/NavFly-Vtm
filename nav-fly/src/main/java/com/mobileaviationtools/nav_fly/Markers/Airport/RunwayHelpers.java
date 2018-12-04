@@ -98,32 +98,34 @@ public class RunwayHelpers {
     {
         if (boundary != null) {
             Coordinate[] b = boundary.getCoordinates();
-            Coordinate c = center.getCoordinate();
-            double width = Math.abs(b[2].x - b[1].x);
-            double heigth = Math.abs(b[1].y - b[0].y);
-            double canvasWidth = canvas.getWidth();
-            double canvasHeight = canvas.getHeight();
+            if (b.length>3) {
+                Coordinate c = center.getCoordinate();
+                double width = Math.abs(b[2].x - b[1].x);
+                double heigth = Math.abs(b[1].y - b[0].y);
+                double canvasWidth = canvas.getWidth();
+                double canvasHeight = canvas.getHeight();
 
-            double symbolWidth = canvas.getWidth() * 0.6;
-            double symbolHeight = canvas.getHeight() * 0.6;
+                double symbolWidth = canvas.getWidth() * 0.6;
+                double symbolHeight = canvas.getHeight() * 0.6;
 
-            double xFactor = width / symbolWidth;
-            double yFactor = heigth / symbolHeight;
+                double xFactor = width / symbolWidth;
+                double yFactor = heigth / symbolHeight;
 
-            double centerX = Math.abs((c.x) / xFactor);
-            double centerY = Math.abs((c.y) / yFactor);
+                double centerX = Math.abs((c.x) / xFactor);
+                double centerY = Math.abs((c.y) / yFactor);
 
-            double x1 = Math.abs((runway.le_longitude_deg / xFactor));// * Math.cos(Math.toRadians(runway.le_latitude_deg));
-            double x2 = Math.abs((runway.he_longitude_deg / xFactor));// * Math.cos(Math.toRadians(runway.he_latitude_deg));
-            double y1 = Math.abs((runway.le_latitude_deg / yFactor));
-            double y2 = Math.abs((runway.he_latitude_deg / yFactor));
+                double x1 = Math.abs((runway.le_longitude_deg / xFactor));// * Math.cos(Math.toRadians(runway.le_latitude_deg));
+                double x2 = Math.abs((runway.he_longitude_deg / xFactor));// * Math.cos(Math.toRadians(runway.he_latitude_deg));
+                double y1 = Math.abs((runway.le_latitude_deg / yFactor));
+                double y2 = Math.abs((runway.he_latitude_deg / yFactor));
 
-            x1 = (canvasWidth / 2) + (x1 - centerX);
-            x2 = (canvasWidth / 2) + (x2 - centerX);
-            y1 = canvasHeight - ((canvasHeight / 2) + (y1 - centerY));
-            y2 = canvasHeight - ((canvasHeight / 2) + (y2 - centerY));
+                x1 = (canvasWidth / 2) + (x1 - centerX);
+                x2 = (canvasWidth / 2) + (x2 - centerX);
+                y1 = canvasHeight - ((canvasHeight / 2) + (y1 - centerY));
+                y2 = canvasHeight - ((canvasHeight / 2) + (y2 - centerY));
 
-            canvas.drawLine((float) x1, (float) y1, (float) x2, (float) y2, paint);
+                canvas.drawLine((float) x1, (float) y1, (float) x2, (float) y2, paint);
+            }
         }
     }
 
