@@ -42,7 +42,13 @@ public class NotamsItemAdapter extends BaseAdapter {
         View rowView = inflater.inflate(R.layout.notam_list_item, viewGroup, false);
 
         TextView notamsText = (TextView) rowView.findViewById(R.id.notamsItemTxt);
-        notamsText.setText(notams.notamList[i].icaoMessage);
+        TextView notamsNumberText = (TextView) rowView.findViewById(R.id.notamNumberText);
+        TextView notamsEndDateText = (TextView) rowView.findViewById(R.id.notamDataEndText);
+
+
+        notamsText.setText(notams.notamList[i].traditionalMessageFrom4thWord);
+        notamsEndDateText.setText(notams.notamList[i].endDate);
+        notamsNumberText.setText(notams.notamList[i].notamNumber);
 
         return  rowView;
     }
