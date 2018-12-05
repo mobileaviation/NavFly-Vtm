@@ -18,20 +18,29 @@ import android.view.WindowManager;
 
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 import com.mobileaviationtools.nav_fly.Settings.ViewPagerAdapter;
 
 public class SearchDialog extends DialogFragment {
+    public interface OnSearch
+    {
+        public void FoundStation(Station station);
+    }
+
     public SearchDialog()
     {
         super();
     }
 
-    public static SearchDialog getInstance(GlobalVars vars)
+    public static SearchDialog getInstance(GlobalVars vars, OnSearch onSearch)
     {
         SearchDialog searchDialog = new SearchDialog();
         searchDialog.vars = vars;
+        searchDialog.onSearch = onSearch;
         return searchDialog;
     }
+
+    private OnSearch onSearch;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,15 +62,6 @@ public class SearchDialog extends DialogFragment {
                         WindowManager.LayoutParams.MATCH_PARENT);
     }
 
-    @Override
-    public void onDismiss(final DialogInterface dialog) {
-        super.onDismiss(dialog);
-        final FragmentActivity activity = getActivity();
-        if (activity instanceof DialogInterface.OnDismissListener) {
-            ((DialogInterface.OnDismissListener) activity).onDismiss(dialog);
-        }
-    }
-
     private GlobalVars vars;
 
     public void setup(View view)
@@ -70,8 +70,8 @@ public class SearchDialog extends DialogFragment {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 
         // Add Fragments to adapter one by one
-        adapter.addFragment(SearchAirnavItemsFragment.getInstance(vars), "Text Search");
-        adapter.addFragment(SearchMapFragment.getInstance(vars), "Map Search");
+        adapter.addFragment(SearchAirnavItemsFragment.getInstance(vars, onSearch), "Text Search");
+        adapter.addFragment(SearchMapFragment.getInstance(vars, onSearch), "Map Search");
 //        adapter.addFragment(SettingsFragmentAdditionalCharts.getInstance(context, settingsObject), "Extra Charts");
 //        adapter.addFragment(SettingsFragmentOffline.getInstance(context, settingsObject), "Offline");
 //        adapter.addFragment(SettingsFragmentOverlays.getInstance(context, settingsObject), "Overlays");

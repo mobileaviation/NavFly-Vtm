@@ -142,12 +142,12 @@ public class NotamService {
         String query = "searchType=" + searchType.toString() +
                 "&designatorsForLocation=" + icao +
                 "&designatorForAccountable=" +
-                "&latDegrees=" + gmsGeoPoint.latitude.degrees.toString() +
-                "&latMinutes=" + gmsGeoPoint.latitude.minutes.toString() +
-                "&latSeconds=" + gmsGeoPoint.latitude.seconds.toString() +
-                "&longDegrees=" + gmsGeoPoint.longitude.degrees.toString() +
-                "&longMinutes=" + gmsGeoPoint.longitude.minutes.toString() +
-                "&longSeconds=" + gmsGeoPoint.longitude.seconds.toString() +
+                "&latDegrees=" + Math.abs(gmsGeoPoint.latitude.degrees) +
+                "&latMinutes=" + Math.abs(gmsGeoPoint.latitude.minutes) +
+                "&latSeconds=" + Math.abs(gmsGeoPoint.latitude.seconds) +
+                "&longDegrees=" + Math.abs(gmsGeoPoint.longitude.degrees) +
+                "&longMinutes=" + Math.abs(gmsGeoPoint.longitude.minutes) +
+                "&longSeconds=" + Math.abs(gmsGeoPoint.longitude.seconds) +
                 "&radius=" + radius.toString() +
                 "&sortColumns=5+false" +
                 "&sortDirection=true" +

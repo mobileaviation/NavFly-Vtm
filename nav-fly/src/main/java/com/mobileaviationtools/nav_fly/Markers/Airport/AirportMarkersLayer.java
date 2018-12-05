@@ -48,6 +48,11 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     private List<CombinedMarkerItem>  all_items;
     private List<String> visibleTypes;
 
+    public void SelectAirport(Airport airport)
+    {
+
+    }
+
     private AirportSelected airportSelected;
     public void SetOnAirportSelected(AirportSelected airportSelected)
     {

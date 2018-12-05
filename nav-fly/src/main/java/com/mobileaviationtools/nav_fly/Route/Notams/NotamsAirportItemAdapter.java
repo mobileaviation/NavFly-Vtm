@@ -63,14 +63,32 @@ public class NotamsAirportItemAdapter extends BaseAdapter {
         TextView airportCountText = (TextView) rowView.findViewById(R.id.notamAirportCountTxt);
 
         Airport a = db.getAirport().getAirportByIdent(notamCount.icaoId);
-        a.runways = db.getRunways().getRunwaysByAirport(a.id);
+        try {
+            if (a != null) {
+                if (a.id != null) {
+                    a.runways = db.getRunways().getRunwaysByAirport(a.id);
 
-        icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
+                    icon.setImageBitmap(AirportMarkerItem.GetMarkerBitmap(a));
 
-        airportNameTextView.setText(a.name);
-        airportCountText.setText(notamCount.notamCount.toString());
-        airportIcaoText.setText(a.ident);
-
+                    airportNameTextView.setText(a.name);
+                    airportCountText.setText(notamCount.notamCount.toString());
+                    airportIcaoText.setText(a.ident);
+                } else {
+                    airportNameTextView.setText(notamCount.name);
+                    airportCountText.setText(notamCount.notamCount.toString());
+                    airportIcaoText.setText(notamCount.icaoId);
+                }
+            }
+            else {
+                airportNameTextView.setText(notamCount.name);
+                airportCountText.setText(notamCount.notamCount.toString());
+                airportIcaoText.setText(notamCount.icaoId);
+            }
+        }
+        catch (Exception ee)
+        {
+            int ii=1;
+        }
         return rowView;
     }
 }

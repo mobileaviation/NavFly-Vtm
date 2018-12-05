@@ -8,6 +8,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -19,6 +20,7 @@ import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Info.InfoItemAdapter;
+import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -35,13 +37,16 @@ public class SearchAirnavItemsFragment extends Fragment {
     }
 
     private static SearchAirnavItemsFragment instance;
+    private SearchDialog.OnSearch onSearch;
+    private AdapterView.OnItemClickListener onListItemClickListener;
 
-    public static SearchAirnavItemsFragment getInstance(GlobalVars vars)
+    public static SearchAirnavItemsFragment getInstance(GlobalVars vars, SearchDialog.OnSearch onSearch)
     {
         if (instance == null) {
             SearchAirnavItemsFragment instance = new SearchAirnavItemsFragment();
             instance.vars = vars;
             instance.service = new SearchService(instance.vars);
+            instance.onSearch = onSearch;
             return instance;
         }
         else
@@ -111,6 +116,23 @@ public class SearchAirnavItemsFragment extends Fragment {
         airportsListView.setAdapter(infoAirportItemAdapter);
         navaidsListView.setAdapter(infoNavaidsItemAdapter);
         fixesListView.setAdapter(infoFixesItemAdapter);
+
+        onListItemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Object station = adapterView.getAdapter().getItem(i);
+                Station s = new Station(vars.context);
+                if (station instanceof Airport)  s.airport = (Airport)station;
+                if (station instanceof Navaid)  s.navaid = (Navaid)station;
+                if (station instanceof Fix)  s.fix = (Fix)station;
+
+                if(onSearch != null) onSearch.FoundStation(s);
+            }
+        };
+
+        airportsListView.setOnItemClickListener(onListItemClickListener);
+        navaidsListView.setOnItemClickListener(onListItemClickListener);
+        fixesListView.setOnItemClickListener(onListItemClickListener);
 
         return view;
     }

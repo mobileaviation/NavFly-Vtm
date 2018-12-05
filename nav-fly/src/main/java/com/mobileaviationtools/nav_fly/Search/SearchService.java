@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly.Search;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.AirportType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
@@ -10,7 +11,9 @@ import com.mobileaviationtools.nav_fly.GlobalVars;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.oscim.core.GeoPoint;
+import org.oscim.utils.pool.Inlist;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchService {
@@ -28,12 +31,21 @@ public class SearchService {
         return b.getCoordinates();
     }
 
+    private List<String> getAirportTypes()
+    {
+        ArrayList<String> types = new ArrayList<>();
+        types.add(AirportType.large_airport.toString());
+        types.add(AirportType.medium_airport.toString());
+        types.add(AirportType.small_airport.toString());
+        return types;
+    }
+
     public List<Airport> searchAirports(String searchString, Long limit)
     {
         String s = "%" + searchString + "%";
 
         AirnavDatabase db = AirnavDatabase.getInstance(vars.context);
-        List<Airport> airports = db.getAirport().searchAirportsByNameOrIdentLimit(s, limit);
+        List<Airport> airports = db.getAirport().searchAirportsByNameOrIdentLimitType(s, limit, getAirportTypes());
 
         return airports;
     }
@@ -46,10 +58,10 @@ public class SearchService {
         List<Airport> airports = null;
         if (coordinates.length>3) {
             airports =
-                    db.getAirport().getAirportListWithinBoundsLimit(coordinates[0].x,
+                    db.getAirport().getAirportListWithinBoundsLimitType(coordinates[0].x,
                             coordinates[2].x,
                             coordinates[2].y,
-                            coordinates[0].y, limit);
+                            coordinates[0].y, limit, getAirportTypes());
         }
         return airports;
     }

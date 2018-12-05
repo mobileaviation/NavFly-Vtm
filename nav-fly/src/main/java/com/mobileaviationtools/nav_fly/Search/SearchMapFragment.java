@@ -4,24 +4,28 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Fix;
+import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Info.InfoItemAdapter;
+import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 
-import org.oscim.android.MapView;
+
 import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
-import org.oscim.event.Event;
-import org.oscim.event.MotionEvent;
-import org.oscim.layers.tile.bitmap.BitmapTileLayer;
-import org.oscim.map.Map;
-import org.oscim.tiling.source.bitmap.BitmapTileSource;
-import org.oscim.tiling.source.bitmap.DefaultSources;
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
 
 import java.util.List;
 
@@ -34,20 +38,19 @@ public class SearchMapFragment extends Fragment {
     private static SearchMapFragment instance;
     private View view;
     private MapView mapView;
-    private Map map;
-    private BitmapTileSource tileSource;
-    protected BitmapTileLayer bitmapLayer;
     private InfoItemAdapter infoItemAdapter;
     private SearchService service;
     private ListView searchMapItemsList;
+    private SearchDialog.OnSearch onSearch;
 
     private String TAG = "SearchMapFragment";
 
-    public static SearchMapFragment getInstance(GlobalVars vars)
+    public static SearchMapFragment getInstance(GlobalVars vars, SearchDialog.OnSearch onSearch)
     {
         if (instance == null) {
             SearchMapFragment instance = new SearchMapFragment();
             instance.vars = vars;
+            instance.onSearch = onSearch;
             return instance;
         }
         else
@@ -69,48 +72,43 @@ public class SearchMapFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_search_map, container, false);
 
         mapView = (MapView) view.findViewById(R.id.searchMapView);
-        map = mapView.map();
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.getController().setZoom(2d);
+        mapView.setTilesScaledToDpi(true);
 
         searchMapItemsList = (ListView) view.findViewById(R.id.searchMapItemsList);
+        searchMapItemsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Object station = adapterView.getAdapter().getItem(i);
+                Station s = new Station(vars.context);
+                if (station instanceof Airport)  s.airport = (Airport)station;
+                if (station instanceof Navaid)  s.navaid = (Navaid)station;
+                if (station instanceof Fix)  s.fix = (Fix)station;
+
+                if(onSearch != null) onSearch.FoundStation(s);
+            }
+        });
 
         setupMap();
-        setListViewItemsInit(vars.airplaneLocation.getGeopoint());
-
         return view;
     }
 
     private void setupMap()
     {
-        tileSource = DefaultSources.OPENSTREETMAP.build();
-        bitmapLayer = new BitmapTileLayer(map, tileSource);
-        map.layers().add(bitmapLayer);
-
-        MapPosition pos = new MapPosition();
-//        map.getMapPosition(pos);
-//        if (pos.x == 0.5 && pos.y == 0.5)
-//            map.setMapPosition(52.4603, 5.5272, Math.pow(2, 14));
-        pos.set(0.5337957775766722, 0.43120260749218736, 4.0, 0.0f, 0.0f, 0.0f);
-        map.setMapPosition(pos);
-
-
-        map.input.bind(new Map.InputListener() {
+        mapView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onInputEvent(Event e, MotionEvent motionEvent) {
+            public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    GeoPoint point = map.viewport().fromScreenPoint(motionEvent.getX(), motionEvent.getY());
-                    setListViewItemsInit(point);
-                    Log.i(TAG, point.toString());
+                    IGeoPoint g = mapView.getProjection().fromPixels((int) motionEvent.getX(), (int) motionEvent.getY());
+                    Log.i(TAG, motionEvent.toString() + " " + g.toString());
+                    GeoPoint geoPoint = new GeoPoint(g.getLatitude(), g.getLongitude());
+                    setListViewItemsInit(geoPoint);
                 }
+                return false;
             }
         });
-        map.events.bind(new Map.UpdateListener() {
-            @Override
-            public void onMapEvent(Event e, MapPosition mapPosition) {
-                MapPosition pos = new MapPosition();
-                pos.set(mapPosition.x, mapPosition.y, 4.0, 0.0f,0.0f, 0.0f);
-                map.setMapPosition(pos);
-            }
-        });
+
     }
 
     private void setListViewItemsInit(GeoPoint point)

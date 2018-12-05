@@ -44,4 +44,11 @@ public abstract class AirportsDao {
 
     @Query("SELECT * FROM tbl_Airports WHERE name like :name OR ident like :name ORDER BY name LIMIT :limit")
     public abstract List<Airport> searchAirportsByNameOrIdentLimit(String name, Long limit);
+
+    @Query("SELECT * FROM tbl_Airports WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat) AND type IN (:types) ORDER BY name LIMIT :limit")
+    public abstract List<Airport> getAirportListWithinBoundsLimitType(double Wlon, double Elon, double Nlat, double Slat, Long limit, List<String> types);
+
+    @Query("SELECT * FROM tbl_Airports WHERE (name like :name OR ident like :name) AND type IN (:types) ORDER BY name LIMIT :limit")
+    public abstract List<Airport> searchAirportsByNameOrIdentLimitType(String name, Long limit, List<String> types);
+
 }

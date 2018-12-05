@@ -47,6 +47,7 @@ import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
 import com.mobileaviationtools.nav_fly.Route.Weather.DatabaseWeatherServices;
+import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.nav_fly.Search.SearchDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
@@ -87,12 +88,13 @@ import java.util.TimerTask;
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
 
-public class MainActivity extends AppCompatActivity implements DialogInterface.OnDismissListener {
+public class MainActivity extends AppCompatActivity {
     final static boolean USE_CACHE = true;
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
     final static int REQUEST_INTERNET_ACCESS_SETUPAPP = 11;
     final static int REQUEST_LOCATION_GPS = 12;
     final static int REQUEST_WAKELOCK_SETUPAPP = 13;
+    final static int REQUEST_SEARCH_DIALOG = 14;
     final String TAG = "MainActivity";
 
     public GlobalVars vars;
@@ -406,6 +408,9 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             if (requestCode == REQUEST_WAKELOCK_SETUPAPP)
                 setupWakeLock();
 
+            if (requestCode == REQUEST_SEARCH_DIALOG)
+                showSearchDialog();
+
             return;
         }
 
@@ -561,11 +566,15 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     }
                     case search:
                     {
-                        mPrefs.save(mMapView.map());
-                        mMapView.onPause();
-                        SearchDialog searchDialog = SearchDialog.getInstance(vars);
-
-                        searchDialog.show(getSupportFragmentManager(), "Search");
+                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )
+                        {
+                            showSearchDialog();
+                        }
+                        else
+                        {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_SEARCH_DIALOG );
+                        }
                         break;
                     }
                     case connectDisconnect:
@@ -579,10 +588,26 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         });
     }
 
-    @Override
-    public void onDismiss(final DialogInterface dialog) {
-        mPrefs.load(mMapView.map());
-        mMapView.onResume();
+    private SearchDialog searchDialog;
+    private void showSearchDialog()
+    {
+        searchDialog = SearchDialog.getInstance(vars, new SearchDialog.OnSearch() {
+            @Override
+            public void FoundStation(Station station) {
+                GeoPoint g = null;
+                if (station.airport != null) g = new GeoPoint(station.airport.latitude_deg, station.airport.longitude_deg);
+                if (station.navaid != null) g = new GeoPoint(station.navaid.latitude_deg, station.navaid.longitude_deg);
+                if (station.fix != null) g = new GeoPoint(station.fix.latitude_deg, station.fix.longitude_deg);
+                if (g != null)
+                {
+                    MapPosition pos = vars.map.getMapPosition();
+                    pos.setPosition(g);
+                    vars.map.setMapPosition(pos);
+                }
+                searchDialog.dismiss();
+            }
+        });
+        searchDialog.show(getSupportFragmentManager(), "Search");
     }
 
     private FspLocationProvider locationProvider;

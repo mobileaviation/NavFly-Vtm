@@ -5,6 +5,8 @@ import android.content.Context;
 import com.mobileaviationtools.airnavdata.AirnavAirportInfoDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
+import com.mobileaviationtools.airnavdata.Entities.Fix;
+import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Classes.MapperHelper;
 import com.mobileaviationtools.weater_notam_data.weather.Metar;
 import com.mobileaviationtools.weater_notam_data.weather.Taf;
@@ -64,6 +66,8 @@ public class Station {
     }
 
     public Airport airport;
+    public Navaid navaid;
+    public Fix fix;
 
     @Override
     public boolean equals(Object station)
