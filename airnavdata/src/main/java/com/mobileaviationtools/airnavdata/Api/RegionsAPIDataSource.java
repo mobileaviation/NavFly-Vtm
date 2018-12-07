@@ -73,7 +73,7 @@ public class RegionsAPIDataSource {
                         Log.i(TAG, "Finished reading Regions");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.regions);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.regions, "");
                     }
                 }
                 else

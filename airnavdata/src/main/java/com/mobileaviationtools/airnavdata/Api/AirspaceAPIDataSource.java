@@ -99,7 +99,7 @@ public class AirspaceAPIDataSource {
                         Log.i(TAG, "Finished reading Airspaces");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.airspaces);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.airspaces, continent);
                     }
                 }
                 else

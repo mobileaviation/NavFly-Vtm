@@ -91,7 +91,7 @@ public class NavaidAPIDataSource {
                         Log.i(TAG, "Finished reading Navaids");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.navaids);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.navaids, continent);
                     }
                 }
                 else

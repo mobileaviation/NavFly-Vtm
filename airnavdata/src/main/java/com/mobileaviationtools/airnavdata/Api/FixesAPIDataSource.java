@@ -92,7 +92,7 @@ public class FixesAPIDataSource {
                         Log.i(TAG, "Finished reading Fixes");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.fixes);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.fixes, continent);
                     }
                 }
                 else

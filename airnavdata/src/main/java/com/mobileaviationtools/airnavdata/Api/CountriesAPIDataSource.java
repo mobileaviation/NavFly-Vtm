@@ -73,7 +73,7 @@ public class CountriesAPIDataSource {
                         Log.i(TAG, "Finished reading Countries");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.countries);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.countries, "");
                     }
                 }
                 else

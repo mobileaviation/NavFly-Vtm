@@ -14,10 +14,14 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
 import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Classes.DataDownloadStatusEvent;
 import com.mobileaviationtools.airnavdata.Classes.TableType;
+import com.mobileaviationtools.airnavdata.Entities.Database;
 import com.mobileaviationtools.airnavdata.Models.Statistics;
+
+import java.util.Date;
 
 public class DatabaseDownloadActivity extends AppCompatActivity {
 
@@ -36,6 +40,7 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
     private Integer finishedCount;
     private String continent;
     private String TAG = "DatabaseDownloadActivity";
+    private Integer version;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,8 +122,17 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void OnFinished(TableType tableType) {
+                        public void OnFinished(TableType tableType, String continent) {
                             finishedCount++;
+
+                            AirnavUserSettingsDatabase db = AirnavUserSettingsDatabase.getInstance(DatabaseDownloadActivity.this);
+                            Database database = new Database();
+                            database.continent = continent;
+                            database.download_date = new Date();
+                            database.version = version;
+                            database.database_name = tableType.toString();
+                            db.getDatabase().InsertDatabase(database);
+
                             if (finishedCount == 9) {
                                 actionBtn.setText("Close");
                                 actionBtn.setTag(true);
@@ -142,13 +156,13 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
                             ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.navaidsCountTxt)).setText(statistics.NavaidsCount.toString());
                             ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.chartsCountTxt)).setText(statistics.MBTilesCount.toString());
                             ((TextView) DatabaseDownloadActivity.this.findViewById(R.id.citiesCountTxt)).setText(statistics.CitiesCount.toString());
-
+                            version = statistics.Version;
                         }
 
 
                     });
 
-                    airnavClient.StartDownload("EU");
+                    airnavClient.StartDownload(continent);
                 }
                 else
                 {

@@ -73,7 +73,7 @@ public class FirsAPIDataSource {
                         Log.i(TAG, "Finished reading Firs");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.firs);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.firs, "");
                     }
                 }
                 else

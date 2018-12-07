@@ -96,7 +96,7 @@ public class AirportsAPIDataSource {
                         Log.i(TAG, "Finished reading Airports");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.airports);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.airports, continent);
                     }
                 }
                 else

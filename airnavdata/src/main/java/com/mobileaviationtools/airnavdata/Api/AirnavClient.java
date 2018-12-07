@@ -154,9 +154,9 @@ public class AirnavClient {
             }
 
             @Override
-            public void OnFinished(TableType tableType) {
+            public void OnFinished(TableType tableType, String continent) {
                 Log.i(TAG, "OnFinished: " + tableType.toString());
-                if (responseStatus!= null) responseStatus.OnFinished(tableType);
+                if (responseStatus!= null) responseStatus.OnFinished(tableType, continent);
             }
 
             @Override

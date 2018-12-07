@@ -92,7 +92,7 @@ public class CitiesAPIDataSource {
                         Log.i(TAG, "Finished reading Countries");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.cities);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.cities, continent);
                     }
                 }
                 else

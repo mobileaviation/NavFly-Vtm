@@ -74,7 +74,7 @@ public class MBTilesAPIDataSource {
                         Log.i(TAG, "Finished reading Countries");
                         db.setTransactionSuccessful();
                         db.endTransaction();
-                        if (statusEvent != null) statusEvent.OnFinished(TableType.mbtiles);
+                        if (statusEvent != null) statusEvent.OnFinished(TableType.mbtiles, "");
                     }
                 }
                 else
