@@ -6,9 +6,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.mobileaviationtools.airnavdata.Api.AirnavClient;
@@ -28,13 +31,19 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
     private ProgressBar airspacesProgressBar;
     private ProgressBar chartsProgressBar;
     private ProgressBar citiesProgressBar;
+    private RadioGroup continentsGroup;
 
     private Integer finishedCount;
+    private String continent;
+    private String TAG = "DatabaseDownloadActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_database_download);
+        continent = "NA";
+
+        continentsGroup = (RadioGroup) this.findViewById(R.id.continent_radiogroup);
 
         actionBtn = (Button)this.findViewById(R.id.downloadDatabasesBtn);
         actionBtn.setTag(false);
@@ -48,6 +57,16 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
         airspacesProgressBar = (ProgressBar)this.findViewById(R.id.airspacesProgress);
         chartsProgressBar = (ProgressBar)this.findViewById(R.id.chartsProgress);
         citiesProgressBar = (ProgressBar)this.findViewById(R.id.citiesProgress);
+
+        continentsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                int id = group.getCheckedRadioButtonId();
+                RadioButton r = (RadioButton) group.findViewById(id);
+                continent = r.getTag().toString();
+                Log.i(TAG, "Selected continent: " + continent);
+            }
+        });
 
         actionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,7 +148,7 @@ public class DatabaseDownloadActivity extends AppCompatActivity {
 
                     });
 
-                    airnavClient.StartDownload();
+                    airnavClient.StartDownload("EU");
                 }
                 else
                 {

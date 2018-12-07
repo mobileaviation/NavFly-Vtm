@@ -40,17 +40,32 @@ public class StatisticsAPIDataSource {
     {
         @GET("v1/airnavdb/statistics")
         Call<Statistics> getStatistics();
+
+        @GET("v1/airnavdb/statistics/{continent}")
+        Call<Statistics> getStatisticsByContinent(@Path("continent") String continent);
     }
 
     public void GetStatistics()
     {
-        doCall();
+        doCall("");
     }
 
-    private void doCall()
+    public void GetStatisticsByContinent(String continent)
+    {
+        doCall(continent);
+    }
+
+    private void doCall(String continent)
     {
         StatisticsService service = retrofit.create(StatisticsService.class);
-        Call<Statistics> statisticsCall = service.getStatistics();
+
+        Call<Statistics> statisticsCall;
+        if (continent.length()==0) {
+            statisticsCall = service.getStatistics();
+        } else
+        {
+            statisticsCall = service.getStatisticsByContinent(continent);
+        }
         statisticsCall.enqueue(new Callback<Statistics>() {
             @Override
             public void onResponse(Call<Statistics> call, Response<Statistics> response) {

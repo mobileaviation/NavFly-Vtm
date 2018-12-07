@@ -46,22 +46,41 @@ public class CitiesAPIDataSource {
     {
         @GET("v1/airnavdb/cities/limit/{start}/{count}")
         Call<List<City>> getCities(@Path("start") int start, @Path("count") int count);
+
+        @GET("v1/airnavdb/cities/limit/{continent}/{start}/{count}")
+        Call<List<City>> getCitiesByContinent(@Path("start") int start, @Path("count") int count, @Path("continent") String continent);
     }
 
     public void loadcities(int totalCount) {
         this.totalCount = totalCount;
         this.position= 0;
+        this.continent = "";
+        db.beginTransaction();
+        doCall();
+    }
+
+    public void loadcitiesByContinent(int totalCount, String continent) {
+        this.totalCount = totalCount;
+        this.position= 0;
+        this.continent = continent;
         db.beginTransaction();
         doCall();
     }
 
     private int totalCount;
     private int position;
+    private String continent;
 
     private void doCall()
     {
         CitiesAPIDataSource.CitiesService service = retrofit.create(CitiesAPIDataSource.CitiesService.class);
-        Call<List<City>> citiesCall = service.getCities(position, 500);
+        Call<List<City>> citiesCall;
+        if (continent.length()==0) {
+            citiesCall = service.getCities(position, 500);
+        } else
+        {
+            citiesCall = service.getCitiesByContinent(position, 500, continent);
+        }
         citiesCall.enqueue(new Callback<List<City>>() {
             @Override
             public void onResponse(Call<List<City>> call, Response<List<City>> response) {

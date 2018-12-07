@@ -46,22 +46,41 @@ public class FixesAPIDataSource {
     {
         @GET("v1/airnavdb/fixes/limit/{start}/{count}")
         Call<List<Fix>> getFixes(@Path("start") int start, @Path("count") int count);
+
+        @GET("v1/airnavdb/fixes/limit/{continent}/{start}/{count}")
+        Call<List<Fix>> getFixesByContinent(@Path("start") int start, @Path("count") int count, @Path("continent") String continent);
     }
 
     public void loadfixes(int totalCount) {
         this.totalCount = totalCount;
         this.position= 0;
+        this.continent = "";
+        db.beginTransaction();
+        doCall();
+    }
+
+    public void loadfixesByContinent(int totalCount, String continent) {
+        this.totalCount = totalCount;
+        this.position= 0;
+        this.continent = continent;
         db.beginTransaction();
         doCall();
     }
 
     private int totalCount;
     private int position;
+    private String continent;
 
     private void doCall()
     {
         FixesAPIDataSource.FixesService service = retrofit.create(FixesAPIDataSource.FixesService.class);
-        Call<List<Fix>> fixesCall = service.getFixes(position, 500);
+        Call<List<Fix>> fixesCall;
+        if (continent.length()==0) {
+            fixesCall = service.getFixes(position, 500);
+        }else
+        {
+            fixesCall = service.getFixesByContinent(position, 500, continent);
+        }
         fixesCall.enqueue(new Callback<List<Fix>>() {
             @Override
             public void onResponse(Call<List<Fix>> call, Response<List<Fix>> response) {

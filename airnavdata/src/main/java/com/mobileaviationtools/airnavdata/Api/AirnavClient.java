@@ -49,7 +49,7 @@ public class AirnavClient {
 
     private String TAG = "AirnavClient";
 
-    public void StartDownload()
+    public void StartDownload(final String continent)
     {
         StatisticsAPIDataSource statisticsAPIDataSource = new StatisticsAPIDataSource(context, retrofit);
         statisticsAPIDataSource.SetStatusEvent(new StatisticsEvent() {
@@ -59,7 +59,7 @@ public class AirnavClient {
 
                 // TODO clear databases
 
-                retrieveDatabases(statistics);
+                retrieveDatabases(statistics, continent);
             }
 
             @Override
@@ -68,17 +68,32 @@ public class AirnavClient {
             }
         });
 
-        statisticsAPIDataSource.GetStatistics();
+        if (continent.length()==0)
+            statisticsAPIDataSource.GetStatistics();
+        else
+            statisticsAPIDataSource.GetStatisticsByContinent(continent);
     }
 
-    private void retrieveDatabases(Statistics statistics){
+    private void retrieveDatabases(Statistics statistics, String continent){
         NavaidAPIDataSource navaidAPIDataSource = new NavaidAPIDataSource(context, retrofit);
         navaidAPIDataSource.SetStatusEvent(clientStatus);
-        navaidAPIDataSource.loadNavaids(statistics.NavaidsCount);
+        if (continent.length()==0) {
+            navaidAPIDataSource.loadNavaids(statistics.NavaidsCount);
+        }
+        else
+        {
+            navaidAPIDataSource.loadNavaidsByContinent(statistics.NavaidsCount, continent);
+        }
 
         AirportsAPIDataSource airportsAPIDataSource= new AirportsAPIDataSource(context, retrofit);
         airportsAPIDataSource.SetStatusEvent(clientStatus);
-        airportsAPIDataSource.loadAirports(statistics.AirportsCount);
+        if (continent.length()==0) {
+            airportsAPIDataSource.loadAirports(statistics.AirportsCount);
+        }
+        else
+        {
+            airportsAPIDataSource.loadAirportsByContinent(statistics.AirportsCount, continent);
+        }
 
         CountriesAPIDataSource countriesAPIDataSource= new CountriesAPIDataSource(context, retrofit);
         countriesAPIDataSource.SetStatusEvent(clientStatus);
@@ -94,11 +109,23 @@ public class AirnavClient {
 
         FixesAPIDataSource fixesAPIDataSource= new FixesAPIDataSource(context, retrofit);
         fixesAPIDataSource.SetStatusEvent(clientStatus);
-        fixesAPIDataSource.loadfixes(statistics.FixesCount);
+        if (continent.length()==0) {
+            fixesAPIDataSource.loadfixes(statistics.FixesCount);
+        }
+        else
+        {
+            fixesAPIDataSource.loadfixesByContinent(statistics.FixesCount, continent);
+        }
 
         AirspaceAPIDataSource airspaceAPIDataSource= new AirspaceAPIDataSource(context, retrofit);
         airspaceAPIDataSource.SetStatusEvent(clientStatus);
-        airspaceAPIDataSource.loadAirspaces(statistics.AirspacesCount);
+        if (continent.length()==0) {
+            airspaceAPIDataSource.loadAirspaces(statistics.AirspacesCount);
+        }
+        else
+        {
+            airspaceAPIDataSource.loadAirspacesByContinent(statistics.AirspacesCount, continent);
+        }
 
         MBTilesAPIDataSource mbTilesAPIDataSource= new MBTilesAPIDataSource(context, retrofit);
         mbTilesAPIDataSource.SetStatusEvent(clientStatus);
@@ -106,7 +133,13 @@ public class AirnavClient {
 
         CitiesAPIDataSource citiesAPIDataSource = new CitiesAPIDataSource(context, retrofit);
         citiesAPIDataSource.SetStatusEvent(clientStatus);
-        citiesAPIDataSource.loadcities(statistics.CitiesCount);
+        if (continent.length()==0) {
+            citiesAPIDataSource.loadcities(statistics.CitiesCount);
+        }
+        else
+        {
+            citiesAPIDataSource.loadcitiesByContinent(statistics.CitiesCount, continent);
+        }
     }
 
     private void setClientDownloadStatus()

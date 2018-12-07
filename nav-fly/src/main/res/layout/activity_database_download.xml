@@ -36,6 +36,100 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <RadioGroup
+                    android:id="@+id/continent_radiogroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:checkedButton="@id/region_na_btn">
+
+                    <RadioButton
+                        android:id="@+id/region_al_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:tag="ALL"
+                        android:paddingRight="10dp"
+                        android:text="All"
+                        android:textSize="8sp" />
+
+                    <RadioButton
+                        android:id="@+id/region_na_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:tag="NA"
+                        android:paddingRight="10dp"
+                        android:text="North America"
+                        android:textSize="8sp" />
+
+                    <RadioButton
+                        android:id="@+id/region_sa_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:tag="SA"
+                        android:paddingRight="10dp"
+                        android:text="South America"
+                        android:textSize="8sp" />
+
+                    <RadioButton
+                        android:id="@+id/region_as_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:tag="AS"
+                        android:paddingRight="10dp"
+                        android:text="Asia"
+                        android:textSize="8sp" />
+
+                    <RadioButton
+                        android:id="@+id/region_eu_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:tag="EU"
+                        android:paddingRight="10dp"
+                        android:text="Europe"
+                        android:textSize="8sp" />
+
+                    <RadioButton
+                        android:id="@+id/region_af_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:tag="AF"
+                        android:paddingRight="10dp"
+                        android:text="Africa"
+                        android:textSize="8sp" />
+
+                    <RadioButton
+                        android:id="@+id/region_au_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:tag="AU"
+                        android:paddingRight="10dp"
+                        android:text="Australia"
+                        android:textSize="8sp" />
+
+                    <RadioButton
+                        android:id="@+id/region_oc_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:tag="OC"
+                        android:paddingRight="10dp"
+                        android:text="Oceania"
+                        android:textSize="8sp" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">

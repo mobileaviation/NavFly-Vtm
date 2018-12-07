@@ -46,22 +46,40 @@ public class NavaidAPIDataSource {
     {
         @GET("v1/airnavdb/navaids/limit/{start}/{count}")
         Call<List<Navaid>> getNavaids(@Path("start") int start, @Path("count") int count);
+        @GET("v1/airnavdb/navaids/limit/{continent}/{start}/{count}")
+        Call<List<Navaid>> getNavaidsByContinent(@Path("start") int start, @Path("count") int count, @Path("continent") String continent);
     }
 
     public void loadNavaids(int totalCount) {
         this.totalCount = totalCount;
         this.position= 0;
+        this.continent = "";
+        db.beginTransaction();
+        doCall();
+    }
+
+    public void loadNavaidsByContinent(int totalCount, String continent) {
+        this.totalCount = totalCount;
+        this.position= 0;
+        this.continent = continent;
         db.beginTransaction();
         doCall();
     }
 
     private int totalCount;
     private int position;
+    private String continent;
 
     private void doCall()
     {
         NavaidsService service = retrofit.create(NavaidsService.class);
-        Call<List<Navaid>> navaidsCall = service.getNavaids(position, 500);
+        Call<List<Navaid>> navaidsCall;
+        if (this.continent.length()==0) {
+            navaidsCall = service.getNavaids(position, 500);
+        }else
+        {
+            navaidsCall = service.getNavaidsByContinent(position, 500, continent);
+        }
         navaidsCall.enqueue(new Callback<List<Navaid>>() {
             @Override
             public void onResponse(Call<List<Navaid>> call, Response<List<Navaid>> response) {

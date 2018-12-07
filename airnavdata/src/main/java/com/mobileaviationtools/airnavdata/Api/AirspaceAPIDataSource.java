@@ -51,6 +51,9 @@ public class AirspaceAPIDataSource {
         @GET("v1/airnavdb/airspaces/limit/{start}/{count}")
         Call<List<Airspace>> getAirspace(@Path("start") int start, @Path("count") int count);
 
+        @GET("v1/airnavdb/airspaces/limit/{continent}/{start}/{count}")
+        Call<List<Airspace>> getAirspacesByContinent(@Path("start") int start, @Path("count") int count, @Path("continent") String continent);
+
         @GET("v1/airnavdb/airspaces/country/{country}")
         Call<List<Airspace>> getAirspacesByCountry(@Path("country") String country);
     }
@@ -58,18 +61,33 @@ public class AirspaceAPIDataSource {
     public void loadAirspaces(int airspaces_count) {
         totalCount = airspaces_count;
         position = 0;
+        continent = "";
+        db.beginTransaction();
+        doCall();
+    }
+
+    public void loadAirspacesByContinent(int airspaces_count, String continent) {
+        totalCount = airspaces_count;
+        position = 0;
+        this.continent = continent;
         db.beginTransaction();
         doCall();
     }
 
     private int totalCount;
     private int position;
+    private String continent;
 
     private void doCall()
     {
         AirspacesService service = retrofit.create(AirspacesService.class);
-        Call<List<Airspace>> airspacesCall = service.getAirspace(position, 500);
-        //Call<List<Airspace>> airspacesCall = service.getAirspacesByCountry("Netherlands");
+        Call<List<Airspace>> airspacesCall;
+        if (continent.length()==0) {
+            airspacesCall = service.getAirspace(position, 500);
+        }else
+        {
+            airspacesCall = service.getAirspacesByContinent(position, 500, continent);
+        }
         airspacesCall.enqueue(new Callback<List<Airspace>>() {
             @Override
             public void onResponse(Call<List<Airspace>> call, Response<List<Airspace>> response) {
