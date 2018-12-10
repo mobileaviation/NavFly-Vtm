@@ -2,6 +2,7 @@ package com.mobileaviationtools.airnavdata.DAOs;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
@@ -14,7 +15,7 @@ import static android.icu.text.MessagePattern.ArgType.SELECT;
 
 @Dao
 public abstract class RunwaysDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertRunways(List<Runway> runways);
 
     @Transaction

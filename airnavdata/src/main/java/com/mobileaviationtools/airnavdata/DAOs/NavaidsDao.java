@@ -2,6 +2,7 @@ package com.mobileaviationtools.airnavdata.DAOs;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Dao
 public abstract class NavaidsDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertNavaids(List<Navaid> navaidList);
 
     @Transaction

@@ -2,6 +2,7 @@ package com.mobileaviationtools.airnavdata.DAOs;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Dao
 public abstract class CitiesDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract void insertCities(List<City> cities);
 
     @Query("SELECT * FROM tbl_Cities WHERE (longitude BETWEEN :Wlon AND :Elon AND latitude BETWEEN :Slat AND :Nlat)")
