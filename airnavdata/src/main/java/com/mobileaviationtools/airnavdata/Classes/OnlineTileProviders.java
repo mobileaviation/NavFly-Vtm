@@ -14,5 +14,20 @@ public enum OnlineTileProviders {
     nexrad_weatherradar_5min ("Nexrad NA weather Radar 5mins old.","https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/[Z]/[X]/[Y].png");
 
     OnlineTileProviders(String name, String base_url) {
+        this.name = name;
+        this.base_url = base_url;
     }
+
+    private String name;
+    private String base_url;
+
+    public String getName() { return name; }
+    public String getBaseUrl() { return base_url; }
+
+    @Override
+    public String toString()
+    {
+        return this.toString();
+    }
+
 }
