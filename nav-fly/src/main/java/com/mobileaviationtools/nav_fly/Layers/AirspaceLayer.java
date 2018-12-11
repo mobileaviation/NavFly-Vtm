@@ -12,7 +12,9 @@ import com.mobileaviationtools.nav_fly.Classes.AirspaceList;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.R;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import org.oscim.android.canvas.AndroidGraphics;
 import org.oscim.backend.CanvasAdapter;
@@ -83,17 +85,29 @@ public class AirspaceLayer extends VectorLayer {
             GeoPoint p = mMap.viewport().fromScreenPoint(e.getX(), e.getY());
             Log.i(TAG,"AirspaceLayer tap\n" + p);
             Airspace[] airspaces = db.getAirpaces().getAirspacesSurroundedBy(p.getLatitude(), p.getLongitude());
-            if (foundAirspacesEvent != null) foundAirspacesEvent.OnAirspaces(airspaces);
-            for(Airspace a : airspaces)
-            {
 
-                Log.i(TAG, "Found Airspace: " + a.name + " Category: " + a.category + " Bottom: "
-                        + a.altLimit_bottom+a.altLimit_bottom_unit
-                        + " Top: " + a.altLimit_top + a.altLimit_top_unit);
+            ArrayList<Airspace> foundAirspaces = new ArrayList<>();
+
+            for (Airspace a : airspaces) {
+                if (a.getAirspaceGeometry().contains(new GeometryFactory().createPoint(new Coordinate(p.getLongitude(), p.getLatitude())))) {
+                    // TODO Add support for active days and periods
+                    //                    if (a.activeDays.size()>0){
+                    //                        a.activeDays.get(0).
+                    //                    }
+                    foundAirspaces.add(a);
+                }
+            }
+
+            if (foundAirspacesEvent != null) foundAirspacesEvent.OnAirspaces(foundAirspaces.toArray(new Airspace[foundAirspaces.size()]));
+            for(Airspace aa : foundAirspaces)
+            {
+                Log.i(TAG, "Found Airspace: " + aa.name + " Category: " + aa.category + " Bottom: "
+                        + aa.altLimit_bottom+aa.altLimit_bottom_unit
+                        + " Top: " + aa.altLimit_top + aa.altLimit_top_unit);
             }
 
             return true;
-            //}
+
         }
         return false;
     }
