@@ -27,6 +27,11 @@ public class NextzenGeojsonTileSource extends GeojsonTileSource {
     private final static String DEFAULT_URL = "https://tile.nextzen.org/tilezen/vector/v1/all";
     private final static String DEFAULT_PATH = "/{Z}/{X}/{Y}.json";
 
+    public String getNextzenUrl()
+    {
+        return DEFAULT_URL + DEFAULT_PATH + getApiKeyStr();
+    }
+
     public static class Builder<T extends Builder<T>> extends UrlTileSource.Builder<T> {
         private String locale = "";
 

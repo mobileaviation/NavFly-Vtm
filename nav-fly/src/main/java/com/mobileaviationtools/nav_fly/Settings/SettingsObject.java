@@ -36,7 +36,8 @@ public class SettingsObject  {
         public void OnSettingsLoaded(SettingsObject object);
     }
 
-    private final String OSCIMAPURL = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
+    //private final String OSCIMAPURL = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
+    private String tiles_url;
     private ArrayList<MBTileChart> mbTileCharts;
     public ChartsOverlayLayers chartsOverlayLayers;
 
@@ -45,7 +46,7 @@ public class SettingsObject  {
         this.map = map;
         this.context = context;
 
-        baseCache = new OfflineTileCache(context, null, "airnav_base_tiles_cache.db");
+        baseCache = new OfflineTileCache(context, null, "airnav_nextzenjson_tiles_cache.db");
         long s = 512 * (1 << 10);
         baseCache.setCacheSize(512 * (1 << 10));
 
@@ -65,8 +66,9 @@ public class SettingsObject  {
     }
 
     private OfflineTileCache baseCache;
-    public void setBaseCache(TileSource source)
+    public void setBaseCache(TileSource source, String url)
     {
+        tiles_url = url;
         source.tileCache = baseCache;
     }
     public OfflineTileCache getBaseCache()
@@ -88,7 +90,7 @@ public class SettingsObject  {
     public void DownloadTiles(OfflineTileDownloadEvent callback)
     {
         baseCache.SetOnOfflineTileDownloadEvent(callback);
-        baseCache.DownloadTiles(map.getBoundingBox(0) ,OSCIMAPURL);
+        baseCache.DownloadTiles(map.getBoundingBox(0) ,tiles_url);
     }
 
     private Chart[] getChartsFromDB()

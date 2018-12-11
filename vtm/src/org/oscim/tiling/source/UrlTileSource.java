@@ -155,6 +155,13 @@ public abstract class UrlTileSource extends TileSource {
         return sb.toString();
     }
 
+    public String getApiKeyStr()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("?").append(mKeyName).append("=").append(mApiKey);
+        return sb.toString();
+    }
+
     public void setHttpEngine(HttpEngine.Factory httpFactory) {
         mHttpFactory = httpFactory;
     }

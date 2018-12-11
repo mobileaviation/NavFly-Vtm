@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<string-array name="mapurls">-->
+        <!--<string name="openstreetmap">https://a.tile.openstreetmap.org/[Z]/[X]/[Y].png</string>-->
+        <!--<string name="openstreetmap_nolabels">http://b.tiles.wmflabs.org/osm-no-labels/[Z]/[X]/[Y].png</string>-->
+        <!--<string name="aaf_sectional">http://wms.chartbundle.com/tms/1.0.0/sec/[Z]/[X]/[Y].png?origin=nw</string>-->
+        <!--<string name="aaf_terminal">http://wms.chartbundle.com/tms/1.0.0/tac/[Z]/[X]/[Y].png?origin=nw</string>-->
+        <!--<string name="aaf_world">http://wms.chartbundle.com/tms/1.0.0/hel/[Z]/[X]/[Y].png?origin=nw</string>-->
+        <!--<string name="aaf_ifrenroutelow">http://wms.chartbundle.com/tms/1.0.0/enrl/[Z]/[X]/[Y].png?origin=nw</string>-->
+        <!--<string name="aaf_ifrenroutehigh">http://wms.chartbundle.com/tms/1.0.0/enrh/[Z]/[X]/[Y].png?origin=nw</string>-->
+        <!--<string name="aaf_ifrarea">http://wms.chartbundle.com/tms/1.0.0/enra/[Z]/[X]/[Y].png?origin=nw</string>-->
+        <!--<string name="hillshading">https://tiles.wmflabs.org/hillshading/[Z]/[X]/[Y].png</string>-->
+        <!--<string name="skylines_airspaces">https://skylines.aero/mapproxy/tiles/1.0.0/airspace/[Z]/[X]/[Y].png</string>-->
+    <!--</string-array>-->
+</resources>
+

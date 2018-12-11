@@ -37,8 +37,9 @@ public class NextzenMvtActivity extends MapActivity {
         super.onCreate(savedInstanceState);
 
         UrlTileSource tileSource = NextzenMvtTileSource.builder()
-                .apiKey("xxxxxxx") // Put a proper API key
+                .apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
                 .httpFactory(new OkHttpEngine.OkHttpFactory())
+
                 //.locale("en")
                 .build();
 
@@ -52,10 +53,10 @@ public class NextzenMvtActivity extends MapActivity {
         VectorTileLayer l = mMap.setBaseMap(tileSource);
         mMap.setTheme(VtmThemes.MAPZEN);
 
-        mMap.layers().add(new BuildingLayer(mMap, l));
+        //mMap.layers().add(new BuildingLayer(mMap, l));
         mMap.layers().add(new LabelLayer(mMap, l));
 
-        mMap.layers().add(new TileGridLayer(mMap));
+        //mMap.layers().add(new TileGridLayer(mMap));
     }
 
     @Override

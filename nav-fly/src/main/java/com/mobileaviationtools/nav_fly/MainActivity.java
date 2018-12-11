@@ -79,6 +79,10 @@ import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
+import org.oscim.tiling.source.UrlTileSource;
+import org.oscim.tiling.source.geojson.NextzenGeojsonTileSource;
+import org.oscim.tiling.source.mvt.MapilionMvtTileSource;
+import org.oscim.tiling.source.mvt.NextzenMvtTileSource;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
@@ -510,12 +514,29 @@ public class MainActivity extends AppCompatActivity {
 
     void setupMap()
     {
-        mTileSource = OSciMap4TileSource.builder()
-                .httpFactory(new OkHttpEngine.OkHttpFactory())
-                .build();
+//        mTileSource = OSciMap4TileSource.builder()
+//                .httpFactory(new OkHttpEngine.OkHttpFactory())
+//                .build();
+//
 
-        settingsObject.setBaseCache(mTileSource);
+        mTileSource = NextzenMvtTileSource.builder()
+            .apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
+            .httpFactory(new OkHttpEngine.OkHttpFactory())
+            //.locale("en")
+            .build();
+
+//        mTileSource = MapilionMvtTileSource.builder()
+//                .httpFactory(new OkHttpEngine.OkHttpFactory())
+//                .build();
+//        String url = ((MapilionMvtTileSource) mTileSource).getUrl().toString();
+
+        String url = ((NextzenMvtTileSource) mTileSource).getNextzenUrl();
+        settingsObject.setBaseCache(mTileSource, url);
         mBaseLayer = vars.map.setBaseMap(mTileSource);
+
+        vars.map.setTheme(VtmThemes.MAPZEN);
+
+        vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer));
 
         /* set initial position on first run */
         MapPosition pos = new MapPosition();
@@ -525,11 +546,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void createLayers() {
-        GroupLayer groupLayer = new GroupLayer(vars.map);
-        groupLayer.layers.add(new BuildingLayer(vars.map, mBaseLayer));
-        groupLayer.layers.add(new LabelLayer(vars.map, mBaseLayer));
-        vars.map.layers().add(groupLayer);
-
         mapScaleBar = new DefaultMapScaleBar(vars.map);
         mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
         mapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
@@ -541,9 +557,6 @@ public class MainActivity extends AppCompatActivity {
         renderer.setPosition(GLViewport.Position.BOTTOM_LEFT);
         renderer.setOffset(5 * CanvasAdapter.getScale(), 0);
         vars.map.layers().add(mapScaleBarLayer);
-
-
-        vars.map.setTheme(VtmThemes.DEFAULT);
     }
 
     private void setupMenuListerners()
