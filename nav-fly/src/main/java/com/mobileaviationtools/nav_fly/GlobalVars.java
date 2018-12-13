@@ -9,6 +9,7 @@ import com.mobileaviationtools.nav_fly.Layers.DeviationLineLayer;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Route.Route;
 
+import org.oscim.layers.GroupLayer;
 import org.oscim.map.Map;
 
 public class GlobalVars {
@@ -22,4 +23,16 @@ public class GlobalVars {
     public AircraftLocationLayer mAircraftLocationLayer;
     public DeviationLineLayer deviationLineLayer;
     public DashboardFragment dashboardFragment;
+
+    public GroupLayer baseGroupLayer;
+
+    public final int BASE_GROUP = 5;
+    public final int ONLINETILES_GROUP = 10;
+    public final int OVERLAYCHARTS_GROUP = 15;
+    public final int AIRSPACE_GROUP = 20;
+    public final int AVIATIONMARKERS_GROUP = 25;
+    public final int ROUTE_GROUP = 40;
+    public final int TRACK_GROUP = 50;
+    public final int DEVIATIONLINE_GROUP = 55;
+    public final int AIRPLANEMARKER_GROUP = 60;
 }

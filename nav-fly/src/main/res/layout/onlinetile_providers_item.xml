@@ -11,19 +11,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
-        android:layout_weight="1"
-        android:text="Name" />
+        android:layout_weight="2"
+        android:text="Name"
+        android:textColor="@color/black_overlay"
+        android:textSize="18sp"
+        android:textStyle="bold|italic" />
 
     <CheckBox
         android:id="@+id/onlineTileProviderActiveCheckbpx"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Active" />
 
     <CheckBox
         android:id="@+id/onlineTileProviderCacheCheckBox"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Cache" />

@@ -5,11 +5,15 @@ import android.icu.text.CollationKey;
 
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.Classes.OnlineTileProviders;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
+import com.mobileaviationtools.airnavdata.Entities.OnlineTileProvider;
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Layers.ChartsOverlayLayers;
 import com.mobileaviationtools.nav_fly.Settings.Overlays.ChartSettingsItemAdapter;
 import com.mobileaviationtools.nav_fly.Settings.Overlays.MBTileChart;
+import com.mobileaviationtools.nav_fly.Settings.Providers.OnlineTileProviderSet;
 
 import org.oscim.android.cache.OfflineTileCache;
 import org.oscim.android.cache.OfflineTileDownloadEvent;
@@ -18,6 +22,7 @@ import org.oscim.map.Map;
 import org.oscim.tiling.TileSource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SettingsObject  {
     public enum SettingType
@@ -36,33 +41,91 @@ public class SettingsObject  {
         public void OnSettingsLoaded(SettingsObject object);
     }
 
-    //private final String OSCIMAPURL = "http://opensciencemap.org/tiles/vtm/{Z}/{X}/{Y}.vtm";
     private String tiles_url;
     private ArrayList<MBTileChart> mbTileCharts;
+    private ArrayList<OnlineTileProviderSet> onlineTileProviders;
     public ChartsOverlayLayers chartsOverlayLayers;
 
-    public SettingsObject(Context context, Map map)
+    public SettingsObject(GlobalVars vars)
     {
-        this.map = map;
-        this.context = context;
-
-        baseCache = new OfflineTileCache(context, null, "airnav_nextzenjson_tiles_cache.db");
+        baseCache = new OfflineTileCache(vars.context, null, "airnav_nextzen_tiles_cache.db");
         long s = 512 * (1 << 10);
         baseCache.setCacheSize(512 * (1 << 10));
+        this.vars = vars;
 
+        onlineTileProviders = new ArrayList<>();
         mbTileCharts = new ArrayList<>();
+
+        setupOnlineTileProviderChangeEvent();
         loadMBTileChartsOverlays();
     }
 
     public void setupChartsOverlayLayers()
     {
-        int index = map.layers().size()-1;
-        chartsOverlayLayers = new ChartsOverlayLayers(context, map, index);
-        AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+        int index = vars.map.layers().size()-1;
+                chartsOverlayLayers = new ChartsOverlayLayers(vars, index);
+        AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
         Chart[] dbCharts = db.getCharts().getActiveCharts(true);
         for (Chart c : dbCharts) {
             setChart(c);
         }
+    }
+
+    public void setupOnlineTileProviders()
+    {
+        // TODO This needs to be stored to and retrieved from the database
+        AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
+
+        for (OnlineTileProviders provider : OnlineTileProviders.values())
+        {
+            OnlineTileProviderSet set = new OnlineTileProviderSet();
+            set.provider = provider;
+
+            OnlineTileProvider p = db.getOnlineTileProviders().getTileProviderByType(provider.toString());
+
+            if (p != null)
+            {
+                set.active = p.active;
+                set.cache = p.cache;
+                set.id = p.id;
+                if (set.active) set.addLayer(vars);
+            }
+            else {
+                set.active = false;
+                set.cache = false;
+                set.id = -1l;
+            }
+
+            set.SetTileProviderSetChanged(onlineTileProviderschangeEvent);
+            onlineTileProviders.add(set);
+        }
+    }
+
+    private OnlineTileProviderSet.TileProviderSetChanged onlineTileProviderschangeEvent;
+    private void setupOnlineTileProviderChangeEvent()
+    {
+        onlineTileProviderschangeEvent = new OnlineTileProviderSet.TileProviderSetChanged() {
+            @Override
+            public void onTileProviderSetActivated(OnlineTileProviderSet tileProviderSet, OnlineTileProviderSet.ChangeType type) {
+                if (type==OnlineTileProviderSet.ChangeType.active)
+                {
+                    if (tileProviderSet.active) tileProviderSet.addLayer(vars);
+                    else
+                        tileProviderSet.removeLayer(vars);
+
+                    OnlineTileProvider provider = new OnlineTileProvider();
+                    AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
+
+                    provider.active = tileProviderSet.active;
+                    provider.cache = tileProviderSet.cache;
+                    provider.type = tileProviderSet.provider;
+                    provider.id = tileProviderSet.id;
+                    if (provider.id==-1) db.getOnlineTileProviders().InsertOnlineTileProvider(provider);
+                    else
+                        db.getOnlineTileProviders().UpdateOnlineTileProvider(provider);
+                }
+            }
+        };
     }
 
     private OfflineTileCache baseCache;
@@ -83,25 +146,24 @@ public class SettingsObject  {
         if (settingsEvent != null) settingsEvent.OnSettingChanged(type, this);
     }
 
-    private Map map;
-    private Context context;
+    private GlobalVars vars;
     public ChartSettingsItemAdapter chartSettingsItemAdapter;
 
     public void DownloadTiles(OfflineTileDownloadEvent callback)
     {
         baseCache.SetOnOfflineTileDownloadEvent(callback);
-        baseCache.DownloadTiles(map.getBoundingBox(0) ,tiles_url);
+        baseCache.DownloadTiles(vars.map.getBoundingBox(0) ,tiles_url);
     }
 
     private Chart[] getChartsFromDB()
     {
-        AirnavChartsDatabase airnavChartsDatabase = AirnavChartsDatabase.getInstance(context);
+        AirnavChartsDatabase airnavChartsDatabase = AirnavChartsDatabase.getInstance(vars.context);
         return airnavChartsDatabase.getCharts().getAllCharts();
     }
 
     private MBTile[] getTilesFromDB()
     {
-        AirnavDatabase airnavDatabase = AirnavDatabase.getInstance(context);
+        AirnavDatabase airnavDatabase = AirnavDatabase.getInstance(vars.context);
         return airnavDatabase.getTiles().getAllMBTiles();
     }
 
@@ -109,7 +171,7 @@ public class SettingsObject  {
     {
         for (MBTile tile: tiles)
         {
-            MBTileChart mbTileChart = new MBTileChart(context);
+            MBTileChart mbTileChart = new MBTileChart(vars.context);
             mbTileChart.setTile(tile);
             setupMBTileChartListener(mbTileChart);
             mbTileCharts.add(mbTileChart);
@@ -120,7 +182,7 @@ public class SettingsObject  {
     {
         for (Chart chart: charts)
         {
-            MBTileChart mbTileChart = new MBTileChart(context);
+            MBTileChart mbTileChart = new MBTileChart(vars.context);
             mbTileChart.setChart(chart);
             if (!mbTileCharts.contains(mbTileChart)) {
                 setupMBTileChartListener(mbTileChart);
@@ -150,6 +212,8 @@ public class SettingsObject  {
     public ArrayList<MBTileChart> getMbTileCharts() {
         return mbTileCharts;
     }
+
+    public ArrayList<OnlineTileProviderSet> getOnlineTileProviders() { return onlineTileProviders; }
 
     private void setupMBTileChartListener(MBTileChart chart)
     {

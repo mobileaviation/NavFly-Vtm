@@ -41,8 +41,8 @@ public class DeviationLineLayer extends VectorLayer {
         MarkerSymbol s = null;
         symbolLayer = new ItemizedLayer(vars.map, s);
 
-        vars.map.layers().add(this);
-        vars.map.layers().add(symbolLayer);
+        vars.map.layers().add(this, vars.DEVIATIONLINE_GROUP);
+        vars.map.layers().add(symbolLayer, vars.DEVIATIONLINE_GROUP);
     }
 
     public void drawDeviationLine(FspLocation startPoint, FspLocation endPoint)

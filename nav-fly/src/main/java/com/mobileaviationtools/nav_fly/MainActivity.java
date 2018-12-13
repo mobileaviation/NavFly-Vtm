@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
     {
         mMapView = (MapView) findViewById(R.id.mapView);
         vars.map = mMapView.map();
+        vars.context = this;
         connectStage = ConnectStage.disconnected;
         vars.doDeviationLineFromLocation = new FspLocation("DeviationFromLocation");
 
@@ -181,13 +182,25 @@ public class MainActivity extends AppCompatActivity {
 
         mPrefs = new MapPreferences(MainActivity.class.getName(), this);
 
-
+        vars.map.layers().addGroup(vars.BASE_GROUP);
 
         setupMap();
         createLayers();
 
+        // Temp test code
+
+        vars.map.layers().addGroup(vars.ONLINETILES_GROUP);
+        vars.map.layers().addGroup(vars.OVERLAYCHARTS_GROUP);
+        vars.map.layers().addGroup(vars.AVIATIONMARKERS_GROUP);
+        vars.map.layers().addGroup(vars.AIRSPACE_GROUP);
+        vars.map.layers().addGroup(vars.ROUTE_GROUP);
+        vars.map.layers().addGroup(vars.TRACK_GROUP);
+        vars.map.layers().addGroup(vars.DEVIATIONLINE_GROUP);
+        vars.map.layers().addGroup(vars.AIRPLANEMARKER_GROUP);
+
         // add overlay layers
         settingsObject.setupChartsOverlayLayers();
+        settingsObject.setupOnlineTileProviders();
 
         //getMBTilesMapPerm();
         //getBitmapOverlayPerm();
@@ -279,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void createSettingsObject()
     {
-        settingsObject = new SettingsObject(this, vars.map);
+        settingsObject = new SettingsObject(vars);
         settingsObject.SetSettingsEvent(new SettingsObject.SettingsEvent() {
             @Override
             public void OnSettingChanged(SettingsObject.SettingType type, SettingsObject object) {
@@ -363,7 +376,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void addTrackingLayer()
     {
-        trackingLayer = new Tracking(this, vars.map);
+        trackingLayer = new Tracking(vars);
     }
 
     public void addAircraftLocationLayer()
@@ -374,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
         vars.mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(vars.map,
                 this, vars.airplaneLocation);
 
-        vars.map.layers().add(vars.mAircraftLocationLayer);
+        vars.map.layers().add(vars.mAircraftLocationLayer, vars.AIRPLANEMARKER_GROUP);
     }
 
     public void addDeviationLineLayer()
@@ -423,7 +436,7 @@ public class MainActivity extends AppCompatActivity {
 
     void setupAirspacesLayer()
     {
-        mAirspaceLayer = new AirspaceLayer(vars.map, this);
+        mAirspaceLayer = new AirspaceLayer(vars);
         mAirspaceLayer.SetFoundAirspacesEvent(new AirspaceLayer.FoundAirspacesEvent() {
             @Override
             public void OnAirspaces(Airspace[] airspaces) {
@@ -536,7 +549,7 @@ public class MainActivity extends AppCompatActivity {
 
         vars.map.setTheme(VtmThemes.MAPZEN);
 
-        vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer));
+        vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer), vars.BASE_GROUP);
 
         /* set initial position on first run */
         MapPosition pos = new MapPosition();
@@ -556,7 +569,8 @@ public class MainActivity extends AppCompatActivity {
         BitmapRenderer renderer = mapScaleBarLayer.getRenderer();
         renderer.setPosition(GLViewport.Position.BOTTOM_LEFT);
         renderer.setOffset(5 * CanvasAdapter.getScale(), 0);
-        vars.map.layers().add(mapScaleBarLayer);
+        vars.map.layers().add(mapScaleBarLayer, vars.BASE_GROUP);
+
     }
 
     private void setupMenuListerners()

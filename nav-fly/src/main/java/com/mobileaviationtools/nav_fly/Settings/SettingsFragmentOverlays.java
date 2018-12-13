@@ -6,9 +6,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.mobileaviationtools.airnavdata.Classes.OnlineTileProviders;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Settings.Providers.OnlineTileProviderSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingsFragmentOverlays extends Fragment {
     public SettingsFragmentOverlays() {
@@ -32,7 +37,8 @@ public class SettingsFragmentOverlays extends Fragment {
     private Context context;
     private SettingsObject settingsObject;
     private View view;
-
+    private ListView listView;
+    private TileProvidersOverlaysAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,10 +51,9 @@ public class SettingsFragmentOverlays extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.settings_fragment_overlays, container, false);
 
-        for (OnlineTileProviders provider : OnlineTileProviders.values())
-        {
-
-        }
+        listView = view.findViewById(R.id.onlineTileProvidersListView);
+        adapter = new TileProvidersOverlaysAdapter(settingsObject.getOnlineTileProviders());
+        listView.setAdapter(adapter);
 
         return view;
     }

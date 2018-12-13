@@ -5,6 +5,7 @@ import android.content.Context;
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.Classes.ChartType;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
+import com.mobileaviationtools.nav_fly.GlobalVars;
 
 import org.oscim.android.tiling.Overlay.OverlayTileSource;
 import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
@@ -21,20 +22,18 @@ import java.util.List;
 
 public class ChartsOverlayLayers {
 
-    public ChartsOverlayLayers(Context content, Map map, int index)
+    public ChartsOverlayLayers(GlobalVars vars, int index)
     {
-        this.mMap = map;
-        this.context = content;
-        startIndex = index;
+        //startIndex = index;
+        this.vars = vars;
         this.charts = new ArrayList<ChartOverlay>();
     }
 
     public class ChartOverlay
     {
-        public ChartOverlay(Context context, Map map, Chart chart, int index)
+        public ChartOverlay(GlobalVars vars, Chart chart)
         {
-            this.context = context;
-            this.map = map;
+            this.vars = vars;
             this.chart = chart;
             setBoundingBox();
         }
@@ -50,10 +49,10 @@ public class ChartsOverlayLayers {
                 }
                 else
                 {
-                    if (!map.layers().contains(bitmapLayer))
+                    if (!vars.map.layers().contains(bitmapLayer))
                     {
-                        map.layers().add(startIndex, bitmapLayer);
-                        map.updateMap(true);
+                        vars.map.layers().add(bitmapLayer, vars.OVERLAYCHARTS_GROUP);
+                        vars.map.updateMap(true);
                     }
                 }
             }
@@ -61,10 +60,10 @@ public class ChartsOverlayLayers {
             {
                 if (bitmapLayer != null)
                 {
-                    if (map.layers().contains(bitmapLayer))
+                    if (vars.map.layers().contains(bitmapLayer))
                     {
-                        map.layers().remove(bitmapLayer);
-                        map.updateMap(true);
+                        vars.map.layers().remove(bitmapLayer);
+                        vars.map.updateMap(true);
                     }
                 }
             }
@@ -75,14 +74,14 @@ public class ChartsOverlayLayers {
         {
             if (bitmapLayer != null)
             {
-                return map.layers().indexOf(bitmapLayer);
+                return vars.map.layers().indexOf(bitmapLayer);
             }
             else return -1;
         }
 
         private void updateChart()
         {
-            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(context);
+            AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
             db.getCharts().UpdateChart(chart);
             //SetChart();
         }
@@ -136,14 +135,13 @@ public class ChartsOverlayLayers {
 
         private void createBitmapLayer(TileSource source)
         {
-            bitmapLayer = new BitmapTileLayer(map, source);
-            map.layers().add(startIndex, bitmapLayer);
-            map.updateMap(true);
+            bitmapLayer = new BitmapTileLayer(vars.map, source);
+            vars.map.layers().add(bitmapLayer, vars.OVERLAYCHARTS_GROUP);
+            vars.map.updateMap(true);
         }
 
         private BoundingBox boundingBox;
-        private Context context;
-        private Map map;
+        private GlobalVars vars;
 //        private GroupLayer groupLayer;
         private Chart chart;
         private OverlayTileSource overlayTileSource;
@@ -173,7 +171,7 @@ public class ChartsOverlayLayers {
 
     public void setChart(Chart chart)
     {
-        ChartOverlay chartOverlay = new ChartOverlay(context, mMap, chart, startIndex);
+        ChartOverlay chartOverlay = new ChartOverlay(vars, chart);
         int i = charts.indexOf(chartOverlay);
         if (i<0) {
             charts.add(chartOverlay);
@@ -186,10 +184,8 @@ public class ChartsOverlayLayers {
         }
     }
 
-    private Map mMap;
-    private GroupLayer groupLayer;
-    private Context context;
-    private int startIndex;
+    private GlobalVars vars;
+    //private int startIndex;
 
 
 }

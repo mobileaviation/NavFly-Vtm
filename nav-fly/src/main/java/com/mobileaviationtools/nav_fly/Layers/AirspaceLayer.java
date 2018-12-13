@@ -10,6 +10,7 @@ import com.mobileaviationtools.airnavdata.Classes.AirspaceCategory;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.nav_fly.Classes.AirspaceList;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -44,13 +45,12 @@ public class AirspaceLayer extends VectorLayer {
         public void OnAirspaces(Airspace[] airspaces);
     }
 
-    public AirspaceLayer(Map map, Context context)
+    public AirspaceLayer(GlobalVars vars)
     {
-        super(map);
-        this.context = context;
-        this.mMap = map;
-        db = AirnavDatabase.getInstance(context);
-        mMap.layers().add(this);
+        super(vars.map);
+        this.vars = vars;
+        db = AirnavDatabase.getInstance(vars.context);
+        mMap.layers().add(this, vars.AIRSPACE_GROUP);
         airspaces = new AirspaceList();
     }
 
@@ -59,8 +59,7 @@ public class AirspaceLayer extends VectorLayer {
         this.foundAirspacesEvent = foundAirspacesEvent;
     }
 
-    private Map mMap;
-    private Context context;
+    private GlobalVars vars;
     private AirnavDatabase db;
     private AirspaceList airspaces;
     private FoundAirspacesEvent foundAirspacesEvent;
@@ -189,7 +188,7 @@ public class AirspaceLayer extends VectorLayer {
         else
         {
             TextureItem tex = null;
-            tex = new TextureItem(AndroidGraphics.drawableToBitmap(context.getResources(), res));
+            tex = new TextureItem(AndroidGraphics.drawableToBitmap(vars.context.getResources(), res));
             tex.mipmap = false;
             return tex;
         }

@@ -6,6 +6,7 @@ import android.content.Context;
 import com.mobileaviationtools.airnavdata.AirnavTracklogDatabase;
 import com.mobileaviationtools.airnavdata.Entities.TrackLog;
 import com.mobileaviationtools.airnavdata.Entities.TrackLogItem;
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Route.Route;
 
 import org.oscim.backend.CanvasAdapter;
@@ -20,17 +21,15 @@ import java.util.Date;
 import java.util.List;
 
 public class Tracking {
-    public Tracking(Context context, Map map)
+    public Tracking(GlobalVars vars)
     {
-        this.context = context;
-        this.map = map;
+        this.vars = vars;
         //locationList = new ArrayList<>();
-        database = AirnavTracklogDatabase.getInstance(context);
+        database = AirnavTracklogDatabase.getInstance(vars.context);
         setupTrackLayer();
     }
 
-    private Context context;
-    private Map map;
+    private GlobalVars vars;
     //private List<FspLocation> locationList;
     private FspLocation lastLocation;
     private Route route;
@@ -41,8 +40,8 @@ public class Tracking {
     private void setupTrackLayer()
     {
         int c = Color.get(0xF4, 0x6E, 0x8F ); //.parseColor("fff46e8f");
-        trackLayer = new PathLayer(map, c, 3 * CanvasAdapter.getScale());
-        map.layers().add(trackLayer);
+        trackLayer = new PathLayer(vars.map, c, 3 * CanvasAdapter.getScale());
+        vars.map.layers().add(trackLayer, vars.TRACK_GROUP);
     }
 
     public void start(Route route)

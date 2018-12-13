@@ -7,12 +7,14 @@ import android.content.Context;
 
 import com.mobileaviationtools.airnavdata.DAOs.ChartDao;
 import com.mobileaviationtools.airnavdata.DAOs.MBTilesDao;
+import com.mobileaviationtools.airnavdata.DAOs.OnlineTileProvidersDao;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
+import com.mobileaviationtools.airnavdata.Entities.OnlineTileProvider;
 import com.mobileaviationtools.airnavdata.Entities.Route;
 import com.mobileaviationtools.airnavdata.Entities.Waypoint;
 
-@Database(entities = {Chart.class}, version = 1)
+@Database(entities = {Chart.class, OnlineTileProvider.class}, version = 1)
 public abstract class AirnavChartsDatabase extends RoomDatabase {
     private static  final String DB_NAME = "room_airnav_chart.db";
     private static volatile AirnavChartsDatabase instance;
@@ -34,4 +36,5 @@ public abstract class AirnavChartsDatabase extends RoomDatabase {
     }
 
     public abstract ChartDao getCharts();
+    public abstract OnlineTileProvidersDao getOnlineTileProviders();
 }
