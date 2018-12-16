@@ -35,11 +35,27 @@ public class DeviationLineLayer extends VectorLayer {
 
     private Leg deviationLeg;
 
+    private Style lineStyle1;
+    private  Style lineStyle2;
+
     public void setupLayers(GlobalVars vars)
     {
         this.vars = vars;
         MarkerSymbol s = null;
         symbolLayer = new ItemizedLayer(vars.map, s);
+
+        lineStyle1 = Style.builder()
+                .fixed(true)
+                .strokeColor(selectedLegColor)
+                .strokeWidth(lineWidth)
+                .build();
+
+        lineStyle2 = Style.builder()
+                .fixed(true)
+                .strokeColor(Color.DKGRAY)
+                .strokeWidth(lineWidth + 4)
+                .build();
+
 
         vars.map.layers().add(this, vars.DEVIATIONLINE_GROUP);
         vars.map.layers().add(symbolLayer, vars.DEVIATIONLINE_GROUP);
@@ -51,30 +67,19 @@ public class DeviationLineLayer extends VectorLayer {
 
         if (startPoint.distanceTo(endPoint)>10000) {
 
-            Style lineStyle1 = Style.builder()
-                    .fixed(true)
-                    .strokeColor(selectedLegColor)
-                    .strokeWidth(lineWidth)
-                    .build();
-
             ArrayList<GeoPoint> points = new ArrayList<>();
             points.add(startPoint.getGeopoint());
             points.add(endPoint.getGeopoint());
-            deviationLineDrawable1 = new LineDrawable(points, lineStyle1);
 
-            Style lineStyle2 = Style.builder()
-                    .fixed(true)
-                    .strokeColor(Color.DKGRAY)
-                    .strokeWidth(lineWidth + 4)
-                    .build();
+            deviationLineDrawable1 = new LineDrawable(points, lineStyle1);
             deviationLineDrawable2 = new LineDrawable(points, lineStyle2);
 
             //if (legSymbolItem != null) symbolLayer.removeItem(legSymbolItem);
 
             if (legSymbolItem == null) {
                 legSymbolItem = new MarkerItem("DeviationSymbol", "DeviationSymbol", endPoint.getGeopoint());
-                symbolLayer.addItem(legSymbolItem);
             }
+            if (!symbolLayer.getItemList().contains(legSymbolItem)) symbolLayer.addItem(legSymbolItem);
 
             deviationLeg = new Leg(startPoint.getGeopoint(), endPoint.getGeopoint(), vars.context);
             legSymbolItem.setMarker(deviationLeg.symbol);
@@ -89,8 +94,10 @@ public class DeviationLineLayer extends VectorLayer {
         }
         else
         {
-            symbolLayer.removeAllItems(true);
-            legSymbolItem = null;
+            if (legSymbolItem != null)
+                if (symbolLayer.getItemList().contains(legSymbolItem))
+                    symbolLayer.removeItem(legSymbolItem);
+            //legSymbolItem = null;
         }
     }
 

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">weater_notam_data</string>
+    <string name="weather_base_url">http://www.aviationweather.gov/</string>
 </resources>

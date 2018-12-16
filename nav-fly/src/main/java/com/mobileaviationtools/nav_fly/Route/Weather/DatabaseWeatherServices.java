@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.mobileaviationtools.airnavdata.AirnavAirportInfoDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Metar;
+import com.mobileaviationtools.airnavdata.Entities.Taf;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.Classes.MapperHelper;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
@@ -28,7 +29,27 @@ public class DatabaseWeatherServices {
     public void GetTafsByLocationAndRadius(GeoPoint position, Long distance,
                                            WeatherResponseEvent weatherDataResponseEvent)
     {
+        // TODO Implement TAF from database retrieval
+        Long m = distance * 1609;
+        Geometry c = GeometryHelpers.getCircle(position, m);
+        Geometry b = c.getEnvelope();
+        List<com.mobileaviationtools.weater_notam_data.weather.Taf> wTafs = new ArrayList<>();
+        if (b.getNumPoints()>3)
+        {
+            Coordinate[] coordinates = b.getCoordinates();
+            List<Taf> tafs = db.getTaf().getTafsWithinBounds(coordinates[0].x,
+                    coordinates[2].x,
+                    coordinates[2].y,
+                    coordinates[0].y);
 
+            for (Taf me : tafs)
+            {
+                //me. = position.sphericalDistance(new GeoPoint(me.latitude, me.longitude));
+                wTafs.add(MapperHelper.getTaf(me));
+            }
+
+            if (weatherDataResponseEvent != null) weatherDataResponseEvent.OnTafsResponse(wTafs, position, "Received DatabaseTafs");
+        }
     }
 
     public void GetMetarsByLocationAndRadius(GeoPoint position, Long distance,

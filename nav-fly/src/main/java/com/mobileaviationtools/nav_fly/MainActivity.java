@@ -25,6 +25,7 @@ import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
+import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment;
 import com.mobileaviationtools.nav_fly.Info.Airspace.AirspacesInfoFragment;
 import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
@@ -261,7 +262,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 FspLocation location = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "Weatherlocation");
-                stations.getWeatherData(location, 100l);
+                if (Helpers.isConnected(MainActivity.this))
+                    stations.getWeatherData(location, 100l);
+                else
+                    stations.getDatabaseWeather(location.getGeopoint(), 100l);
             }
         }, 1800000, 1800000);
         vars.dashboardFragment.setZuluTime();
@@ -286,7 +290,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         FspLocation loc = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "weatherLoc");
-        stations.getWeatherData(loc, 100l);
+        if (Helpers.isConnected(this))
+            stations.getWeatherData(loc, 100l);
+        else
+            stations.getDatabaseWeather(loc.getGeopoint(), 100l);
         // TODO start a timer to get weather data for current location each 30 mins
     }
 

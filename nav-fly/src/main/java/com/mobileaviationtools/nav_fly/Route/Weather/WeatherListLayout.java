@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
@@ -89,7 +90,10 @@ public class WeatherListLayout extends LinearLayout {
                 if (stations != null) {
                     if (weatherProgressBar != null) weatherProgressBar.setVisibility(VISIBLE);
                     FspLocation loc = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "weatherLoc");
-                    stations.getWeatherData(loc, 100l);
+                    if (Helpers.isConnected(vars.context))
+                        stations.getWeatherData(loc, 100l);
+                    else
+                        stations.getDatabaseWeather(loc.getGeopoint(), 100l);
                 }
             }
         });

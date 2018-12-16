@@ -68,6 +68,19 @@ public class MapperHelper {
         return m;
     }
 
+    public static com.mobileaviationtools.weater_notam_data.weather.Taf getTaf(Taf taf)
+    {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
+                .setMatchingStrategy(MatchingStrategies.STRICT);
+        com.mobileaviationtools.weater_notam_data.weather.Taf m =
+                modelMapper.map(taf, com.mobileaviationtools.weater_notam_data.weather.Taf.class);
+        m.raw_text = taf.raw_text;
+        return m;
+    }
+
     public static Taf getTafEntity(com.mobileaviationtools.weater_notam_data.weather.Taf taf, Airport airport)
     {
         ModelMapper modelMapper = new ModelMapper();

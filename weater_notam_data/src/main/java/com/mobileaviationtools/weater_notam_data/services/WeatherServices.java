@@ -1,5 +1,6 @@
 package com.mobileaviationtools.weater_notam_data.services;
 
+import com.mobileaviationtools.weater_notam_data.Values;
 import com.mobileaviationtools.weater_notam_data.weather.MetarsResponse;
 import com.mobileaviationtools.weater_notam_data.weather.TafsResponse;
 import org.oscim.core.GeoPoint;
@@ -8,6 +9,8 @@ import org.simpleframework.xml.core.Persister;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Dispatcher;
@@ -66,7 +69,7 @@ public class WeatherServices {
 
     private HttpUrl.Builder buildBaseUrl(String datasource)
     {
-        HttpUrl.Builder urlBuilder = HttpUrl.parse("http://www.aviationweather.gov/adds/dataserver_current/httpparam").newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(Values.weather_base_url + "adds/dataserver_current/httpparam").newBuilder();
         urlBuilder.addQueryParameter("dataSource", datasource);
         urlBuilder.addQueryParameter("requestType", "retrieve");
         urlBuilder.addQueryParameter("format", "xml");
@@ -80,12 +83,16 @@ public class WeatherServices {
         dispatcher.setMaxRequests(10);
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.dispatcher(dispatcher);
+        builder.connectTimeout(2000, TimeUnit.MILLISECONDS);
+        builder.readTimeout(2000, TimeUnit.MILLISECONDS);
+        builder.writeTimeout(2000, TimeUnit.MILLISECONDS);
 
         OkHttpClient client = builder.build();
         client.dispatcher().setMaxRequests(10);
 
         return client;
     }
+
 
     private void doCall(final String command, Request request, final WeatherResponseEvent event)
     {

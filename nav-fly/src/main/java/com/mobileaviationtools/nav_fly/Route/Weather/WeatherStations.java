@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
+import com.mobileaviationtools.weater_notam_data.Values;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
 import com.mobileaviationtools.weater_notam_data.services.WeatherServices;
 import com.mobileaviationtools.weater_notam_data.weather.Metar;
@@ -11,8 +12,16 @@ import com.mobileaviationtools.weater_notam_data.weather.Taf;
 
 import org.oscim.core.GeoPoint;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class WeatherStations extends ArrayList<Station> {
     public interface WeatherDataReceivedEvent
@@ -20,9 +29,11 @@ public class WeatherStations extends ArrayList<Station> {
         public void Received(WeatherStations stations);
     }
 
-
     public WeatherStations(Context context)
     {
+        fireEvent = 0;
+        tafs_received = false;
+        metars_received = false;
         this.context = context;
         setWeatherResponse();
     }
@@ -37,6 +48,8 @@ public class WeatherStations extends ArrayList<Station> {
         this.weatherDataReceivedEvent = weatherDataReceivedEvent;
     }
     private Integer fireEvent;
+    private Boolean tafs_received;
+    private Boolean metars_received;
 
 
     private void setWeatherResponse()
@@ -44,14 +57,16 @@ public class WeatherStations extends ArrayList<Station> {
         weatherResponseEvent = new WeatherResponseEvent() {
             @Override
             public void OnMetarsResponse(List<Metar> metars, GeoPoint location, String message) {
-                fireEvent++;
+                //fireEvent++;
+                metars_received = true;
                 setMetars(metars, location);
                 fireEvent();
             }
 
             @Override
             public void OnTafsResponse(List<Taf> tafs, GeoPoint location, String message) {
-                fireEvent++;
+                // fireEvent++;
+                tafs_received = true;
                 setTafs(tafs);
                 fireEvent();
             }
@@ -106,7 +121,8 @@ public class WeatherStations extends ArrayList<Station> {
 
     private void fireEvent()
     {
-        if (fireEvent>1)
+        //if (fireEvent>1)
+        if (metars_received && tafs_received)
         {
             Log.i(TAG, "Received both Metars and Tafs");
             if(weatherDataReceivedEvent != null) weatherDataReceivedEvent.Received(this);
@@ -114,7 +130,7 @@ public class WeatherStations extends ArrayList<Station> {
         }
     }
 
-    private void getDatabaseWeather(GeoPoint location, long distance)
+    public void getDatabaseWeather(GeoPoint location, long distance)
     {
         DatabaseWeatherServices databaseWeatherServices = new DatabaseWeatherServices(context);
         databaseWeatherServices.GetMetarsByLocationAndRadius(location, distance, weatherResponseEvent);
@@ -159,6 +175,11 @@ public class WeatherStations extends ArrayList<Station> {
         int qindex = raw.indexOf("Q");
         if (qindex>-1)
             qnh = raw.substring(qindex+1, qindex+5);
+        else {
+            qindex = raw.indexOf("A");
+            if (qindex>-1)
+                qnh = raw.substring(qindex+1, qindex+5);
+        }
         return new String[]{ident, qnh};
     }
 }
