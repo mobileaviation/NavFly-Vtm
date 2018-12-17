@@ -7,14 +7,15 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.mobileaviationtools.airnavdata.Entities.Notam;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
 
 public class NotamsItemAdapter extends BaseAdapter {
-    private Notams notams;
+    private Notam[] notams;
     private Context context;
 
-    public NotamsItemAdapter(Context context, Notams notams)
+    public NotamsItemAdapter(Context context, Notam[] notams)
     {
         this.notams = notams;
         this.context = context;
@@ -22,12 +23,12 @@ public class NotamsItemAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return notams.notamList.length;
+        return notams.length;
     }
 
     @Override
     public Object getItem(int i) {
-        return notams.notamList[i];
+        return notams[i];
     }
 
     @Override
@@ -46,9 +47,9 @@ public class NotamsItemAdapter extends BaseAdapter {
         TextView notamsEndDateText = (TextView) rowView.findViewById(R.id.notamDataEndText);
 
 
-        notamsText.setText(notams.notamList[i].traditionalMessageFrom4thWord);
-        notamsEndDateText.setText(notams.notamList[i].endDate);
-        notamsNumberText.setText(notams.notamList[i].notamNumber);
+        notamsText.setText(notams[i].traditionalMessageFrom4thWord);
+        notamsEndDateText.setText(notams[i].endDate);
+        notamsNumberText.setText(notams[i].notamNumber);
 
         return  rowView;
     }

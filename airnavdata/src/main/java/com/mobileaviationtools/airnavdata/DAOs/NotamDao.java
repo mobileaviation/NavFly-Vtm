@@ -26,4 +26,10 @@ public abstract class NotamDao {
 
     @Query("SELECT * FROM tbl_Notams WHERE icaoId=:icaoId")
     public abstract Notam[] getNotamsByStationId(String icaoId);
+
+    @Query("SELECT * FROM tbl_Notams WHERE icaoId=:icaoId group by notamNumber order by endDate desc")
+    public abstract Notam[] getLatestStoredNotamsByStationId(String icaoId);
+
+    @Query("SELECT * FROM tbl_Notams WHERE (longitude BETWEEN :Wlon AND :Elon AND latitude BETWEEN :Slat AND :Nlat) GROUP BY icaoId")
+    public abstract List<Notam> getStationsListWithinBoundsLimit(double Wlon, double Elon, double Nlat, double Slat);
 }

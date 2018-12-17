@@ -3,6 +3,7 @@ package com.mobileaviationtools.weater_notam_data.services;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
@@ -46,7 +47,7 @@ public class NotamService {
         String q = getQuery(3, "", location, radius, 0l);
         RequestBody requestBody = RequestBody.create(FROM, q);
         Request request = getRequest(requestBody, command);
-        if (command.equals("search")) doNotamCall(request, notamResponseEvent);
+        if (command.equals("search")) doNotamCall(request, notamResponseEvent, null);
         if (command.equals("counts")) doCountsCall(request, notamResponseEvent);
     }
 
@@ -56,7 +57,16 @@ public class NotamService {
         String q = getQuery(0, icao, null, 100l, 0l);
         RequestBody requestBody = RequestBody.create(FROM, q);
         Request request = getRequest(requestBody, "search");
-        doNotamCall(request, notamResponseEvent);
+        doNotamCall(request, notamResponseEvent, null);
+    }
+
+    public void GetNotamsByCount(NotamCount count, NotamResponseEvent notamResponseEvent)
+    {
+        MediaType FROM = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
+        String q = getQuery(0, count.icaoId, null, 100l, 0l);
+        RequestBody requestBody = RequestBody.create(FROM, q);
+        Request request = getRequest(requestBody, "search");
+        doNotamCall(request, notamResponseEvent, count);
     }
 
     private void doCountsCall(Request request, final NotamResponseEvent event)
@@ -79,7 +89,7 @@ public class NotamService {
         });
     }
 
-    private void doNotamCall(Request request, final NotamResponseEvent event)
+    private void doNotamCall(Request request, final NotamResponseEvent event, final NotamCount count)
     {
         Call call = GetHttpClient().newCall(request);
         call.enqueue(new Callback() {
@@ -94,7 +104,8 @@ public class NotamService {
                 String notamsJson = response.body().string();
                 Notams notams = new Gson().fromJson(notamsJson, Notams.class);
                 Log.i(TAG, "Retrieved Notams");
-                if (event != null) event.OnNotamsResponse(notams, response.message());
+                count.notams = notams;
+                if (event != null) event.OnNotamsResponse(notams, count, response.message());
             }
         });
     }

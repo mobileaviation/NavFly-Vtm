@@ -16,9 +16,11 @@ import android.widget.ProgressBar;
 import com.mobileaviationtools.airnavdata.AirnavAirportInfoDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Notam;
+import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.Classes.MapperHelper;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
@@ -39,7 +41,6 @@ public class NotamsListLayout extends LinearLayout {
     private Activity activity;
     private ProgressBar notamsProgressBar;
 
-
     public NotamsListLayout(Context context) {
         super(context);
     }
@@ -47,12 +48,6 @@ public class NotamsListLayout extends LinearLayout {
     public NotamsListLayout(Context context,  AttributeSet attrs) {
         super(context, attrs);
     }
-
-    //private Map map;
-
-    //public void setMap(Map map) {
-//        this.map = map;
-//    }
 
     private GlobalVars vars;
     public void setGlobalVars(GlobalVars vars)
@@ -86,32 +81,15 @@ public class NotamsListLayout extends LinearLayout {
     {
         notamResponseEvent = new NotamResponseEvent() {
             @Override
-            public void OnNotamsResponse(final Notams notams, String message) {
-                AirnavAirportInfoDatabase db = AirnavAirportInfoDatabase.getInstance(getContext());
+            public void OnNotamsResponse(final Notams notams, NotamCount count, String message) {
 
-                Airport a  = MapperHelper.getAirport(notams.notamList[0].icaoId, getContext());
-                for (com.mobileaviationtools.weater_notam_data.notams.Notam n : notams.notamList)
-                {
-                    Notam db_notam = MapperHelper.getNotamEntity(n, a);
-                    db.getNotam().InsertNotam(db_notam);
-                }
-
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        notamsItemAdapter = new NotamsItemAdapter(NotamsListLayout.this.getContext(), notams);
-                        notamsList = (ListView) findViewById(R.id.notamsList);
-                        notamsList.setAdapter(notamsItemAdapter);
-                    }
-                });
-
-                toggleNotamsProgressVisibility(false);
             }
 
             @Override
             public void OnNotamsCountResponse(final NotamCounts counts, String message) {
 
                 Log.i(TAG, message);
+                toggleNotamsProgressVisibility(false);
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -134,10 +112,9 @@ public class NotamsListLayout extends LinearLayout {
 
     public void notamBtnClick() {
         if (notamsAirportItemAdapter == null) {
-            MapPosition pos = vars.map.getMapPosition();
-            NotamService notamService = new NotamService();
-            notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
             toggleNotamsProgressVisibility(true);
+            getNotams();
+
         }
     }
 
@@ -146,12 +123,18 @@ public class NotamsListLayout extends LinearLayout {
         notamsRefreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MapPosition pos = vars.map.getMapPosition();
-                NotamService notamService = new NotamService();
-                notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
                 toggleNotamsProgressVisibility(true);
+                getNotams();
+
             }
         });
+    }
+
+    private void getNotams()
+    {
+        NotamRetrieval notamRetrieval = new NotamRetrieval(vars);
+        notamRetrieval.setNotamsRetrievedResponseEvent(notamResponseEvent);
+        notamRetrieval.startNotamRetrieval();
     }
 
     private void setNotamItemListClickItem()
@@ -161,10 +144,19 @@ public class NotamsListLayout extends LinearLayout {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 NotamsAirportItemAdapter adapter = (NotamsAirportItemAdapter)adapterView.getAdapter();
                 Airport airport = adapter.getAirport(i);
-                NotamService notamService = new NotamService();
-                notamService.GetNotamsByICAO(airport.ident, notamResponseEvent);
-                toggleNotamsProgressVisibility(true);
+                getNotamsFromDB(airport);
             }
         });
     }
+
+    private void getNotamsFromDB(Airport airport)
+    {
+        AirnavAirportInfoDatabase db = AirnavAirportInfoDatabase.getInstance(vars.context);
+        Notam[] notams = db.getNotam().getLatestStoredNotamsByStationId(airport.ident);
+
+        notamsItemAdapter = new NotamsItemAdapter(NotamsListLayout.this.getContext(), notams);
+        notamsList = (ListView) findViewById(R.id.notamsList);
+        notamsList.setAdapter(notamsItemAdapter);
+    }
+
 }

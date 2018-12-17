@@ -21,6 +21,7 @@ public class Notam {
     public String icaoMessage;   //1
     public String traditionalMessage;  //2
     public String plainLanguageMessage;   //3
+    public String traditionalMessageFrom4thWord;
     public String airportName;
     public String mapPointer;
     public float latitude;

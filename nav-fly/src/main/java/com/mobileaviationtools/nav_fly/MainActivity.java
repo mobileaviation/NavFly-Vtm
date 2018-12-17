@@ -266,6 +266,8 @@ public class MainActivity extends AppCompatActivity {
                     stations.getWeatherData(location, 100l);
                 else
                     stations.getDatabaseWeather(location.getGeopoint(), 100l);
+
+                // TODO Add code to retrieve Notams
             }
         }, 1800000, 1800000);
         vars.dashboardFragment.setZuluTime();
@@ -294,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
             stations.getWeatherData(loc, 100l);
         else
             stations.getDatabaseWeather(loc.getGeopoint(), 100l);
-        // TODO start a timer to get weather data for current location each 30 mins
+        // TODO Add code to retrieve notams
     }
 
     private void createSettingsObject()
@@ -558,6 +560,7 @@ public class MainActivity extends AppCompatActivity {
 
         vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer), vars.BASE_GROUP);
 
+        //TODO Setup for initial location..
         /* set initial position on first run */
         MapPosition pos = new MapPosition();
         vars.map.getMapPosition(pos);

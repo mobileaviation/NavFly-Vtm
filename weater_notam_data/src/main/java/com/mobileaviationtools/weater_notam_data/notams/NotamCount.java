@@ -17,4 +17,6 @@ public class NotamCount {
     public Long requestID;
 
     public Date notamsRetrievedDate;
+
+    public Notams notams;
 }
