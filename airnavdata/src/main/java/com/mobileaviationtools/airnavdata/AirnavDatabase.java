@@ -48,7 +48,7 @@ import java.io.FileReader;
         ActivePeriod.class, ActiveDay.class, ATCStation.class, City.class},
         version = 1)
 public abstract class AirnavDatabase extends RoomDatabase {
-    private static  final String DB_NAME = "room_airnav.db";
+    public static  final String DB_NAME = "room_airnav.db";
     private static volatile AirnavDatabase instance;
 
     public static synchronized AirnavDatabase getInstance(Context context)
@@ -63,7 +63,7 @@ public abstract class AirnavDatabase extends RoomDatabase {
         return Room.databaseBuilder(
                 context,
                 AirnavDatabase.class,
-                DB_NAME
+                AirnavDatabase.DB_NAME
         ).allowMainThreadQueries().build();
     }
 

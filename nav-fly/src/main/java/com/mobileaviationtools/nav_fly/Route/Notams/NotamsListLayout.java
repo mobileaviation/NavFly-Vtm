@@ -77,6 +77,7 @@ public class NotamsListLayout extends LinearLayout {
     }
 
     private NotamResponseEvent notamResponseEvent;
+    public NotamResponseEvent getNotamResponseEvent() { return notamResponseEvent; }
     private void setNotamResponseEvent()
     {
         notamResponseEvent = new NotamResponseEvent() {
@@ -105,6 +106,7 @@ public class NotamsListLayout extends LinearLayout {
             @Override
             public void OnFailure(String message) {
                 Log.i(TAG, "Failure: " + message);
+                getNotams(true);
                 toggleNotamsProgressVisibility(false);
             }
         };
@@ -113,8 +115,7 @@ public class NotamsListLayout extends LinearLayout {
     public void notamBtnClick() {
         if (notamsAirportItemAdapter == null) {
             toggleNotamsProgressVisibility(true);
-            getNotams();
-
+            getNotams(true);
         }
     }
 
@@ -124,17 +125,16 @@ public class NotamsListLayout extends LinearLayout {
             @Override
             public void onClick(View view) {
                 toggleNotamsProgressVisibility(true);
-                getNotams();
-
+                getNotams(false);
             }
         });
     }
 
-    private void getNotams()
+    private void getNotams(Boolean fromDatabase)
     {
         NotamRetrieval notamRetrieval = new NotamRetrieval(vars);
         notamRetrieval.setNotamsRetrievedResponseEvent(notamResponseEvent);
-        notamRetrieval.startNotamRetrieval();
+        notamRetrieval.startNotamRetrieval(fromDatabase);
     }
 
     private void setNotamItemListClickItem()

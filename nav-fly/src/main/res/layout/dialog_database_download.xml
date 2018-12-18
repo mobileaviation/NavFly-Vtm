@@ -4,16 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="50dp"
+    android:background="@color/primaryColor5"
     android:fitsSystemWindows="true"
     tools:context=".DatabaseDownloadActivity">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,8 +30,8 @@
                 android:id="@+id/textView37"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
                 android:layout_marginLeft="5dp"
+                android:layout_marginBottom="10dp"
                 android:text="Download Databases"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -43,16 +45,16 @@
                     android:id="@+id/continent_radiogroup"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:checkedButton="@id/region_na_btn">
+                    android:checkedButton="@id/region_na_btn"
+                    android:orientation="horizontal">
 
                     <RadioButton
                         android:id="@+id/region_al_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:tag="ALL"
                         android:paddingRight="10dp"
+                        android:tag="ALL"
                         android:text="All"
                         android:textSize="8sp" />
 
@@ -61,8 +63,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:tag="NA"
                         android:paddingRight="10dp"
+                        android:tag="NA"
                         android:text="North America"
                         android:textSize="8sp" />
 
@@ -71,8 +73,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:tag="SA"
                         android:paddingRight="10dp"
+                        android:tag="SA"
                         android:text="South America"
                         android:textSize="8sp" />
 
@@ -81,8 +83,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:tag="AS"
                         android:paddingRight="10dp"
+                        android:tag="AS"
                         android:text="Asia"
                         android:textSize="8sp" />
 
@@ -91,8 +93,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:tag="EU"
                         android:paddingRight="10dp"
+                        android:tag="EU"
                         android:text="Europe"
                         android:textSize="8sp" />
 
@@ -101,8 +103,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:tag="AF"
                         android:paddingRight="10dp"
+                        android:tag="AF"
                         android:text="Africa"
                         android:textSize="8sp" />
 
@@ -111,8 +113,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:tag="AU"
                         android:paddingRight="10dp"
+                        android:tag="AU"
                         android:text="Australia"
                         android:textSize="8sp" />
 
@@ -121,8 +123,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:tag="OC"
                         android:paddingRight="10dp"
+                        android:tag="OC"
                         android:text="Oceania"
                         android:textSize="8sp" />
                 </RadioGroup>
@@ -138,9 +140,9 @@
                     android:id="@+id/textView28"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Airports:" />
 
@@ -175,9 +177,9 @@
                     android:id="@+id/textView29"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Navaids:" />
 
@@ -190,6 +192,7 @@
                     android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
                 <TextView
                     android:id="@+id/navaidsCountTxt"
                     android:layout_width="wrap_content"
@@ -211,9 +214,9 @@
                     android:id="@+id/textView30"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Fixes:" />
 
@@ -248,9 +251,9 @@
                     android:id="@+id/textView31"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Countries:" />
 
@@ -285,9 +288,9 @@
                     android:id="@+id/textView32"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Regions:" />
 
@@ -300,6 +303,7 @@
                     android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
                 <TextView
                     android:id="@+id/regionsCountTxt"
                     android:layout_width="wrap_content"
@@ -321,9 +325,9 @@
                     android:id="@+id/textView33"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Firs:" />
 
@@ -336,6 +340,7 @@
                     android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
                 <TextView
                     android:id="@+id/firsCountTxt"
                     android:layout_width="wrap_content"
@@ -357,9 +362,9 @@
                     android:id="@+id/textView34"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Charts:" />
 
@@ -372,6 +377,7 @@
                     android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
                 <TextView
                     android:id="@+id/chartsCountTxt"
                     android:layout_width="wrap_content"
@@ -393,9 +399,9 @@
                     android:id="@+id/textView35"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Airspaces:" />
 
@@ -408,6 +414,7 @@
                     android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
                 <TextView
                     android:id="@+id/airspacesCountTxt"
                     android:layout_width="wrap_content"
@@ -430,9 +437,9 @@
                     android:id="@+id/textView40"
                     android:layout_width="10dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="2dp"
+                    android:layout_marginBottom="2dp"
                     android:layout_weight="6"
                     android:text="Cities:" />
 
@@ -445,6 +452,7 @@
                     android:layout_weight="16"
                     android:max="100"
                     android:progress="0" />
+
                 <TextView
                     android:id="@+id/citiesCountTxt"
                     android:layout_width="wrap_content"

@@ -123,6 +123,11 @@ public class RouteListFragment extends Fragment {
         });
     }
 
+    public NotamResponseEvent getNotamResponseEvent()
+    {
+        return notamsLayout.getNotamResponseEvent();
+    }
+
 //    private Map map;
 //
 //    public void setMap(Map map) {

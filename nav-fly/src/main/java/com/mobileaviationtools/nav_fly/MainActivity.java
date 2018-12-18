@@ -1,10 +1,12 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Environment;
 import android.os.Bundle;
 import android.provider.Telephony;
@@ -20,9 +22,16 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
+import com.mobileaviationtools.airnavdata.AirnavDatabase;
+import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
+import com.mobileaviationtools.airnavdata.Classes.PropertiesGroup;
+import com.mobileaviationtools.airnavdata.Classes.PropertiesName;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
+import com.mobileaviationtools.airnavdata.Entities.Database;
+import com.mobileaviationtools.airnavdata.Entities.Property;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
 import com.mobileaviationtools.nav_fly.Classes.Helpers;
@@ -45,15 +54,21 @@ import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
+import com.mobileaviationtools.nav_fly.Route.Notams.NotamRetrieval;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
 import com.mobileaviationtools.nav_fly.Route.Weather.DatabaseWeatherServices;
 import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.nav_fly.Search.SearchDialog;
+import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
+import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
+import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
+import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
+import com.mobileaviationtools.weater_notam_data.notams.Notams;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
@@ -87,13 +102,14 @@ import org.oscim.tiling.source.mvt.NextzenMvtTileSource;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DialogInterface.OnDismissListener{
     final static boolean USE_CACHE = true;
     final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
     final static int REQUEST_INTERNET_ACCESS_SETUPAPP = 11;
@@ -113,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
     Tracking trackingLayer;
+    Boolean fromMenu;
 
 
 
@@ -133,16 +150,65 @@ public class MainActivity extends AppCompatActivity {
     private ConnectStage connectStage;
 
     private WeatherStations stations;
+    private NotamRetrieval notamRetrieval;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //AirnavClient.deleteDatabaseFile(this, "room_airnav_chart.db");
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
         vars = new GlobalVars();
         vars.mainActivity = this;
         vars.context = this;
+
+        testDB();
+
+        if (!Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) {
+            fromMenu = false;
+            DatabaseDownloadDialog databaseDownloadDialog = DatabaseDownloadDialog.getInstance(vars);
+            databaseDownloadDialog.show(getSupportFragmentManager(), "DatabaseDownload");
+        }
+        else {
+
+            startApp();
+        }
+    }
+
+    private void testDB()
+    {
+//        AirnavDatabase db = AirnavDatabase.getInstance(vars.context);
+//        Airport airport = db.getAirport().getAirportByIdent("EHLE");
+//        Log.i(TAG, "Found Airport: " + airport.name);
+        AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
+        Chart[] charts = db.getCharts().getAllCharts();
+        Log.i(TAG, "Retrieved " + charts.length + " charts");
+        AirnavUserSettingsDatabase db1 = AirnavUserSettingsDatabase.getInstance(vars.context);
+        List<Database> databases = db1.getDatabase().getLatestDownloadedDatabases();
+        Log.i(TAG, "Downloaded databases: " + databases.size());
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        Log.i(TAG, dialog.toString());
+        if (Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) {
+            if (!fromMenu)
+                startApp();
+        }
+        else
+        {
+            // Show warning database not present
+            startApp();
+        }
+    }
+
+    private void startApp()
+    {
+        setContentView(R.layout.activity_main);
+        mMapView = (MapView) findViewById(R.id.mapView);
+
+        vars.map = mMapView.map();
+        mPrefs = new MapPreferences(MainActivity.class.getName(), this);
+        mPrefs.load(mMapView.map());
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED )
         {
@@ -164,13 +230,12 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WAKE_LOCK}, REQUEST_WAKELOCK_SETUPAPP );
         }
+
+
     }
 
     private void setupApp()
     {
-        mMapView = (MapView) findViewById(R.id.mapView);
-        vars.map = mMapView.map();
-        vars.context = this;
         connectStage = ConnectStage.disconnected;
         vars.doDeviationLineFromLocation = new FspLocation("DeviationFromLocation");
 
@@ -181,11 +246,12 @@ public class MainActivity extends AppCompatActivity {
 
         vars.dashboardFragment = (DashboardFragment)getSupportFragmentManager().findFragmentById(R.id.dashboardFragment);
 
-        mPrefs = new MapPreferences(MainActivity.class.getName(), this);
-
         vars.map.layers().addGroup(vars.BASE_GROUP);
 
         setupMap();
+
+        setupInitialLocation();
+
         createLayers();
 
         // Temp test code
@@ -203,13 +269,6 @@ public class MainActivity extends AppCompatActivity {
         settingsObject.setupChartsOverlayLayers();
         settingsObject.setupOnlineTileProviders();
 
-        //getMBTilesMapPerm();
-        //getBitmapOverlayPerm();
-        //setupChartsOverlayLayers();
-        //viewportTest();
-
-        //NetworkDiscovery networkDiscovery = new NetworkDiscovery(this);
-
         setupAirspacesLayer();
         addMarkerLayers();
         addTrackingLayer();
@@ -218,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupRouteFragment();
         setupWeatherStations();
+        setupNotamsRetrieval();
         setupTimers();
 
 
@@ -236,8 +296,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 vars.deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
-
-                //if (mAirportSelectionLayer.getSelected()) mAirportSelectionLayer.unSelectItem();
             }
         });
     }
@@ -267,7 +325,8 @@ public class MainActivity extends AppCompatActivity {
                 else
                     stations.getDatabaseWeather(location.getGeopoint(), 100l);
 
-                // TODO Add code to retrieve Notams
+                notamRetrieval.startNotamRetrieval(false);
+
             }
         }, 1800000, 1800000);
         vars.dashboardFragment.setZuluTime();
@@ -276,7 +335,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupWeatherStations()
     {
         routeListFragment.ToggleWeatherProgressVisibility(true);
+
         stations = new WeatherStations(this);
+
         stations.SetWeatherDataReceivedEvent(new WeatherStations.WeatherDataReceivedEvent() {
             @Override
             public void Received(WeatherStations stations) {
@@ -297,6 +358,30 @@ public class MainActivity extends AppCompatActivity {
         else
             stations.getDatabaseWeather(loc.getGeopoint(), 100l);
         // TODO Add code to retrieve notams
+    }
+
+    private void setupNotamsRetrieval()
+    {
+        routeListFragment.ToggleNotamsProgressVisibility(true);
+        notamRetrieval = new NotamRetrieval(vars);
+        notamRetrieval.setNotamsRetrievedResponseEvent(new NotamResponseEvent() {
+            @Override
+            public void OnNotamsResponse(Notams notams, NotamCount count, String message) {
+
+            }
+
+            @Override
+            public void OnNotamsCountResponse(NotamCounts counts, String message) {
+                routeListFragment.ToggleNotamsProgressVisibility(false);
+
+            }
+
+            @Override
+            public void OnFailure(String message) {
+                routeListFragment.ToggleNotamsProgressVisibility(false);
+            }
+        });
+        notamRetrieval.startNotamRetrieval(false);
     }
 
     private void createSettingsObject()
@@ -437,6 +522,9 @@ public class MainActivity extends AppCompatActivity {
             if (requestCode == REQUEST_SEARCH_DIALOG)
                 showSearchDialog();
 
+            if (requestCode == REQUEST_LOCATION_GPS)
+                setupInitialLocation();
+
             return;
         }
 
@@ -462,67 +550,67 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    void getMBTilesMapPerm()
-    {
+//    void getMBTilesMapPerm()
+//    {
+//
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+//        {
+//            request_Type = requestType.mbtiles;
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
+//        }
+//        else {
+//            getMBTilesMap();
+//        }
+//    }
+//
+//    void getBitmapOverlayPerm()
+//    {
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+//        {
+//            request_Type = requestType.bitmap;
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
+//        }
+//        else {
+//            getBitmapOverlay();
+//        }
+//    }
+//
+//    void getBitmapOverlay()
+//    {
+//        BoundingBox bb = new BoundingBox(52.31267664,5.38673401, 52.58511188, 5.71289063);
+//        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
+//
+//        OverlayTileSource overlayTileSource = new OverlayTileSource(folder, bb);
+//        overlayTileSource.open();
+//        mBitmapLayer = new BitmapTileLayer(vars.map, overlayTileSource);
+//        vars.map.layers().add(mBitmapLayer);
+//    }
+//
+//    void viewportTest()
+//    {
+//        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
+//        BitmapToTile bitmapToTile = new BitmapToTile();
+//        //bitmapToTile.Test(mMapView, mMap, folder);
+//        bitmapToTile.TransformTest();
+//    }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-        {
-            request_Type = requestType.mbtiles;
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
-        }
-        else {
-            getMBTilesMap();
-        }
-    }
-
-    void getBitmapOverlayPerm()
-    {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-        {
-            request_Type = requestType.bitmap;
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
-        }
-        else {
-            getBitmapOverlay();
-        }
-    }
-
-    void getBitmapOverlay()
-    {
-        BoundingBox bb = new BoundingBox(52.31267664,5.38673401, 52.58511188, 5.71289063);
-        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
-
-        OverlayTileSource overlayTileSource = new OverlayTileSource(folder, bb);
-        overlayTileSource.open();
-        mBitmapLayer = new BitmapTileLayer(vars.map, overlayTileSource);
-        vars.map.layers().add(mBitmapLayer);
-    }
-
-    void viewportTest()
-    {
-        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
-        BitmapToTile bitmapToTile = new BitmapToTile();
-        //bitmapToTile.Test(mMapView, mMap, folder);
-        bitmapToTile.TransformTest();
-    }
-
-    void getMBTilesMap()
-    {
-        // ehaa_256@2x.mbtiles
-        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        String folder = downloadFolder.getAbsolutePath() + "/ehaa_256@2x.mbtiles";
-
-        File f = new File(folder);
-        if (f.exists()) {
-            MBTilesTileSource mbTilesTileSource = new MBTilesTileSource(folder);
-            mbTilesTileSource.open();
-            mBitmapLayer = new BitmapTileLayer(vars.map, mbTilesTileSource);
-            vars.map.layers().add(mBitmapLayer);
-
-        }
-    }
+//    void getMBTilesMap()
+//    {
+//        // ehaa_256@2x.mbtiles
+//        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//        String folder = downloadFolder.getAbsolutePath() + "/ehaa_256@2x.mbtiles";
+//
+//        File f = new File(folder);
+//        if (f.exists()) {
+//            MBTilesTileSource mbTilesTileSource = new MBTilesTileSource(folder);
+//            mbTilesTileSource.open();
+//            mBitmapLayer = new BitmapTileLayer(vars.map, mbTilesTileSource);
+//            vars.map.layers().add(mBitmapLayer);
+//
+//        }
+//    }
 
 //    void setupChartsOverlayLayers()
 //    {
@@ -559,6 +647,30 @@ public class MainActivity extends AppCompatActivity {
         vars.map.setTheme(VtmThemes.MAPZEN);
 
         vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer), vars.BASE_GROUP);
+    }
+
+    void setupInitialLocation()
+    {
+//        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+//        List<String> providers = locationManager.getProviders(true);
+//
+//        Location l = null;
+//        for (int i = providers.size()-1; i>=0; i--)
+//        {
+//            l = locationManager.getLastKnownLocation(providers.get(i));
+//            if (l != null) break;
+//        }
+//
+//        if (l != null)
+//            Log.i(TAG, "Found Last Known Location: " + l.toString());
+//        else
+//            Log.i(TAG, "No last known location found");
+
+        AirnavUserSettingsDatabase db = AirnavUserSettingsDatabase.getInstance(vars.context);
+        Property p = db.getProperties().getPropertyByGroupAndName(PropertiesGroup.home_location.toString(),
+                PropertiesName.home_airport.toString());
+
+        // choice your home airport
 
         //TODO Setup for initial location..
         /* set initial position on first run */
@@ -591,8 +703,11 @@ public class MainActivity extends AppCompatActivity {
                 switch (itemType){
                     case downloaddatabase:
                     {
-                        Intent dbDonwloadIntent = new Intent(MainActivity.this, DatabaseDownloadActivity.class);
-                        MainActivity.this.startActivity(dbDonwloadIntent);
+//                        Intent dbDonwloadIntent = new Intent(MainActivity.this, DatabaseDownloadActivity.class);
+//                        MainActivity.this.startActivity(dbDonwloadIntent);
+                        DatabaseDownloadDialog databaseDownloadDialog = DatabaseDownloadDialog.getInstance(vars);
+                        fromMenu = true;
+                        databaseDownloadDialog.show(getSupportFragmentManager(), "DatabaseDownload");
                         break;
                     }
                     case maptype:
@@ -705,9 +820,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        mPrefs.load(mMapView.map());
-        mMapView.onResume();
+        if (mMapView != null) {
+            mPrefs.load(mMapView.map());
+            mMapView.onResume();
+        }
     }
 
     @Override

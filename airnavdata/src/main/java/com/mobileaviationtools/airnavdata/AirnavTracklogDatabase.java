@@ -12,7 +12,7 @@ import com.mobileaviationtools.airnavdata.Entities.TrackLogItem;
 
 @Database(entities = {TrackLog.class, TrackLogItem.class}, version = 1)
 public abstract class AirnavTracklogDatabase extends RoomDatabase {
-    private static  final String DB_NAME = "room_airnav_tracklog.db";
+    public static  final String DB_NAME = "room_airnav_tracklog.db";
     private static volatile AirnavTracklogDatabase instance;
 
     public static synchronized AirnavTracklogDatabase getInstance(Context context)

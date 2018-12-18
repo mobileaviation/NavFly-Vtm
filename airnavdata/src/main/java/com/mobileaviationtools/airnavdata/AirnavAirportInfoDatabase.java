@@ -15,7 +15,7 @@ import com.mobileaviationtools.airnavdata.Entities.Taf;
 @Database(entities = {Notam.class, Taf.class, Metar.class},
         version = 1)
 public abstract class AirnavAirportInfoDatabase extends RoomDatabase{
-    private static  final String DB_NAME = "room_airnav_airport_info.db";
+    public static final String DB_NAME = "room_airnav_airport_info.db";
     private static volatile AirnavAirportInfoDatabase instance;
 
     public static synchronized AirnavAirportInfoDatabase getInstance(Context context)

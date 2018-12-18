@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -46,5 +47,11 @@ public class Helpers {
             Log.e("Connectivity Exception", e.getMessage());
         }
         return connected;
+    }
+
+    public static boolean DatabaseExists(Context context, String dbName)
+    {
+        File dbFile = context.getDatabasePath(dbName);
+        return dbFile.exists();
     }
 }

@@ -12,7 +12,7 @@ import com.mobileaviationtools.airnavdata.Entities.Waypoint;
 
 @Database(entities = {Route.class, Waypoint.class}, version = 1)
 public abstract class AirnavRouteDatabase extends RoomDatabase {
-    private static  final String DB_NAME = "room_airnav_route.db";
+    public static  final String DB_NAME = "room_airnav_route.db";
     private static volatile AirnavRouteDatabase instance;
 
     public static synchronized AirnavRouteDatabase getInstance(Context context)

@@ -16,7 +16,7 @@ import com.mobileaviationtools.airnavdata.Entities.Waypoint;
 
 @Database(entities = {Chart.class, OnlineTileProvider.class}, version = 1)
 public abstract class AirnavChartsDatabase extends RoomDatabase {
-    private static  final String DB_NAME = "room_airnav_chart.db";
+    public static  final String DB_NAME = "room_airnav_chart.db";
     private static volatile AirnavChartsDatabase instance;
 
     public static synchronized AirnavChartsDatabase getInstance(Context context)

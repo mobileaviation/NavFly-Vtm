@@ -57,7 +57,7 @@ public class NotamRetrieval {
 
                 AirnavAirportInfoDatabase db = AirnavAirportInfoDatabase.getInstance(vars.context);
                 Airport a = MapperHelper.getAirport(notams.notamList[0].icaoId, vars.context);
-                Log.i(TAG, "Retrieved Notams for: " + a.ident + " Notams count: " + notams.totalNotamCount.toString());
+                Log.i(TAG, "Retrieved Notams for: " + notams.notamList[0].icaoId + " Notams count: " + notams.totalNotamCount.toString());
 
                 for (com.mobileaviationtools.weater_notam_data.notams.Notam n : notams.notamList) {
                     Notam db_notam = MapperHelper.getNotamEntity(n, a);
@@ -129,20 +129,28 @@ public class NotamRetrieval {
         }
     }
 
-    public void startNotamRetrieval()
+    public void startNotamRetrieval(Boolean fromDatabase)
     {
         notamsRetrieved = 0;
         MapPosition pos = vars.map.getMapPosition();
-        if (Helpers.isConnected(vars.context)) {
-            NotamService notamService = new NotamService();
-            notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
-        } else
-        {
-            NotamCounts counts = retrieveNotamCountsFromDB(pos.getGeoPoint(), 100l);
-            Log.i(TAG, "Notam stations from DB retrieved");
-            if (notamsRetrievedResponseEvent != null)
-                notamsRetrievedResponseEvent.OnNotamsCountResponse(counts, "Notam stations from DB retrieved");
-        }
+
+        if (fromDatabase)
+            startNotalRetrievalFromDatabase(pos.getGeoPoint());
+        else
+            if (Helpers.isConnected(vars.context)) {
+                NotamService notamService = new NotamService();
+                notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
+            } else
+                startNotalRetrievalFromDatabase(pos.getGeoPoint());
+
+    }
+
+    private void startNotalRetrievalFromDatabase(GeoPoint pos)
+    {
+        NotamCounts counts = retrieveNotamCountsFromDB(pos, 100l);
+        Log.i(TAG, "Notam stations from DB retrieved");
+        if (notamsRetrievedResponseEvent != null)
+            notamsRetrievedResponseEvent.OnNotamsCountResponse(counts, "Notam stations from DB retrieved");
     }
 
 }
