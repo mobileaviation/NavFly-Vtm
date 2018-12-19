@@ -77,6 +77,7 @@ public class StartupDialog extends DialogFragment {
 //        adapter.addFragment(SettingsFragmentAdditionalCharts.getInstance(context, settingsObject), "Extra Charts");
 //        adapter.addFragment(SettingsFragmentOffline.getInstance(context, settingsObject), "Offline");
 //        adapter.addFragment(SettingsFragmentOverlays.getInstance(context, settingsObject), "Overlays");
+        adapter.addFragment(StartupInfoFragment.getInstance(this, vars), "Information");
         adapter.addFragment(DatabaseDownloadFragment.getInstance(this, vars), "Download Databases");
         viewPager.setAdapter(adapter);
 
