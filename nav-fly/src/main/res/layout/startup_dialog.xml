@@ -14,7 +14,7 @@
 
 
         <android.support.design.widget.TabLayout
-            android:id="@+id/dbDownloadtabs"
+            android:id="@+id/startuptabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/complementaryColor5"
@@ -26,7 +26,7 @@
 
 
         <android.support.v4.view.ViewPager
-            android:id="@+id/dbDownloadpager"
+            android:id="@+id/startuppager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

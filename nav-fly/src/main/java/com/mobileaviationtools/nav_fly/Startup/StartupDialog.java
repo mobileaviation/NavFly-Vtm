@@ -1,4 +1,4 @@
-package com.mobileaviationtools.nav_fly.Settings.Database;
+package com.mobileaviationtools.nav_fly.Startup;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -19,11 +19,11 @@ import android.view.WindowManager;
 
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadFragment;
 import com.mobileaviationtools.nav_fly.Settings.ViewPagerAdapter;
 
-
-public class DatabaseDownloadDialog extends DialogFragment {
-    public DatabaseDownloadDialog()
+public class StartupDialog extends DialogFragment {
+    public StartupDialog()
     {
         super();
     }
@@ -31,17 +31,17 @@ public class DatabaseDownloadDialog extends DialogFragment {
     private GlobalVars vars;
     private View view;
 
-    public static DatabaseDownloadDialog getInstance(GlobalVars vars)
+    public static StartupDialog getInstance(GlobalVars vars)
     {
-        DatabaseDownloadDialog dialog = new DatabaseDownloadDialog();
+        StartupDialog dialog = new StartupDialog();
         dialog.vars = vars;
         return dialog;
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.dialog_database_download, container);
+        view = inflater.inflate(R.layout.startup_dialog, container);
+
         setStyle(DialogFragment.STYLE_NORMAL, R.style.SettingsDialog);
         setup(view);
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -69,7 +69,7 @@ public class DatabaseDownloadDialog extends DialogFragment {
 
     public void setup(View view)
     {
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.dbDownloadpager);
+        ViewPager viewPager = (ViewPager) view.findViewById(R.id.startuppager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 
         // Add Fragments to adapter one by one
@@ -80,8 +80,7 @@ public class DatabaseDownloadDialog extends DialogFragment {
         adapter.addFragment(DatabaseDownloadFragment.getInstance(this, vars), "Download Databases");
         viewPager.setAdapter(adapter);
 
-        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.dbDownloadtabs);
+        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.startuptabs);
         tabLayout.setupWithViewPager(viewPager);
     }
-
 }

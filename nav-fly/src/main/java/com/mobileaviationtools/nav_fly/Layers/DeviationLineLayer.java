@@ -1,10 +1,14 @@
 package com.mobileaviationtools.nav_fly.Layers;
 
+import android.graphics.BitmapFactory;
+
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Markers.Route.RouteLegSymbol;
+import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Leg;
 
+import org.oscim.android.canvas.AndroidBitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ItemizedLayer;
@@ -41,7 +45,7 @@ public class DeviationLineLayer extends VectorLayer {
     public void setupLayers(GlobalVars vars)
     {
         this.vars = vars;
-        MarkerSymbol s = null;
+        MarkerSymbol s = new MarkerSymbol(getDefaultBitmap(), MarkerSymbol.HotspotPlace.CENTER);
         symbolLayer = new ItemizedLayer(vars.map, s);
 
         lineStyle1 = Style.builder()
@@ -108,5 +112,14 @@ public class DeviationLineLayer extends VectorLayer {
             this.remove(deviationLineDrawable1);
             this.remove(deviationLineDrawable2);
         }
+    }
+
+    private AndroidBitmap getDefaultBitmap()
+    {
+        BitmapFactory.Options op = new BitmapFactory.Options();
+        op.inMutable = true;
+        android.graphics.Bitmap courseBitmap =
+                BitmapFactory.decodeResource(vars.context.getResources(), R.drawable.direction_marker_square, op);
+        return new AndroidBitmap(courseBitmap);
     }
 }

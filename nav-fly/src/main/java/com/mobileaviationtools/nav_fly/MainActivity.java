@@ -64,6 +64,7 @@ import com.mobileaviationtools.nav_fly.Search.SearchDialog;
 import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
+import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
 import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
@@ -161,12 +162,10 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars.mainActivity = this;
         vars.context = this;
 
-        testDB();
-
         if (!Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) {
             fromMenu = false;
-            DatabaseDownloadDialog databaseDownloadDialog = DatabaseDownloadDialog.getInstance(vars);
-            databaseDownloadDialog.show(getSupportFragmentManager(), "DatabaseDownload");
+            StartupDialog startupDialog = StartupDialog.getInstance(vars);
+            startupDialog.show(getSupportFragmentManager(), "Startup");
         }
         else {
 
