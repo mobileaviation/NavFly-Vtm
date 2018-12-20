@@ -9,8 +9,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -23,6 +25,7 @@ import com.mobileaviationtools.nav_fly.Search.SearchService;
 import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
 import com.mobileaviationtools.nav_fly.Startup.StartupInfoFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -84,7 +87,7 @@ public class HomeAirportFragment extends Fragment {
             }
         });
 
-        ListView airportsListView = view.findViewById(R.id.searchHomeAirportsList);
+        final ListView airportsListView = view.findViewById(R.id.searchHomeAirportsList);
 
         infoAirportItemAdapter = new InfoItemAdapter(vars.context);
         infoAirportItemAdapter.setAirports(service.getAirportsLimit(50l));
@@ -109,5 +112,21 @@ public class HomeAirportFragment extends Fragment {
             }
         });
         airportsListView.setAdapter(infoAirportItemAdapter);
+
+        airportsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                InfoItemAdapter adapter = (InfoItemAdapter)parent.getAdapter();
+                Object item = adapter.getItem(position);
+                if (item instanceof Airport){
+                    ArrayList<Airport> selectedAirportList = new ArrayList<>();
+                    selectedAirportList.add((Airport)item);
+                    infoAirportItemAdapter = new InfoItemAdapter(vars.context);
+                    infoAirportItemAdapter.setAirports(selectedAirportList);
+                    ListView selectedListView = getView().findViewById(R.id.selectedHomeAirportsList);
+                    selectedListView.setAdapter(infoAirportItemAdapter);
+                }
+            }
+        });
     }
 }

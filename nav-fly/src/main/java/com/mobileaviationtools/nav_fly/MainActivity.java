@@ -162,7 +162,9 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars.mainActivity = this;
         vars.context = this;
 
-        if (!Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) {
+        Boolean test = true;
+
+        if ((!Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) || test) {
             fromMenu = false;
             StartupDialog startupDialog = StartupDialog.getInstance(vars);
             startupDialog.show(getSupportFragmentManager(), "Startup");
