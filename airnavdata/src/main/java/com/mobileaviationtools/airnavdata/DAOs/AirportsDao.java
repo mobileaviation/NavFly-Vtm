@@ -52,4 +52,7 @@ public abstract class AirportsDao {
     @Query("SELECT * FROM tbl_Airports WHERE (name like :name OR ident like :name) AND type IN (:types) ORDER BY name LIMIT :limit")
     public abstract List<Airport> searchAirportsByNameOrIdentLimitType(String name, Long limit, List<String> types);
 
+    @Query("SELECT * FROM tbl_Airports WHERE type IN (:types) ORDER BY name LIMIT :limit")
+    public abstract List<Airport> getAirportsLimitType(Long limit, List<String> types);
+
 }

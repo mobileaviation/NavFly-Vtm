@@ -77,7 +77,7 @@ public class DatabaseDownloadDialog extends DialogFragment {
 //        adapter.addFragment(SettingsFragmentAdditionalCharts.getInstance(context, settingsObject), "Extra Charts");
 //        adapter.addFragment(SettingsFragmentOffline.getInstance(context, settingsObject), "Offline");
 //        adapter.addFragment(SettingsFragmentOverlays.getInstance(context, settingsObject), "Overlays");
-        adapter.addFragment(DatabaseDownloadFragment.getInstance(this, vars), "Download Databases");
+        adapter.addFragment(DatabaseDownloadFragment.getInstance(this, vars, false), "Download Databases");
         viewPager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.dbDownloadtabs);

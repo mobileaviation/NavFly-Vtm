@@ -26,7 +26,7 @@ android:layout_height="match_parent">
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="8dp"
-    android:text="It seems that this is your firsttime here. So before you can start some things needs to be setup. We start with downloading the aviation databases. You can select for a subset for the continent you do your flying or just for the whole of the world. Downloads will take longer if you choice the last option. You can if you want, add data for the other continents at a later time."
+    android:text="It seems that this is your first time here. So before you can start some things needs to be setup. We start with downloading the aviation databases. You can select for the continent you do your flying or just for the whole of the world. Downloads will take longer if you choice the last option. You can download other continents at a later time."
     android:textAppearance="@style/TextAppearance.AppCompat"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
@@ -39,22 +39,22 @@ android:layout_height="match_parent">
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="8dp"
-    android:text="After downloading the database some other onetime setup items need to be set. We start with you home airport. This will be the initial location the app will show when you start it.
-Second define you location provider. This can be the internal GPS of you tablet or phone but we also support connection to FSX, Prepar or XPlane. For this to work you need to install and setup a special peice of server software and setup the IpAddreess and port for it."
+    android:text="After downloading the databases some other items need to be set. We start with selecting you home airport. This will be the initial location when you start the app.
+Second you define the location provider. This can be either the internal GPS or a connection to FSX, Prepar or XPlane. For connection to a simulator you need to download and install special piece of server software (only windows) and setup the IpAddreess and Tcp-port for it."
     android:textAppearance="@style/TextAppearance.AppCompat"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/editText" />
 
-<Button
-    android:id="@+id/button"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginEnd="8dp"
-    android:layout_marginBottom="8dp"
-    android:text="Next"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent" />
+    <Button
+        android:id="@+id/startupInfoNextBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 <TextView
     android:id="@+id/textView11"

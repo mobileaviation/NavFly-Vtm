@@ -66,6 +66,12 @@ public class SearchService {
         return airports;
     }
 
+    public List<Airport> getAirportsLimit(Long Limit)
+    {
+        AirnavDatabase db = AirnavDatabase.getInstance(vars.context);
+        return db.getAirport().getAirportsLimitType(Limit, getAirportTypes());
+    }
+
     public List<Navaid> searchNavaids(String searchString, Long limit)
     {
         String s = "%" + searchString + "%";

@@ -23,8 +23,12 @@ import com.mobileaviationtools.airnavdata.Entities.Database;
 import com.mobileaviationtools.airnavdata.Models.Statistics;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
+
+import org.w3c.dom.Text;
 
 import java.util.Date;
+import java.util.EventListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,12 +40,13 @@ public class DatabaseDownloadFragment extends Fragment {
 
     private static DatabaseDownloadFragment instance;
 
-    public static DatabaseDownloadFragment getInstance(DialogFragment parentDialog, GlobalVars vars)
+    public static DatabaseDownloadFragment getInstance(DialogFragment parentDialog, GlobalVars vars, Boolean startup)
     {
         if (instance == null) {
             DatabaseDownloadFragment instance = new DatabaseDownloadFragment();
             instance.vars = vars;
             instance.parentDialog = parentDialog;
+            instance.startup = startup;
             return instance;
         }
         else
@@ -50,6 +55,12 @@ public class DatabaseDownloadFragment extends Fragment {
 
     private GlobalVars vars;
     private DialogFragment parentDialog;
+    private Boolean startup;
+    private StartupDialog.NextPrevEventListener nextEvent;
+    public void SetNextEventListener(StartupDialog.NextPrevEventListener listener)
+    {
+        nextEvent = listener;
+    }
 
     private Button actionBtn;
     private ProgressBar airportsProgressBar;
@@ -62,6 +73,8 @@ public class DatabaseDownloadFragment extends Fragment {
     private ProgressBar chartsProgressBar;
     private ProgressBar citiesProgressBar;
     private RadioGroup continentsGroup;
+
+    private TextView dbDownloadHelpTextView;
 
     private Integer finishedCount;
     private String continent;
@@ -97,6 +110,9 @@ public class DatabaseDownloadFragment extends Fragment {
         airspacesProgressBar = (ProgressBar)view.findViewById(R.id.airspacesProgress);
         chartsProgressBar = (ProgressBar)view.findViewById(R.id.chartsProgress);
         citiesProgressBar = (ProgressBar)view.findViewById(R.id.citiesProgress);
+
+        dbDownloadHelpTextView = (TextView)view.findViewById(R.id.dbDownloadHelpTextView);
+        dbDownloadHelpTextView.setVisibility((startup) ? View.VISIBLE : View.GONE);
 
         continentsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -169,7 +185,7 @@ public class DatabaseDownloadFragment extends Fragment {
                             db.getDatabase().InsertDatabase(database);
 
                             if (finishedCount == 9) {
-                                actionBtn.setText("Close");
+                                actionBtn.setText((startup) ? "Next" : "Close");
                                 actionBtn.setTag(true);
                                 actionBtn.setEnabled(true);
                             }
@@ -201,7 +217,13 @@ public class DatabaseDownloadFragment extends Fragment {
                 }
                 else
                 {
-                    parentDialog.dismiss();
+                    if (startup)
+                    {
+                        if (nextEvent != null) nextEvent.OnNext(DatabaseDownloadFragment.this);
+                    }
+                    else {
+                        parentDialog.dismiss();
+                    }
                 }
 
             }

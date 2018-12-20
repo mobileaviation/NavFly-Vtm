@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
@@ -24,6 +25,11 @@ public class StartupInfoFragment extends Fragment {
     private static StartupInfoFragment instance;
     private DialogFragment parentDialog;
     private View view;
+    private StartupDialog.NextPrevEventListener nextEvent;
+    public void SetNextEventListener(StartupDialog.NextPrevEventListener listener)
+    {
+        nextEvent = listener;
+    }
 
     public static StartupInfoFragment getInstance(DialogFragment parentDialog, GlobalVars vars)
     {
@@ -51,7 +57,13 @@ public class StartupInfoFragment extends Fragment {
 
     private void setup(View view)
     {
-
+        Button startupInfoNextBtn = (Button) view.findViewById(R.id.startupInfoNextBtn);
+        startupInfoNextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (nextEvent != null) nextEvent.OnNext(StartupInfoFragment.this);
+            }
+        });
     }
 
 }
