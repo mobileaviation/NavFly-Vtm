@@ -21,7 +21,7 @@ import android.view.WindowManager;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadFragment;
-import com.mobileaviationtools.nav_fly.Settings.HomeAirportFragment;
+import com.mobileaviationtools.nav_fly.Settings.HomeAirport.HomeAirportFragment;
 import com.mobileaviationtools.nav_fly.Settings.LoationProviderSetupFragment;
 import com.mobileaviationtools.nav_fly.Settings.ViewPagerAdapter;
 
@@ -38,6 +38,7 @@ public class StartupDialog extends DialogFragment {
 
     private GlobalVars vars;
     private View view;
+    private HomeAirportFragment homeAirportFragment;
     private NextPrevEventListener nextPrevEventListener;
 
     public static StartupDialog getInstance(GlobalVars vars)
@@ -91,7 +92,7 @@ public class StartupDialog extends DialogFragment {
         databaseDownloadFragment.SetNextEventListener(nextPrevEventListener);
         adapter.addFragment(databaseDownloadFragment, "Download Databases");
 
-        HomeAirportFragment homeAirportFragment = HomeAirportFragment.getInstance(this, vars, true);
+        homeAirportFragment = HomeAirportFragment.getInstance(this, vars, true);
         homeAirportFragment.SetNextEventListener(nextPrevEventListener);
         adapter.addFragment(homeAirportFragment, "Home Airport");
 
@@ -119,6 +120,10 @@ public class StartupDialog extends DialogFragment {
         nextPrevEventListener = new NextPrevEventListener() {
             @Override
             public void OnNext(Fragment fragment) {
+                if (fragment instanceof DatabaseDownloadFragment)
+                {
+                    homeAirportFragment.setBaseAirports();
+                }
                 NextPage();
             }
         };

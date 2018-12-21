@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
 import com.mobileaviationtools.airnavdata.Api.AirnavClient;
@@ -193,7 +194,8 @@ public class DatabaseDownloadFragment extends Fragment {
 
                         @Override
                         public void OnError(String message, TableType tableType) {
-
+                            Toast.makeText(vars.context, "Error downloading database, please try again in a few minutes!", Toast.LENGTH_LONG);
+                            actionBtn.setEnabled(true);
                         }
 
                         @Override

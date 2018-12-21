@@ -29,4 +29,7 @@ public abstract class RunwaysDao {
 
     @Query("SELECT * FROM tbl_Runways WHERE airport_ref=:airport_ref")
     public abstract List<Runway> getRunwaysByAirport(Integer airport_ref);
+
+    @Query("SELECT * FROM tbl_Runways WHERE id=:id")
+    public abstract Runway getRunwayById(Integer id);
  }

@@ -62,6 +62,8 @@ import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.nav_fly.Search.SearchDialog;
 import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadDialog;
+import com.mobileaviationtools.nav_fly.Settings.HomeAirport.HomeAirportService;
+import com.mobileaviationtools.nav_fly.Settings.HomeAirport.SelectedAirport;
 import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
@@ -251,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
         setupMap();
 
-        setupInitialLocation();
+        //setupInitialLocation();
 
         createLayers();
 
@@ -275,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         addTrackingLayer();
         addAircraftLocationLayer();
         addDeviationLineLayer();
+        setupHomeLocation();
 
         setupRouteFragment();
         setupWeatherStations();
@@ -299,6 +302,20 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                 vars.deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
             }
         });
+    }
+
+    private void setupHomeLocation() {
+        HomeAirportService homeAirportService = new HomeAirportService(vars);
+        SelectedAirport airport = homeAirportService.getSelectedHomeAirport();
+        if (airport != null)
+        {
+            Location location = new Location("StartLocation");
+            location.setLatitude(airport.airport.latitude_deg);
+            location.setLongitude(airport.airport.longitude_deg);
+            FspLocation loc = new FspLocation(location);
+            vars.airplaneLocation.Assign(loc);
+            vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
+        }
     }
 
     public void setupTimers()
@@ -477,8 +494,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     public void addAircraftLocationLayer()
     {
         vars.airplaneLocation = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "AirplaneLocation");
-
-
         vars.mAircraftLocationLayer = AircraftLocationLayer.createNewAircraftLayer(vars.map,
                 this, vars.airplaneLocation);
 
@@ -652,26 +667,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
     void setupInitialLocation()
     {
-//        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-//        List<String> providers = locationManager.getProviders(true);
-//
-//        Location l = null;
-//        for (int i = providers.size()-1; i>=0; i--)
-//        {
-//            l = locationManager.getLastKnownLocation(providers.get(i));
-//            if (l != null) break;
-//        }
-//
-//        if (l != null)
-//            Log.i(TAG, "Found Last Known Location: " + l.toString());
-//        else
-//            Log.i(TAG, "No last known location found");
 
-        AirnavUserSettingsDatabase db = AirnavUserSettingsDatabase.getInstance(vars.context);
-        Property p = db.getProperties().getPropertyByGroupAndName(PropertiesGroup.home_location.toString(),
-                PropertiesName.home_airport.toString());
-
-        // choice your home airport
 
         //TODO Setup for initial location..
         /* set initial position on first run */
