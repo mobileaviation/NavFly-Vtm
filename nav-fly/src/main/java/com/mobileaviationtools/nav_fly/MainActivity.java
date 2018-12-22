@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars.mainActivity = this;
         vars.context = this;
 
-        Boolean test = true;
+        Boolean test = false;
 
         if ((!Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) || test) {
             fromMenu = false;
