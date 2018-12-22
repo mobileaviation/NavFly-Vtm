@@ -1,15 +1,10 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
-import android.os.Environment;
 import android.os.Bundle;
-import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,13 +20,11 @@ import android.widget.Toast;
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
-import com.mobileaviationtools.airnavdata.Classes.PropertiesGroup;
-import com.mobileaviationtools.airnavdata.Classes.PropertiesName;
+import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.Database;
-import com.mobileaviationtools.airnavdata.Entities.Property;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
 import com.mobileaviationtools.nav_fly.Classes.Helpers;
@@ -41,7 +34,6 @@ import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Layers.DeviationLineLayer;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
-import com.mobileaviationtools.nav_fly.Location.FspGPSLocationProvider;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Location.FspLocationProvider;
 import com.mobileaviationtools.nav_fly.Location.LocationEvents;
@@ -50,24 +42,22 @@ import com.mobileaviationtools.nav_fly.Location.Tracking;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
+import com.mobileaviationtools.nav_fly.Menus.MapDirectionType;
 import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamRetrieval;
-import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
-import com.mobileaviationtools.nav_fly.Route.Weather.DatabaseWeatherServices;
 import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.nav_fly.Search.SearchDialog;
 import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadDialog;
 import com.mobileaviationtools.nav_fly.Settings.HomeAirport.HomeAirportService;
 import com.mobileaviationtools.nav_fly.Settings.HomeAirport.SelectedAirport;
-import com.mobileaviationtools.nav_fly.Settings.SettingsDialog;
+import com.mobileaviationtools.nav_fly.Settings.ChartSettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
-import com.mobileaviationtools.nav_fly.Test.BitmapToTile;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
@@ -75,16 +65,11 @@ import com.mobileaviationtools.weater_notam_data.notams.Notams;
 
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
-import org.oscim.android.tiling.Overlay.OverlayTileSource;
-import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.backend.CanvasAdapter;
-import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
-import org.oscim.layers.GroupLayer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
-import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Map;
@@ -98,13 +83,8 @@ import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
-import org.oscim.tiling.source.UrlTileSource;
-import org.oscim.tiling.source.geojson.NextzenGeojsonTileSource;
-import org.oscim.tiling.source.mvt.MapilionMvtTileSource;
 import org.oscim.tiling.source.mvt.NextzenMvtTileSource;
-import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
-import java.io.File;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -134,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     Tracking trackingLayer;
     Boolean fromMenu;
 
+    Boolean mapPosLockedToAirplanePos = true;
+    MapDirectionType mapDirectionType = MapDirectionType.north;
+
 
 
     Timer clockTimer;
@@ -158,6 +141,9 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //AirnavClient.deleteDatabaseFile(this, "room_airnav_chart.db");
+        //AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
+        //AirnavClient.deleteDatabaseFile(this, "room_airnav_settings.db");
+
         super.onCreate(savedInstanceState);
 
         vars = new GlobalVars();
@@ -310,11 +296,26 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         if (airport != null)
         {
             Location location = new Location("StartLocation");
-            location.setLatitude(airport.airport.latitude_deg);
-            location.setLongitude(airport.airport.longitude_deg);
+            if (airport.runway == null) {
+                location.setLatitude(airport.airport.latitude_deg);
+                location.setLongitude(airport.airport.longitude_deg);
+            }
+            else
+            {
+                String ident = airport.runwayIdent;
+                boolean le = airport.runway.le_ident.equals(ident);
+                location.setLatitude(le ? airport.runway.le_latitude_deg : airport.runway.he_latitude_deg);
+                location.setLongitude(le ? airport.runway.le_longitude_deg : airport.runway.he_longitude_deg);
+                location.setBearing((le ? airport.runway.le_heading_degT : airport.runway.he_heading_degT).floatValue());
+            }
             FspLocation loc = new FspLocation(location);
             vars.airplaneLocation.Assign(loc);
             vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
+
+            MapPosition position = vars.map.getMapPosition();
+            position.setPosition(loc.getGeopoint());
+            position.setZoom(14);
+            vars.map.setMapPosition(position);
         }
     }
 
@@ -538,8 +539,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             if (requestCode == REQUEST_SEARCH_DIALOG)
                 showSearchDialog();
 
-            if (requestCode == REQUEST_LOCATION_GPS)
-                setupInitialLocation();
+//            if (requestCode == REQUEST_LOCATION_GPS)
+//                setupInitialLocation();
 
             return;
         }
@@ -709,8 +710,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     }
                     case maptype:
                     {
-                        SettingsDialog settingsDialog = SettingsDialog.getInstance(MainActivity.this, settingsObject);
-                        settingsDialog.show(getSupportFragmentManager(), "Settings");
+                        ChartSettingsDialog chartSettingsDialog = ChartSettingsDialog.getInstance(MainActivity.this, settingsObject);
+                        chartSettingsDialog.show(getSupportFragmentManager(), "Settings");
                         break;
                     }
                     case search:
@@ -729,6 +730,19 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     case connectDisconnect:
                     {
                         ConnectionProcess();
+                        break;
+                    }
+
+                    case tracking:
+                    {
+                        mapPosLockedToAirplanePos = !mapPosLockedToAirplanePos;
+                        menu.SetTrackingItemIcon(mapPosLockedToAirplanePos);
+                        break;
+                    }
+                    case mapDirection:
+                    {
+                        mapDirectionType = MapDirectionType.getNextDirectionType(mapDirectionType);
+                        menu.setDirectionBtnIcon(mapDirectionType);
                         break;
                     }
                 }
@@ -787,6 +801,13 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                             vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
                             vars.dashboardFragment.setLocation(vars.airplaneLocation);
                             //mMap.render();
+
+                            if (mapPosLockedToAirplanePos)
+                            {
+                                MapPosition pos = vars.map.getMapPosition();
+                                pos.setPosition(vars.airplaneLocation.getGeopoint());
+                                vars.map.setMapPosition(pos);
+                            }
                         }
                     }
                     else

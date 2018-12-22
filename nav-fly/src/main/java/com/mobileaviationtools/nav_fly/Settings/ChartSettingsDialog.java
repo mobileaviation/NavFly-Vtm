@@ -7,7 +7,6 @@ import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,18 +16,18 @@ import android.view.WindowManager;
 
 import com.mobileaviationtools.nav_fly.R;
 
-public class SettingsDialog extends DialogFragment {
-    public SettingsDialog()
+public class ChartSettingsDialog extends DialogFragment {
+    public ChartSettingsDialog()
     {
         super();
     }
 
-    public static SettingsDialog getInstance(Context context, SettingsObject object)
+    public static ChartSettingsDialog getInstance(Context context, SettingsObject object)
     {
-        SettingsDialog settingsDialog = new SettingsDialog();
-        settingsDialog.context = context;
-        settingsDialog.settingsObject = object;
-        return settingsDialog;
+        ChartSettingsDialog chartSettingsDialog = new ChartSettingsDialog();
+        chartSettingsDialog.context = context;
+        chartSettingsDialog.settingsObject = object;
+        return chartSettingsDialog;
     }
 
     @Override
