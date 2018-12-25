@@ -7,6 +7,7 @@ import com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment;
 import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.DeviationLineLayer;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
+import com.mobileaviationtools.nav_fly.Menus.MapDirectionType;
 import com.mobileaviationtools.nav_fly.Route.Route;
 
 import org.oscim.layers.GroupLayer;
@@ -23,6 +24,8 @@ public class GlobalVars {
     public AircraftLocationLayer mAircraftLocationLayer;
     public DeviationLineLayer deviationLineLayer;
     public DashboardFragment dashboardFragment;
+
+    public MapDirectionType mapDirectionType = MapDirectionType.north;
 
     public GroupLayer baseGroupLayer;
 

@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,7 +21,6 @@ import android.widget.Toast;
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
-import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
@@ -53,7 +53,8 @@ import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.nav_fly.Search.SearchDialog;
 import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadDialog;
-import com.mobileaviationtools.nav_fly.Settings.HomeAirport.HomeAirportService;
+import com.mobileaviationtools.nav_fly.Settings.GeneralSettingsDialog;
+import com.mobileaviationtools.nav_fly.Settings.Services.HomeAirportService;
 import com.mobileaviationtools.nav_fly.Settings.HomeAirport.SelectedAirport;
 import com.mobileaviationtools.nav_fly.Settings.ChartSettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
@@ -115,9 +116,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     Boolean fromMenu;
 
     Boolean mapPosLockedToAirplanePos = true;
-    MapDirectionType mapDirectionType = MapDirectionType.north;
-
-
 
     Timer clockTimer;
     Timer weatherTimer;
@@ -158,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             startupDialog.show(getSupportFragmentManager(), "Startup");
         }
         else {
-
             startApp();
         }
     }
@@ -180,6 +177,14 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     public void onDismiss(DialogInterface dialog) {
         Log.i(TAG, dialog.toString());
         if (Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) {
+
+//            if (dialog instanceof Dialog)
+//            {
+//                Dialog d = (Dialog)dialog;
+//                int i=0;
+//                d.g
+//            }
+
             if (!fromMenu)
                 startApp();
         }
@@ -196,8 +201,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         mMapView = (MapView) findViewById(R.id.mapView);
 
         vars.map = mMapView.map();
-        mPrefs = new MapPreferences(MainActivity.class.getName(), this);
-        mPrefs.load(mMapView.map());
+        //mPrefs = new MapPreferences(MainActivity.class.getName(), this);
+        //mPrefs.load(mMapView.map());
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED )
         {
@@ -262,8 +267,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         addMarkerLayers();
         addTrackingLayer();
         addAircraftLocationLayer();
-        addDeviationLineLayer();
         setupHomeLocation();
+        addDeviationLineLayer();
 
         setupRouteFragment();
         setupWeatherStations();
@@ -286,8 +291,30 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                 }
 
                 vars.deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
+
+                setMapDirectoinType(vars.mapDirectionType);
+
             }
         });
+    }
+
+    private void setMapDirectoinType(MapDirectionType type)
+    {
+        vars.mapDirectionType = type;
+        MapPosition pos = vars.map.getMapPosition();
+        switch (type)
+        {
+            case north: {
+                pos.setBearing(0);
+                vars.map.setMapPosition(pos);
+                break;
+            }
+            case flight: {
+                pos.setBearing(360-vars.airplaneLocation.getBearing());
+                vars.map.setMapPosition(pos);
+                break;
+            }
+        }
     }
 
     private void setupHomeLocation() {
@@ -314,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
             MapPosition position = vars.map.getMapPosition();
             position.setPosition(loc.getGeopoint());
-            position.setZoom(14);
+            position.setZoom(9);
             vars.map.setMapPosition(position);
         }
     }
@@ -711,7 +738,15 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     case maptype:
                     {
                         ChartSettingsDialog chartSettingsDialog = ChartSettingsDialog.getInstance(MainActivity.this, settingsObject);
-                        chartSettingsDialog.show(getSupportFragmentManager(), "Settings");
+                        fromMenu = true;
+                        chartSettingsDialog.show(getSupportFragmentManager(), "ChartSettings");
+                        break;
+                    }
+                    case settings:
+                    {
+                        GeneralSettingsDialog generalSettingsDialog = GeneralSettingsDialog.getInstance(MainActivity.this.vars);
+                        fromMenu = true;
+                        generalSettingsDialog.show(getSupportFragmentManager(), "GeneralSettings");
                         break;
                     }
                     case search:
@@ -741,8 +776,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     }
                     case mapDirection:
                     {
-                        mapDirectionType = MapDirectionType.getNextDirectionType(mapDirectionType);
-                        menu.setDirectionBtnIcon(mapDirectionType);
+                        setMapDirectoinType(MapDirectionType.getNextDirectionType(vars.mapDirectionType));
+                        menu.setDirectionBtnIcon(vars.mapDirectionType);
                         break;
                     }
                 }
@@ -802,12 +837,19 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                             vars.dashboardFragment.setLocation(vars.airplaneLocation);
                             //mMap.render();
 
+                            MapPosition pos = vars.map.getMapPosition();
                             if (mapPosLockedToAirplanePos)
                             {
-                                MapPosition pos = vars.map.getMapPosition();
                                 pos.setPosition(vars.airplaneLocation.getGeopoint());
                                 vars.map.setMapPosition(pos);
                             }
+
+                            if (vars.mapDirectionType==MapDirectionType.flight)
+                            {
+                                pos.setBearing(360-vars.airplaneLocation.getBearing());
+                            }
+
+                            vars.map.setMapPosition(pos);
                         }
                     }
                     else
@@ -839,14 +881,14 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     protected void onResume() {
         super.onResume();
         if (mMapView != null) {
-            mPrefs.load(mMapView.map());
+            //mPrefs.load(mMapView.map());
             mMapView.onResume();
         }
     }
 
     @Override
     protected void onPause() {
-        mPrefs.save(mMapView.map());
+        //mPrefs.save(mMapView.map());
         mMapView.onPause();
 
         super.onPause();

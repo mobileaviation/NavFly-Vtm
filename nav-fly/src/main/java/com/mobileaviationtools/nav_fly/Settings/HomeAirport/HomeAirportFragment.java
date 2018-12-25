@@ -15,17 +15,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.mobileaviationtools.airnavdata.AirnavDatabase;
-import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
-import com.mobileaviationtools.airnavdata.Classes.PropertiesGroup;
-import com.mobileaviationtools.airnavdata.Classes.PropertiesName;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
-import com.mobileaviationtools.airnavdata.Entities.Property;
-import com.mobileaviationtools.airnavdata.Entities.Runway;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Info.InfoItemAdapter;
 import com.mobileaviationtools.nav_fly.Search.SearchService;
+import com.mobileaviationtools.nav_fly.Settings.Services.HomeAirportService;
 import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
 
 import java.util.ArrayList;

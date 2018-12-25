@@ -1,4 +1,4 @@
-package com.mobileaviationtools.nav_fly.Settings.HomeAirport;
+package com.mobileaviationtools.nav_fly.Settings.Services;
 
 import android.util.Log;
 
@@ -9,19 +9,23 @@ import com.mobileaviationtools.airnavdata.Classes.PropertiesName;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Property;
 import com.mobileaviationtools.nav_fly.GlobalVars;
+import com.mobileaviationtools.nav_fly.Settings.HomeAirport.SelectedAirport;
+
+import org.jeo.carto.Prop;
 
 public class HomeAirportService {
     public HomeAirportService(GlobalVars vars)
     {
         this.vars = vars;
+        db = AirnavUserSettingsDatabase.getInstance(vars.context);
     }
 
     private GlobalVars vars;
     private final String TAG = "HomeAirportService";
+    private AirnavUserSettingsDatabase db;
 
     public void storeAirport(SelectedAirport airport)
     {
-        AirnavUserSettingsDatabase db = AirnavUserSettingsDatabase.getInstance(vars.context);
         Property p = db.getProperties().getPropertyByGroupAndName(PropertiesGroup.home_location.toString(),
                 PropertiesName.home_airport.toString());
 
@@ -44,15 +48,19 @@ public class HomeAirportService {
             p.value3 = "";
         }
 
-        if(insert) db.getProperties().InsertProperty(p);
-        else db.getProperties().UpdateProperty(p);
+        UpdateInsertProperty(insert, p);
+    }
+
+    private void UpdateInsertProperty(Boolean insert, Property property)
+    {
+        if(insert) db.getProperties().InsertProperty(property);
+        else db.getProperties().UpdateProperty(property);
     }
 
     public SelectedAirport getSelectedHomeAirport()
     {
         Log.i(TAG, "Start retrieving selected home airport");
 
-        AirnavUserSettingsDatabase db = AirnavUserSettingsDatabase.getInstance(vars.context);
         SelectedAirport airport = null;
         Property p = db.getProperties().getPropertyByGroupAndName(PropertiesGroup.home_location.toString(),
                 PropertiesName.home_airport.toString());

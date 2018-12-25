@@ -1,4 +1,4 @@
-package com.mobileaviationtools.nav_fly.Startup;
+package com.mobileaviationtools.nav_fly.Settings;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -20,20 +20,11 @@ import android.view.WindowManager;
 
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
-import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadFragment;
 import com.mobileaviationtools.nav_fly.Settings.HomeAirport.HomeAirportFragment;
-import com.mobileaviationtools.nav_fly.Settings.LocationProviderSetupFragment;
-import com.mobileaviationtools.nav_fly.Settings.ViewPagerAdapter;
+import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
 
-public class StartupDialog extends DialogFragment {
-    public interface NextPrevEventListener
-    {
-        public void OnNext(Fragment fragment);
-        public void OnPrev(Fragment fragment);
-        public void OnClose(Fragment fragment);
-    }
-
-    public StartupDialog()
+public class GeneralSettingsDialog extends DialogFragment {
+    public GeneralSettingsDialog()
     {
         super();
     }
@@ -41,18 +32,18 @@ public class StartupDialog extends DialogFragment {
     private GlobalVars vars;
     private View view;
     private HomeAirportFragment homeAirportFragment;
-    private NextPrevEventListener nextPrevEventListener;
+    private StartupDialog.NextPrevEventListener nextPrevEventListener;
 
-    public static StartupDialog getInstance(GlobalVars vars)
+    public static GeneralSettingsDialog getInstance(GlobalVars vars)
     {
-        StartupDialog dialog = new StartupDialog();
+        GeneralSettingsDialog dialog = new GeneralSettingsDialog();
         dialog.vars = vars;
         return dialog;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.startup_dialog, container);
+        view = inflater.inflate(R.layout.settings_base_layout, container);
 
         setStyle(DialogFragment.STYLE_NORMAL, R.style.SettingsDialog);
         setupNextPrevListener();
@@ -80,19 +71,10 @@ public class StartupDialog extends DialogFragment {
         ((DialogInterface.OnDismissListener)activity).onDismiss(dialog);
     }
 
-    public void setup(View view)
+    private void setup(View view)
     {
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.startuppager);
+        ViewPager viewPager = (ViewPager) view.findViewById(R.id.vppager);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-
-        // Add Fragments to adapter one by one
-        StartupInfoFragment startupInfoFragment = StartupInfoFragment.getInstance(this, vars);
-        startupInfoFragment.SetNextEventListener(nextPrevEventListener);
-        adapter.addFragment(startupInfoFragment, "Information");
-
-        DatabaseDownloadFragment databaseDownloadFragment = DatabaseDownloadFragment.getInstance(this, vars, true);
-        databaseDownloadFragment.SetNextEventListener(nextPrevEventListener);
-        adapter.addFragment(databaseDownloadFragment, "Download Databases");
 
         homeAirportFragment = HomeAirportFragment.getInstance(this, vars, true);
         homeAirportFragment.SetNextEventListener(nextPrevEventListener);
@@ -102,30 +84,24 @@ public class StartupDialog extends DialogFragment {
         loationProviderSetupFragment.SetNextEventListener(nextPrevEventListener);
         adapter.addFragment(loationProviderSetupFragment, "Location Provider");
 
-
-
         viewPager.setAdapter(adapter);
 
-        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.startuptabs);
+        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
     }
 
     public void NextPage()
     {
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.startuppager);
+        ViewPager viewPager = (ViewPager) view.findViewById(R.id.vppager);
         int currpos = viewPager.getCurrentItem();
         viewPager.setCurrentItem(currpos + 1);
     }
 
     public void setupNextPrevListener()
     {
-        nextPrevEventListener = new NextPrevEventListener() {
+        nextPrevEventListener = new StartupDialog.NextPrevEventListener() {
             @Override
             public void OnNext(Fragment fragment) {
-                if (fragment instanceof DatabaseDownloadFragment)
-                {
-                    homeAirportFragment.setBaseAirports();
-                }
                 NextPage();
             }
             @Override
