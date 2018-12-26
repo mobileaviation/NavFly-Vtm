@@ -814,7 +814,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         if (connectStage == ConnectStage.disconnected) {
             connectStage = ConnectStage.connecting;
             menu.SetConnectingIcon();
-            locationProvider = new FspLocationProvider(MainActivity.this);
+            locationProvider = new FspLocationProvider(vars);
             locationProvider.Start(new LocationEvents() {
                 @Override
                 public void OnLocationChanged(LocationProviderType type, FspLocation location, String message, Boolean success) {
