@@ -2,15 +2,18 @@ package com.mobileaviationtools.nav_fly.Location;
 
 import android.content.Context;
 
+import com.mobileaviationtools.nav_fly.GlobalVars;
+import com.mobileaviationtools.nav_fly.Settings.Services.LocationProviderService;
+
 import org.modelmapper.internal.bytebuddy.matcher.CollectionOneToOneMatcher;
 
 public class FspLocationProvider {
-    public FspLocationProvider(Context context)
+    public FspLocationProvider(GlobalVars vars)
     {
-        this.context = context;
+        this.vars = vars;
     }
 
-    private Context context;
+    private GlobalVars vars;
 
     private LocationEvents locationEvents;
     private LocationProviderType type;
@@ -26,11 +29,11 @@ public class FspLocationProvider {
         switch (type)
         {
             case gps:{
-                locationProvider = new FspGPSLocationProvider(context);
+                locationProvider = new FspGPSLocationProvider(vars.context);
                 break;
             }
             case simulator:{
-                locationProvider = new FspSimLocationProvider(context);
+                locationProvider = new FspSimLocationProvider(vars);
                 break;
             }
             case playback:{
@@ -51,8 +54,10 @@ public class FspLocationProvider {
     private LocationProviderType retrieveType()
     {
         //TODO Build database logic to retrieve the connection type..
+        LocationProviderService service = new LocationProviderService(vars);
+
         //return LocationProviderType.simulator;
-        return LocationProviderType.gps;
+        return service.getLocationProviderType();
     }
 
 }

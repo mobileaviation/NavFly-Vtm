@@ -3,6 +3,8 @@ package com.mobileaviationtools.nav_fly.Location;
 import android.content.Context;
 import android.util.Log;
 
+import com.mobileaviationtools.nav_fly.GlobalVars;
+import com.mobileaviationtools.nav_fly.Settings.Services.LocationProviderService;
 import com.mobileaviationtools.nav_fly.SimConnect.FspWebApi;
 import com.mobileaviationtools.nav_fly.SimConnect.Requests.ConnectRequest;
 import com.mobileaviationtools.nav_fly.SimConnect.Requests.OffsetRequest;
@@ -28,13 +30,17 @@ public class FspSimLocationProvider implements IFspLocationProvider{
 
     private Timer offsetsTimer;
 
-    public FspSimLocationProvider(Context context)
+    public FspSimLocationProvider(GlobalVars vars)
     {
-        this.context = context;
+        this.vars = vars;
         this.connected = false;
+        LocationProviderService service = new LocationProviderService(vars);
+        String[] network = service.getNetwerkInfo();
+        ipAddress = network[0];
+        port = Integer.parseInt(network[1]);
     }
 
-    private Context context;
+    private GlobalVars vars;
 
     private LocationEvents locationEvents;
 
