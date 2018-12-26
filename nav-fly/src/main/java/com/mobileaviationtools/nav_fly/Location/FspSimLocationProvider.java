@@ -134,6 +134,7 @@ public class FspSimLocationProvider implements IFspLocationProvider{
 
             @Override
             public void OnFailure(String message) {
+                Log.e(TAG, "Connection Failure: " + message + " IP:"+ ipAddress + " Port:" + port);
                 if (locationEvents != null) locationEvents.OnLocationChanged(LocationProviderType.simulator,
                         null, "Error : " + message, false);
             }
@@ -256,8 +257,8 @@ public class FspSimLocationProvider implements IFspLocationProvider{
             double he = 0d;
             if (o != null) {
                 he = Double.parseDouble(o.Value);
+                he = he * 3.2808399d; // meters to feet
                 location.setAltitude(he);
-                //he = he * 3.2808399d; // meters to feet
             }
         }
         catch (Exception ee)

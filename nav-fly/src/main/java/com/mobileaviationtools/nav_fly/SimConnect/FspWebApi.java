@@ -5,6 +5,8 @@ import com.mobileaviationtools.nav_fly.SimConnect.Requests.OffsetRequest;
 import com.mobileaviationtools.nav_fly.SimConnect.Responses.ConnectResponse;
 import com.mobileaviationtools.nav_fly.SimConnect.Responses.OffsetResponse;
 import com.mobileaviationtools.nav_fly.SimConnect.Responses.VersionResponse;
+import com.mobileaviationtools.weater_notam_data.services.HttpClientInstance;
+
 import java.util.List;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
@@ -41,17 +43,17 @@ public class FspWebApi {
 
     private void setupConnectionBase()
     {
-        Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(10);
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.dispatcher(dispatcher);
-
-        OkHttpClient client = builder.build();
-        client.dispatcher().setMaxRequests(10);
+//        Dispatcher dispatcher = new Dispatcher();
+//        dispatcher.setMaxRequests(2);
+//        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+//        builder.dispatcher(dispatcher);
+//
+//        OkHttpClient client = builder.build();
+        //client.dispatcher().setMaxRequests(10);
         retrofit = new Retrofit.Builder()
                 .baseUrl(_url)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
+                .client(HttpClientInstance.getClient())
                 .build();
     }
 

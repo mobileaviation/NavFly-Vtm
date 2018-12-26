@@ -79,18 +79,18 @@ public class WeatherServices {
 
     private OkHttpClient GetHttpClient()
     {
-        Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(10);
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.dispatcher(dispatcher);
-        builder.connectTimeout(2000, TimeUnit.MILLISECONDS);
-        builder.readTimeout(2000, TimeUnit.MILLISECONDS);
-        builder.writeTimeout(2000, TimeUnit.MILLISECONDS);
+//        Dispatcher dispatcher = new Dispatcher();
+//        dispatcher.setMaxRequests(10);
+//        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+//        builder.dispatcher(dispatcher);
+//        builder.connectTimeout(2000, TimeUnit.MILLISECONDS);
+//        builder.readTimeout(2000, TimeUnit.MILLISECONDS);
+//        builder.writeTimeout(2000, TimeUnit.MILLISECONDS);
+//
+//        OkHttpClient client = builder.build();
+//        client.dispatcher().setMaxRequests(10);
 
-        OkHttpClient client = builder.build();
-        client.dispatcher().setMaxRequests(10);
-
-        return client;
+        return HttpClientInstance.getClient();
     }
 
 

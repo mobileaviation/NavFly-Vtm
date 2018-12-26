@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
+import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
@@ -823,14 +824,15 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                         if (connectStage == ConnectStage.connecting) {
                             menu.SetConnectDisConnectIcon(true);
                             trackingLayer.start(vars.route);
+                            Log.i(TAG, "Location tracking started");
                         }
                         connectStage = ConnectStage.connected;
                         Log.i("OnLocationChanged", "Success Message: " + message);
                         if (location != null) {
                             vars.airplaneLocation.Assign(location);
                             vars.doDeviationLineFromLocation.Assign(location);
-                            Log.i("OnLocationChanged", "Location Changed: " + vars.airplaneLocation.getLatitude() + " "
-                                    + vars.airplaneLocation.getLongitude() + " " + vars.airplaneLocation.getBearing() + " " + vars.airplaneLocation.getSpeed());
+//                            Log.i("OnLocationChanged", "Location Changed: " + vars.airplaneLocation.getLatitude() + " "
+//                                    + vars.airplaneLocation.getLongitude() + " " + vars.airplaneLocation.getBearing() + " " + vars.airplaneLocation.getSpeed());
                             //location.setBearing(90);
                             trackingLayer.setLocation(vars.airplaneLocation);
                             vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);

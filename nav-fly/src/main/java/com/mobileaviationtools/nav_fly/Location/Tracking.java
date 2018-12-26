@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly.Location;
 
 import android.content.Context;
+import android.util.Log;
 
 //import com.mobileaviationtools.nav_fly.Route;
 import com.mobileaviationtools.airnavdata.AirnavTracklogDatabase;
@@ -29,6 +30,7 @@ public class Tracking {
         setupTrackLayer();
     }
 
+    private String TAG = "Tracking";
     private GlobalVars vars;
     //private List<FspLocation> locationList;
     private FspLocation lastLocation;
@@ -63,18 +65,28 @@ public class Tracking {
 
     public void setLocation(FspLocation location)
     {
+        Log.i(TAG, "Location Changed: " + vars.airplaneLocation.getLatitude() + " "
+                + vars.airplaneLocation.getLongitude() + " " + vars.airplaneLocation.getBearing() + " " + vars.airplaneLocation.getSpeed());
+
         if (trackLog != null) {
             //locationList.add(location);
             if (lastLocation == null) {
                 trackLayer.addPoint(new GeoPoint(location.getLatitude(), location.getLongitude()));
-                lastLocation = location;
+                lastLocation = new FspLocation("TrackingLoc");
+                lastLocation.Assign(location);
             } else {
+                Log.i(TAG, "Distance: " + location.distanceTo(lastLocation));
                 if (location.distanceTo(lastLocation) > 100) {
                     trackLayer.addPoint(new GeoPoint(location.getLatitude(), location.getLongitude()));
-                    lastLocation = location;
+                    Log.i(TAG, "Add Trackpoint");
+                    lastLocation.Assign(location);
                     addLocationToLog(location);
                 }
             }
+        }
+        else
+        {
+            Log.i(TAG, "tracklog object not found");
         }
     }
 

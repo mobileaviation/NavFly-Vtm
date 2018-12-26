@@ -168,18 +168,23 @@ public class WeatherStations extends ArrayList<Station> {
     public String[] getQNHInfo(GeoPoint location)
     {
         int index = getStationNearestToOrg(location);
-        Metar metar = this.get(index).metar;
-        String raw = metar.raw_text;
-        String qnh = "UNK";
-        String ident = metar.station_id;
-        int qindex = raw.indexOf("Q");
-        if (qindex>-1)
-            qnh = raw.substring(qindex+1, qindex+5);
-        else {
-            qindex = raw.indexOf("A");
-            if (qindex>-1)
-                qnh = raw.substring(qindex+1, qindex+5);
+        if (index>-1) {
+            Metar metar = this.get(index).metar;
+            String raw = metar.raw_text;
+            String qnh = "UNK";
+            String ident = metar.station_id;
+            int qindex = raw.indexOf("Q");
+            if (qindex > -1)
+                qnh = raw.substring(qindex + 1, qindex + 5);
+            else {
+                qindex = raw.indexOf("A");
+                if (qindex > -1)
+                    qnh = raw.substring(qindex + 1, qindex + 5);
+            }
+
+            return new String[]{ident, qnh};
         }
-        return new String[]{ident, qnh};
+        else
+            return new String[]{"", "UNK"};
     }
 }

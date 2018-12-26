@@ -125,15 +125,15 @@ public class NotamService {
 
     private OkHttpClient GetHttpClient()
     {
-        Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(10);
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.dispatcher(dispatcher);
+//        Dispatcher dispatcher = new Dispatcher();
+//        dispatcher.setMaxRequests(10);
+//        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+//        builder.dispatcher(dispatcher);
+//
+//        OkHttpClient client = builder.build();
+//        client.dispatcher().setMaxRequests(10);
 
-        OkHttpClient client = builder.build();
-        client.dispatcher().setMaxRequests(10);
-
-        return client;
+        return HttpClientInstance.getClient();
     }
 
     private String getQuery(Integer searchType, String icao, GeoPoint location, Long radius, Long offset)
