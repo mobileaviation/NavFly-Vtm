@@ -55,4 +55,7 @@ public abstract class AirportsDao {
     @Query("SELECT * FROM tbl_Airports WHERE type IN (:types) ORDER BY name LIMIT :limit")
     public abstract List<Airport> getAirportsLimitType(Long limit, List<String> types);
 
+    @Query("DELETE FROM tbl_Airports WHERE continent=:continent")
+    public abstract void deleteFromAirportsByContinent(String continent);
+
 }

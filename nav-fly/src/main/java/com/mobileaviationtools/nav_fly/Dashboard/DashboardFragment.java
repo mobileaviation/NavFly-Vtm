@@ -64,6 +64,9 @@ public class DashboardFragment extends Fragment {
         Float sf = (speedType == SpeedType.knots) ? toKnots : toKm;
         speedTextView.setText(String.format("%03d", Math.round(location.getSpeed() * sf)));
         heightTextView.setText(String.format("%05d", Math.round(location.getAltitude())));
+        String toDest =  (location.GetDistanceRemaining()==0) ? "UNK-" : String.format("%04d", Math.round(location.GetDistanceRemaining()));
+
+        toDestTextView.setText(toDest);
 
 
     }

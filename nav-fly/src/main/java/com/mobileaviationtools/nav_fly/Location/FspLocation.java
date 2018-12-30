@@ -19,6 +19,8 @@ public class FspLocation extends Location {
         setGeopoint(g);
     }
 
+    private double distanceRemaining;
+
     public static FspLocation getInstance(Location location)
     {
         return new FspLocation(location);
@@ -35,6 +37,7 @@ public class FspLocation extends Location {
         return new GeoPoint(this.getLatitude(), this.getLongitude());
     }
 
+
     public void Assign(FspLocation location)
     {
         this.setLongitude(location.getLongitude());
@@ -45,6 +48,16 @@ public class FspLocation extends Location {
         this.setAccuracy(location.getAccuracy());
 
         //FspLocation l = (FspLocation)location.clone();
+    }
+
+    public void SetDistanceRemaining(Double distanceRemaining)
+    {
+        this.distanceRemaining = distanceRemaining;
+    }
+
+    public Double GetDistanceRemaining()
+    {
+        return distanceRemaining;
     }
 
 }

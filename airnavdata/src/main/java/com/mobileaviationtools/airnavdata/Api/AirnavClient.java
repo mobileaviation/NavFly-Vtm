@@ -64,7 +64,9 @@ public class AirnavClient {
 
             @Override
             public void OnError(String message) {
+
                 Log.i(TAG, "OnError: " + message);
+                if (responseStatus != null) responseStatus.OnError(message, null);
             }
         });
 

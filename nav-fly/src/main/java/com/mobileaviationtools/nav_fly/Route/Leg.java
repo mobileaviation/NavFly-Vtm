@@ -7,10 +7,15 @@ import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Markers.Route.RouteLegSymbol;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.operation.buffer.BufferOp;
+import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.oscim.core.GeoPoint;
 
 public class Leg {
     private Context context;
+    public Geometry legBuffer;
 
     public Leg(GeoPoint start, GeoPoint end, Context context)
     {
@@ -50,6 +55,7 @@ public class Leg {
         }
         calculateLegVariables();
         createRouteSymbol();
+        calculateLegBuffer();
     }
 
     private void calculateLegVariables()
@@ -84,6 +90,18 @@ public class Leg {
         coordinates[0] = new Coordinate(startWaypoint.point.getLongitude(), startWaypoint.point.getLatitude());
         coordinates[1] = new Coordinate(endWaypoint.point.getLongitude(), endWaypoint.point.getLatitude());
         return coordinates;
+    }
+
+    private void calculateLegBuffer()
+    {
+        GeometryFactory factory = new GeometryFactory();
+        Geometry leg = factory.createLineString(getLegCoordinates());
+        legBuffer = leg.buffer(0.175d, 10, BufferParameters.CAP_ROUND);
+    }
+
+    public Geometry getLegBuffer()
+    {
+        return legBuffer;
     }
 
     private double distance;

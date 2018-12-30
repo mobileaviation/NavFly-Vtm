@@ -40,7 +40,7 @@ public class Route extends ArrayList<Waypoint> {
         this.id = -1l;
         this.vars = vars;
         this.createdDate = new Date();
-        legs = new ArrayList<>();
+        legs = new Legs();
     }
 
     private String TAG = "Route";
@@ -115,7 +115,7 @@ public class Route extends ArrayList<Waypoint> {
         }
     }
 
-    private ArrayList<Leg> legs;
+    private Legs legs;
 
     public ArrayList<Leg> getLegs() {
         return legs;
@@ -166,6 +166,7 @@ public class Route extends ArrayList<Waypoint> {
 
     private RoutePathLayer routePathLayer;
     private WaypointLayer waypointLayer;
+    private LegBufferLayer legBufferLayer;
     private Map mMap;
     private MarkerDragEvent onWaypointDrag;
 
@@ -177,15 +178,22 @@ public class Route extends ArrayList<Waypoint> {
             if (routePathLayer == null) {
                 createNewPathLayer(map);
                 createNewMarkerLayer(map);
+                createNewBufferLayer();
             }
             routePathLayer.clearPath();
             for (Waypoint w : this)
             {
                 routePathLayer.AddWaypoint(w);
                 waypointLayer.PlaceMarker(w);
+                legBufferLayer.ShowRouteBuffers();
             }
             routePathLayer.update();
         }
+    }
+
+    private void createNewBufferLayer()
+    {
+        legBufferLayer = new LegBufferLayer(vars, this, true);
     }
 
     private void createNewMarkerLayer(Map map)
@@ -233,6 +241,14 @@ public class Route extends ArrayList<Waypoint> {
         if (waypoint.afterLeg != null) waypoint.afterLeg.UpdateLeg();
     }
 
+    public void setAirplaneLocation(FspLocation location)
+    {
+        Leg l = legs.getActiveLeg(location);
+        if (l != null) {
+            routePathLayer.SelectLeg(l);
+        }
+        vars.airplaneLocation.SetDistanceRemaining(legs.remainingDistanceNM(location));
+    }
 
     private void createNewPathLayer(Map map)
     {
@@ -328,10 +344,17 @@ public class Route extends ArrayList<Waypoint> {
         }
     }
 
+    private void clearLegBufferLayer()
+    {
+        if (legBufferLayer != null)
+            legBufferLayer.ClearLayer();
+    }
+
     public void ClearRoute(Map map)
     {
         clearPathLayer();
         clearMarkerLayer();
+        clearLegBufferLayer();
         SelectedStartAirport = null;
         SelectedEndAirport = null;
         legs.clear();
@@ -449,6 +472,9 @@ public class Route extends ArrayList<Waypoint> {
     private void setAirplaneStartLocation()
     {
         vars.airplaneLocation.setGeopoint(this.get(0).point);
+        Leg l = legs.getActiveLeg(vars.airplaneLocation);
+        routePathLayer.SelectLeg(l);
+        vars.airplaneLocation.SetDistanceRemaining(legs.remainingDistanceNM(vars.airplaneLocation));
         vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
         vars.dashboardFragment.setLocation(vars.airplaneLocation);
 
@@ -461,14 +487,4 @@ public class Route extends ArrayList<Waypoint> {
         vars.deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
     }
 
-    public Long GetTotalDistanceFromLocation(FspLocation location)
-    {
-        // Find the nearest waypoint
-        // Check the coarse to the waypoint
-            // may not differ more than 180 compared to current flight heading
-            // if os check the second nearest waypoint and do the same heading check
-        // calculate the distance to the found waypoint
-        // add the distance from the found waypoint up to the destibation
-        return  0l;
-    }
 }

@@ -2,6 +2,7 @@ package com.mobileaviationtools.nav_fly.Classes;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.util.GeometricShapeFactory;
@@ -42,6 +43,12 @@ public class GeometryHelpers {
         double lon3 = lon1 + Math.atan2(By, Math.cos(lat1) + Bx);
 
         return new GeoPoint(Math.toDegrees(lat3), Math.toDegrees(lon3));
+    }
+
+    public static Geometry getPoint(GeoPoint p)
+    {
+        GeometryFactory factory = new GeometryFactory();
+        return factory.createPoint(new Coordinate(p.getLongitude(), p.getLatitude()));
     }
 
 

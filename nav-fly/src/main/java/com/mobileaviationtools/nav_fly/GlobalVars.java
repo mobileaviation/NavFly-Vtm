@@ -35,6 +35,7 @@ public class GlobalVars {
     public final int AIRSPACE_GROUP = 20;
     public final int AVIATIONMARKERS_GROUP = 25;
     public final int ROUTE_GROUP = 40;
+    public final int ROUTE_BUFFERS_GROUP = 41;
     public final int TRACK_GROUP = 50;
     public final int DEVIATIONLINE_GROUP = 55;
     public final int AIRPLANEMARKER_GROUP = 60;

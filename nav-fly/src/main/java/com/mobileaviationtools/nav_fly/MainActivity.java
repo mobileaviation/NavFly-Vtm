@@ -256,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars.map.layers().addGroup(vars.AVIATIONMARKERS_GROUP);
         vars.map.layers().addGroup(vars.AIRSPACE_GROUP);
         vars.map.layers().addGroup(vars.ROUTE_GROUP);
+        vars.map.layers().addGroup(vars.ROUTE_BUFFERS_GROUP);
         vars.map.layers().addGroup(vars.TRACK_GROUP);
         vars.map.layers().addGroup(vars.DEVIATIONLINE_GROUP);
         vars.map.layers().addGroup(vars.AIRPLANEMARKER_GROUP);
@@ -836,7 +837,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                             //location.setBearing(90);
                             trackingLayer.setLocation(vars.airplaneLocation);
                             vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
-                            vars.dashboardFragment.setLocation(vars.airplaneLocation);
+
                             //mMap.render();
 
                             MapPosition pos = vars.map.getMapPosition();
@@ -851,6 +852,15 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                                 pos.setBearing(360-vars.airplaneLocation.getBearing());
                             }
 
+                            if (vars.route != null)
+                            {
+                                if (vars.route.getLegs().size()>0)
+                                {
+                                    vars.route.setAirplaneLocation(location);
+                                }
+                            }
+
+                            vars.dashboardFragment.setLocation(vars.airplaneLocation);
                             vars.map.setMapPosition(pos);
                         }
                     }
