@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -322,6 +323,8 @@ public class SelectChartDialog extends DialogFragment {
 
         // Copy chart to "Charts" directory
         try {
+            File dir = new File(basePath);
+            if (!dir.exists()) dir.mkdir();
             FileHelpers.copy(selectedFile, new File(chart.filelocation));
         }
         catch (IOException ee)

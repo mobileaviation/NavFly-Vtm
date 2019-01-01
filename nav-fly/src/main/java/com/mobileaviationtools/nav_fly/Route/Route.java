@@ -148,6 +148,10 @@ public class Route extends ArrayList<Waypoint> {
 
         createLegs();
         setupRouteVariables();
+        DrawRoute(vars.map);
+
+        updateLegData();
+        vars.dashboardFragment.setLocation(vars.airplaneLocation, indicatedAirspeed);
 
         if (routeEvents != null) routeEvents.RouteUpdated(this);
     }
@@ -228,6 +232,8 @@ public class Route extends ArrayList<Waypoint> {
                     setupRouteVariables();
                     DrawRoute(mMap);
                     setDeviationLineStartLocation(newLocation);
+                    updateLegData();
+                    vars.dashboardFragment.setLocation(vars.airplaneLocation, indicatedAirspeed);
 
                     if (routeEvents != null) routeEvents.WaypointUpdated(Route.this, item.getWaypoint());
                 }
@@ -260,7 +266,7 @@ public class Route extends ArrayList<Waypoint> {
                         Log.i(TAG, "Tapped on route, at: " + mMap.viewport().fromScreenPoint(e.getX(), e.getY()));
                         GeoPoint point = mMap.viewport().fromScreenPoint(e.getX(), e.getY());
 
-                        Leg selectedLeg = findLeg(point);
+                        Leg selectedLeg = legs.findLeg(point);
                         if (selectedLeg != null)
                         {
                             // Test
@@ -273,6 +279,9 @@ public class Route extends ArrayList<Waypoint> {
                             clearPathLayer();
                             DrawRoute(mMap);
                             setDeviationLineStartLocation(point);
+                            updateLegData();
+                            vars.dashboardFragment.setLocation(vars.airplaneLocation, indicatedAirspeed);
+
                             if (routeEvents != null) routeEvents.NewWaypointInserted(Route.this, newWaypoint);
                         }
 
@@ -315,22 +324,6 @@ public class Route extends ArrayList<Waypoint> {
         return name;
     }
 
-    private Leg findLeg(GeoPoint point)
-    {
-        Leg return_leg = null;
-        for (Leg leg: legs)
-        {
-            GeometryFactory geometryFactory = new GeometryFactory();
-            Geometry leg_line = geometryFactory.createLineString(leg.getLegCoordinates());
-            Geometry buffer = leg_line.buffer(0.01);
-            Geometry gpoint = geometryFactory.createPoint(new Coordinate(point.getLongitude(), point.getLatitude()));
-            if (buffer.contains(gpoint))
-            {
-                return_leg = leg;
-            }
-        }
-        return return_leg;
-    }
 
     private void clearPathLayer() {
         if (routePathLayer != null)
@@ -472,13 +465,20 @@ public class Route extends ArrayList<Waypoint> {
     private void setAirplaneStartLocation()
     {
         vars.airplaneLocation.setGeopoint(this.get(0).point);
-        Leg l = legs.getActiveLeg(vars.airplaneLocation);
-        routePathLayer.SelectLeg(l);
-        vars.airplaneLocation.SetDistanceRemaining(legs.remainingDistanceNM(vars.airplaneLocation));
+        updateLegData();
         vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
-        vars.dashboardFragment.setLocation(vars.airplaneLocation);
+        vars.dashboardFragment.setLocation(vars.airplaneLocation, indicatedAirspeed);
 
         setDeviationLineStartLocation(this.get(0).point);
+    }
+
+    private void updateLegData()
+    {
+        Leg l = legs.getActiveLeg(vars.airplaneLocation);
+        if (l != null) {
+            routePathLayer.SelectLeg(l);
+            vars.airplaneLocation.SetDistanceRemaining(legs.remainingDistanceNM(vars.airplaneLocation));
+        }
     }
 
     private void setDeviationLineStartLocation(GeoPoint point)

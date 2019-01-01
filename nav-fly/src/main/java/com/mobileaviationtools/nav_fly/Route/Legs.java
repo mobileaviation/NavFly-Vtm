@@ -8,6 +8,7 @@ import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.oscim.core.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,23 @@ public class Legs extends ArrayList<Leg> {
     private Leg selectedLeg;
     private String TAG = "Legs";
     private double meterToNMile = 0.000539956803d;
+
+    public Leg findLeg(GeoPoint point)
+    {
+        Leg return_leg = null;
+        for (Leg leg: this)
+        {
+            GeometryFactory geometryFactory = new GeometryFactory();
+            Geometry leg_line = geometryFactory.createLineString(leg.getLegCoordinates());
+            Geometry buffer = leg_line.buffer(0.01);
+            Geometry gpoint = geometryFactory.createPoint(new Coordinate(point.getLongitude(), point.getLatitude()));
+            if (buffer.contains(gpoint))
+            {
+                return_leg = leg;
+            }
+        }
+        return return_leg;
+    }
 
     public Leg getActiveLeg(FspLocation location)
     {

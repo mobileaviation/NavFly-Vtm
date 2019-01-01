@@ -51,7 +51,15 @@ public class DashboardFragment extends Fragment {
         return sdf.format(new Date());
     }
 
-    public void setLocation(FspLocation location)
+    private String getEET(Double distanceRemaining, Double speed)
+    {
+        Double timeMin = (distanceRemaining / speed) * 60;
+        Long hours = (long)(timeMin / 60d);
+        Long minutes = (long)(timeMin % 60d);
+        return String.format("%02d:%02d", hours, minutes);
+    }
+
+    public void setLocation(FspLocation location, double presetAirspeed)
     {
         TextView toDestTextView = (TextView) view.findViewById(R.id.toDestTextView);
         TextView coarseTextView = (TextView) view.findViewById(R.id.coarseTextView);
@@ -60,13 +68,16 @@ public class DashboardFragment extends Fragment {
         TextView eetTextView = (TextView) view.findViewById(R.id.eetTextView);
 
 
+
         coarseTextView.setText(String.format("%03d", Math.round(location.getBearing())));
         Float sf = (speedType == SpeedType.knots) ? toKnots : toKm;
         speedTextView.setText(String.format("%03d", Math.round(location.getSpeed() * sf)));
         heightTextView.setText(String.format("%05d", Math.round(location.getAltitude())));
-        String toDest =  (location.GetDistanceRemaining()==0) ? "UNK-" : String.format("%04d", Math.round(location.GetDistanceRemaining()));
+        Double d = location.GetDistanceRemaining();
+        String toDest =  (d==0) ? "UNK-" : String.format("%04d", Math.round(d));
 
         toDestTextView.setText(toDest);
+        eetTextView.setText(getEET(d, (location.getSpeed()>5) ? location.getSpeed() : presetAirspeed));
 
 
     }

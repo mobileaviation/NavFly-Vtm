@@ -6,6 +6,7 @@ import android.arch.persistence.room.Query;
 
 import com.mobileaviationtools.airnavdata.Entities.TrackLogItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao

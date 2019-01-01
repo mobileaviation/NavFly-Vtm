@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class RoutePathLayer extends PathLayer {
     private Route route;
-    private Integer selectedLegColor = 0xFFFFBC00;
+    private Integer selectedLegColor = 0xFF7277d8;// 0xFFF43D6B;//0xFFFFBC00;
     private float lineWidth;
 
     public RoutePathLayer(Map map, Style style) {

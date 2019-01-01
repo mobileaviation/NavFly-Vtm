@@ -60,6 +60,7 @@ import com.mobileaviationtools.nav_fly.Settings.HomeAirport.SelectedAirport;
 import com.mobileaviationtools.nav_fly.Settings.ChartSettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
+import com.mobileaviationtools.nav_fly.Tracks.PlaybackFragment;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
@@ -496,7 +497,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     {
                         vars.route.setSelectedEndAirport(airport);
                         Log.i(TAG, "Route Start Airport selected: " + airport.ident);
-                        vars.route.DrawRoute(vars.map);
                         return;
                     }
 
@@ -782,10 +782,22 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                         menu.setDirectionBtnIcon(vars.mapDirectionType);
                         break;
                     }
+                    case loadTrack:
+                    {
+                        setTracklogFragment();
+                        break;
+                    }
                 }
                 return false;
             }
         });
+    }
+
+    private void setTracklogFragment()
+    {
+        Long trackLogId = 1l;
+        PlaybackFragment playbackFragment = (PlaybackFragment)getSupportFragmentManager().findFragmentById(R.id.playbackFragment);
+        playbackFragment.setTrackLog(trackLogId, vars);
     }
 
     private SearchDialog searchDialog;
@@ -858,9 +870,14 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                                 {
                                     vars.route.setAirplaneLocation(location);
                                 }
+                                vars.dashboardFragment.setLocation(vars.airplaneLocation, vars.route.getIndicatedAirspeed());
+                            }
+                            else
+                            {
+                                vars.dashboardFragment.setLocation(vars.airplaneLocation, 100d);
                             }
 
-                            vars.dashboardFragment.setLocation(vars.airplaneLocation);
+
                             vars.map.setMapPosition(pos);
                         }
                     }
