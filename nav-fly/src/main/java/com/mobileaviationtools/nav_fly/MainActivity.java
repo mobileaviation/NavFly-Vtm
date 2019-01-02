@@ -60,6 +60,7 @@ import com.mobileaviationtools.nav_fly.Settings.HomeAirport.SelectedAirport;
 import com.mobileaviationtools.nav_fly.Settings.ChartSettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
+import com.mobileaviationtools.nav_fly.Tracks.LoadLogDialog;
 import com.mobileaviationtools.nav_fly.Tracks.PlaybackFragment;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
@@ -784,7 +785,15 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     }
                     case loadTrack:
                     {
-                        setTracklogFragment();
+                        View view = findViewById(R.id.main);
+                        LoadLogDialog loadLogDialog = new LoadLogDialog(vars, view, new LoadLogDialog.LoadLog() {
+                            @Override
+                            public void LogSelected(Long TrackLogId) {
+                                setTracklogFragment(TrackLogId);
+                            }
+                        });
+                        loadLogDialog.show();
+                        //setTracklogFragment();
                         break;
                     }
                 }
@@ -793,9 +802,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         });
     }
 
-    private void setTracklogFragment()
+    private void setTracklogFragment(Long trackLogId)
     {
-        Long trackLogId = 1l;
         PlaybackFragment playbackFragment = (PlaybackFragment)getSupportFragmentManager().findFragmentById(R.id.playbackFragment);
         playbackFragment.setTrackLog(trackLogId, vars);
     }

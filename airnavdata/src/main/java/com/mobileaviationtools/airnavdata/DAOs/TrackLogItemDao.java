@@ -16,4 +16,7 @@ public abstract class TrackLogItemDao {
 
     @Insert
     public abstract Long insertItem(TrackLogItem item);
+
+    @Query("SELECT MAX(altitude_ft) FROM tbl_TrackLogItems WHERE trackLogId=:tracklogid")
+    public abstract Long getMaxAltitude(Long tracklogid);
 }

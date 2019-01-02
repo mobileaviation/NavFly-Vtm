@@ -14,6 +14,10 @@ public abstract class TrackLogDao {
     @Query("SELECT * FROM tbl_TrackLogs WHERE id=:tracklog_id")
     public abstract TrackLog getTracklogByID(Long tracklog_id);
 
+    @Query("SELECT * FROM tbl_TrackLogs ORDER BY logDate DESC")
+    public abstract List<TrackLog> getTracklogs();
+
+
     @Insert
     public abstract Long InsertLog(TrackLog log);
 }

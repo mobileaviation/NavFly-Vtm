@@ -39,6 +39,9 @@ public class PlaybackFragment extends Fragment {
         this.vars = vars;
         airnavTracklogDatabase = AirnavTracklogDatabase.getInstance(vars.context);
         this.trackLogId = trackLogId;
+
+        Long maxAltitudeFt = airnavTracklogDatabase.getTracklogItems().getMaxAltitude(this.trackLogId);
+
         List<TrackLogItem> items = airnavTracklogDatabase.getTracklogItems().getTracklogItemByLogId(this.trackLogId);
         playbackAdapter = new PlaybackAdapter(items);
         playbackRecyclerView.setAdapter(playbackAdapter);
