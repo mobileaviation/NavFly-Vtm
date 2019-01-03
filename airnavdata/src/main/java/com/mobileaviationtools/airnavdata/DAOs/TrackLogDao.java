@@ -14,7 +14,9 @@ public abstract class TrackLogDao {
     @Query("SELECT * FROM tbl_TrackLogs WHERE id=:tracklog_id")
     public abstract TrackLog getTracklogByID(Long tracklog_id);
 
-    @Query("SELECT * FROM tbl_TrackLogs ORDER BY logDate DESC")
+    @Query("SELECT TL.* FROM tbl_TrackLogs TL " +
+            " WHERE (SELECT COUNT(*) FROM tbl_TrackLogItems WHERE trackLogId=TL.id)>0" +
+            " ORDER BY logDate DESC")
     public abstract List<TrackLog> getTracklogs();
 
 

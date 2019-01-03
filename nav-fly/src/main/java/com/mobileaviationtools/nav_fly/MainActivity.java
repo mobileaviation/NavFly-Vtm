@@ -793,7 +793,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                             }
                         });
                         loadLogDialog.show();
-                        //setTracklogFragment();
                         break;
                     }
                 }
@@ -805,7 +804,12 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     private void setTracklogFragment(Long trackLogId)
     {
         PlaybackFragment playbackFragment = (PlaybackFragment)getSupportFragmentManager().findFragmentById(R.id.playbackFragment);
-        playbackFragment.setTrackLog(trackLogId, vars);
+        playbackFragment.setTrackLog(trackLogId, vars, new PlaybackFragment.PlaybackFragmentEvents() {
+            @Override
+            public void OnCloseBtnClicked() {
+
+            }
+        });
     }
 
     private SearchDialog searchDialog;
