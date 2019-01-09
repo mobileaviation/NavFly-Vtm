@@ -14,6 +14,9 @@ public abstract class RouteDao {
     @Insert
     public abstract long InsertRoute(Route route);
 
+    @Query("SELECT * FROM tbl_Route WHERE id=:id")
+    public abstract Route getRouteById(Long id);
+
     @Query("SELECT * FROM tbl_Route ORDER BY id")
     public abstract List<Route> getAllRoutes();
 

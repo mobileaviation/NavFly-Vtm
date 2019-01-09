@@ -90,6 +90,7 @@ public class RouteListFragment extends Fragment {
     private InfoLayout infoLayout;
 
     private ListView airportsList;
+    private RouteEvents routeEvents;
 
     private WeatherStations weatherStations;
     public void setWeatherStations(GlobalVars vars, WeatherStations stations)
@@ -139,6 +140,12 @@ public class RouteListFragment extends Fragment {
     {
         this.vars = vars;
     }
+
+    public void setRouteEvents(RouteEvents routeEvents)
+    {
+        this.routeEvents = routeEvents;
+    }
+
 
     private ChartEvents chartEvents;
     public void setChartEvents(ChartEvents chartEvents)
@@ -228,23 +235,31 @@ public class RouteListFragment extends Fragment {
             @Override
             public void NewWaypointInserted(Route route, Waypoint newWaypoint) {
                 RouteListFragment.this.InvalidateRouteList();
+                if (routeEvents != null) routeEvents.NewWaypointInserted(route, newWaypoint);
             }
 
             @Override
             public void NewRouteCreated(Route route) {
                 RouteListFragment.this.SetRoute();
+                if (routeEvents != null) routeEvents.NewRouteCreated(route);
             }
             @Override
             public void WaypointUpdated(Route route, Waypoint updatedWaypoint)
             {
                 RouteListFragment.this.InvalidateRouteList();
+                if (routeEvents != null) routeEvents.WaypointUpdated(route, updatedWaypoint);
             }
             @Override
-            public void RouteUpdated(Route route)
-            {
+            public void RouteUpdated(Route route) {
                 RouteListFragment.this.InvalidateRouteList();
+                if (routeEvents != null) routeEvents.RouteUpdated(route);
             }
 
+            @Override
+            public void RouteOpened(Route route) {
+                RouteListFragment.this.InvalidateRouteList();
+                if (routeEvents != null) routeEvents.RouteOpened(route);
+            }
         });
     }
 

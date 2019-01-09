@@ -47,9 +47,13 @@ import com.mobileaviationtools.nav_fly.Menus.MapDirectionType;
 import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
+import com.mobileaviationtools.nav_fly.Route.HeightMapFragment;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamRetrieval;
+import com.mobileaviationtools.nav_fly.Route.Route;
+import com.mobileaviationtools.nav_fly.Route.RouteEvents;
 import com.mobileaviationtools.nav_fly.Route.RouteListFragment;
+import com.mobileaviationtools.nav_fly.Route.Waypoint;
 import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 import com.mobileaviationtools.nav_fly.Route.Weather.WeatherStations;
 import com.mobileaviationtools.nav_fly.Search.SearchDialog;
@@ -476,6 +480,33 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
             }
         });
+
+        routeListFragment.setRouteEvents(new RouteEvents() {
+            @Override
+            public void NewWaypointInserted(Route route, Waypoint newWaypoint) {
+
+            }
+
+            @Override
+            public void WaypointUpdated(Route route, Waypoint updatedWaypoint) {
+
+            }
+
+            @Override
+            public void NewRouteCreated(Route route) {
+
+            }
+
+            @Override
+            public void RouteUpdated(Route route) {
+
+            }
+
+            @Override
+            public void RouteOpened(Route route) {
+                setHeightMapFragment(route);
+            }
+        });
     }
 
     public void addMarkerLayers() {
@@ -803,13 +834,22 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
     private void setTracklogFragment(Long trackLogId)
     {
-        PlaybackFragment playbackFragment = (PlaybackFragment)getSupportFragmentManager().findFragmentById(R.id.playbackFragment);
-        playbackFragment.setTrackLog(trackLogId, vars, new PlaybackFragment.PlaybackFragmentEvents() {
-            @Override
-            public void OnCloseBtnClicked() {
+//        PlaybackFragment playbackFragment = (PlaybackFragment)getSupportFragmentManager().findFragmentById(R.id.playbackFragment);
+//        playbackFragment.setTrackLog(trackLogId, vars, new PlaybackFragment.PlaybackFragmentEvents() {
+//            @Override
+//            public void OnCloseBtnClicked() {
+//
+//            }
+//        });
+    }
 
-            }
-        });
+    private void setHeightMapFragment(Route route)
+    {
+        vars.route = route;
+        HeightMapFragment heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
+        heightMapFragment.setVisibility(View.VISIBLE);
+
+        //heightMapFragment.setupHeightMap(vars, null);
     }
 
     private SearchDialog searchDialog;

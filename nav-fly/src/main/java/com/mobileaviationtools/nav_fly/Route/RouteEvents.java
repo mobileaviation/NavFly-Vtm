@@ -5,4 +5,5 @@ public interface RouteEvents {
     void WaypointUpdated(Route route, Waypoint updatedWaypoint);
     void NewRouteCreated(Route route);
     void RouteUpdated(Route route);
+    void RouteOpened(Route route);
 }

@@ -58,12 +58,12 @@
     </LinearLayout>
 
     <fragment
-        android:id="@+id/playbackFragment"
-        android:name="com.mobileaviationtools.nav_fly.Tracks.PlaybackFragment"
+        android:id="@+id/heightMapFragment"
+        android:name="com.mobileaviationtools.nav_fly.Route.HeightMapFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="60dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/dashboardFragment"
         app:layout_constraintEnd_toEndOf="parent"

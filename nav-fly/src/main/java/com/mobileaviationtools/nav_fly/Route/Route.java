@@ -14,6 +14,9 @@ import com.mobileaviationtools.nav_fly.Info.Cities;
 import com.mobileaviationtools.nav_fly.Info.City;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
+import com.mobileaviationtools.weater_notam_data.Elevation.ElevationResponseEvent;
+import com.mobileaviationtools.weater_notam_data.Elevation.elevation;
+import com.mobileaviationtools.weater_notam_data.services.ElevationService;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -29,6 +32,7 @@ import org.oscim.layers.vector.geometries.Style;
 import org.oscim.map.Map;
 import org.oscim.renderer.bucket.TextureItem;
 import org.oscim.theme.styles.LineStyle;
+import org.oscim.tiling.source.mapfile.Way;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -91,6 +95,10 @@ public class Route extends ArrayList<Waypoint> {
     public double getIndicatedAirspeed() {
         return indicatedAirspeed;
     }
+
+    private double proposedAltitude = 2000;
+
+    public double getProposedAltitude() { return proposedAltitude; }
 
     public void setWindAndAirspeed(double windDirection, double windSpeed, double indicatedAirspeed)
     {
@@ -189,11 +197,21 @@ public class Route extends ArrayList<Waypoint> {
             {
                 routePathLayer.AddWaypoint(w);
                 waypointLayer.PlaceMarker(w);
-                legBufferLayer.ShowRouteBuffers();
             }
+
+            setupRoutePoints();
+            legBufferLayer.ShowRouteBuffers();
             routePathLayer.update();
         }
     }
+
+    private RoutePoints routePoints;
+    private void setupRoutePoints()
+    {
+        routePoints = new RoutePoints();
+        routePoints.SetupPoints(this);
+    }
+
 
     private void createNewBufferLayer()
     {
@@ -412,6 +430,12 @@ public class Route extends ArrayList<Waypoint> {
         mMap = map;
         AirnavDatabase a_db = AirnavDatabase.getInstance(vars.context);
         AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(vars.context);
+        com.mobileaviationtools.airnavdata.Entities.Route routeEntity = db.getRoute().getRouteById(routeId);
+        this.id = routeEntity.id;
+        this.name = routeEntity.name;
+        this.createdDate = new Date(routeEntity.createdDate);
+        this.modifiedDate = new Date(routeEntity.modifiedDate);
+
         com.mobileaviationtools.airnavdata.Entities.Waypoint[] waypoints = db.getWaypoint().GetWaypointsByRouteID(routeId);
 
         for (com.mobileaviationtools.airnavdata.Entities.Waypoint db_waypoint : waypoints)
@@ -459,7 +483,7 @@ public class Route extends ArrayList<Waypoint> {
         DrawRoute(mMap);
         setAirplaneStartLocation();
 
-        if (routeEvents != null) routeEvents.RouteUpdated(this);
+        if (routeEvents != null) routeEvents.RouteOpened(this);
     }
 
     private void setAirplaneStartLocation()
