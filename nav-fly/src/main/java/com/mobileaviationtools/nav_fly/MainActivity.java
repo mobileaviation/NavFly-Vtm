@@ -1,11 +1,11 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,10 +18,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.example.aircraft.Types.PiperArcher;
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
-import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
@@ -47,7 +47,7 @@ import com.mobileaviationtools.nav_fly.Menus.MapDirectionType;
 import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
-import com.mobileaviationtools.nav_fly.Route.HeightMapFragment;
+import com.mobileaviationtools.nav_fly.Route.HeightMap.HeightMapFragment;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamRetrieval;
 import com.mobileaviationtools.nav_fly.Route.Route;
@@ -65,7 +65,6 @@ import com.mobileaviationtools.nav_fly.Settings.ChartSettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
 import com.mobileaviationtools.nav_fly.Tracks.LoadLogDialog;
-import com.mobileaviationtools.nav_fly.Tracks.PlaybackFragment;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
@@ -78,6 +77,7 @@ import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
+import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Map;
@@ -91,8 +91,11 @@ import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
+import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mvt.NextzenMvtTileSource;
+import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
+import java.io.File;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -154,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars = new GlobalVars();
         vars.mainActivity = this;
         vars.context = this;
+        vars.aircraft = new PiperArcher();
 
         Boolean test = false;
 
@@ -261,8 +265,10 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars.map.layers().addGroup(vars.OVERLAYCHARTS_GROUP);
         vars.map.layers().addGroup(vars.AVIATIONMARKERS_GROUP);
         vars.map.layers().addGroup(vars.AIRSPACE_GROUP);
+
         vars.map.layers().addGroup(vars.ROUTE_GROUP);
         vars.map.layers().addGroup(vars.ROUTE_BUFFERS_GROUP);
+
         vars.map.layers().addGroup(vars.TRACK_GROUP);
         vars.map.layers().addGroup(vars.DEVIATIONLINE_GROUP);
         vars.map.layers().addGroup(vars.AIRPLANEMARKER_GROUP);
@@ -484,12 +490,12 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         routeListFragment.setRouteEvents(new RouteEvents() {
             @Override
             public void NewWaypointInserted(Route route, Waypoint newWaypoint) {
-
+                setHeightMapFragment(route, true);
             }
 
             @Override
             public void WaypointUpdated(Route route, Waypoint updatedWaypoint) {
-
+                setHeightMapFragment(route, true);
             }
 
             @Override
@@ -499,12 +505,12 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
             @Override
             public void RouteUpdated(Route route) {
-
+                setHeightMapFragment(route, true);
             }
 
             @Override
             public void RouteOpened(Route route) {
-                setHeightMapFragment(route);
+                setHeightMapFragment(route, false);
             }
         });
     }
@@ -706,23 +712,58 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 //                .httpFactory(new OkHttpEngine.OkHttpFactory())
 //                .build();
 //
+        boolean loadNextZenMaps = true;
+        boolean LoadMapforgeMaps = false;
+        boolean OSciMaps = false;
 
-        mTileSource = NextzenMvtTileSource.builder()
-            .apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
-            .httpFactory(new OkHttpEngine.OkHttpFactory())
-            //.locale("en")
-            .build();
+        VtmThemes defaultTheme = VtmThemes.DEFAULT;
+
+        if (OSciMaps)
+        {
+            mTileSource = OSciMap4TileSource.builder()
+                .httpFactory(new OkHttpEngine.OkHttpFactory())
+                .build();
+            defaultTheme = VtmThemes.DEFAULT;
+        }
+
+
+        if (LoadMapforgeMaps) {
+            // Mapforge mas test
+            File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File mapFile = new File(downloadDir.toString() + "/netherlands.map");
+            if (mapFile.exists()) {
+                Log.i(TAG, "Found netherlands.map !!");
+                mTileSource = new MapFileTileSource();
+                String path = mapFile.getAbsolutePath();
+                if (((MapFileTileSource) mTileSource).setMapFile(path)) {
+                    Log.i(TAG, "Netherlands map loaded");
+                }
+            }
+            defaultTheme = VtmThemes.DEFAULT;
+        }
+
+        if (loadNextZenMaps) {
+            mTileSource = NextzenMvtTileSource.builder()
+                    .apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
+                    .httpFactory(new OkHttpEngine.OkHttpFactory())
+                    //.locale("en")
+                    .build();
 
 //        mTileSource = MapilionMvtTileSource.builder()
 //                .httpFactory(new OkHttpEngine.OkHttpFactory())
 //                .build();
 //        String url = ((MapilionMvtTileSource) mTileSource).getUrl().toString();
 
-        String url = ((NextzenMvtTileSource) mTileSource).getNextzenUrl();
-        settingsObject.setBaseCache(mTileSource, url);
+            String url = ((NextzenMvtTileSource) mTileSource).getNextzenUrl();
+            settingsObject.setBaseCache(mTileSource, url);
+            defaultTheme = VtmThemes.MAPZEN;
+        }
+
+
+
         mBaseLayer = vars.map.setBaseMap(mTileSource);
 
-        vars.map.setTheme(VtmThemes.MAPZEN);
+        vars.map.setTheme(defaultTheme);
 
         vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer), vars.BASE_GROUP);
     }
@@ -843,13 +884,13 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 //        });
     }
 
-    private void setHeightMapFragment(Route route)
+    private void setHeightMapFragment(Route route, Boolean parseFromService)
     {
         vars.route = route;
         HeightMapFragment heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
         heightMapFragment.setVisibility(View.VISIBLE);
 
-        //heightMapFragment.setupHeightMap(vars, null);
+        heightMapFragment.setupHeightMap(vars, null, parseFromService);
     }
 
     private SearchDialog searchDialog;

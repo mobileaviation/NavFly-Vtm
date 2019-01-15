@@ -10,4 +10,5 @@ public class Route {
     public Long createdDate;
     public Long modifiedDate;
     public String name;
+    public String elevation_json;
 }

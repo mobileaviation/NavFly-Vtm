@@ -186,31 +186,31 @@ public class MapsforgeActivity extends MapActivity {
                 mTileLayer = mMap.setBaseMap(mTileSource);
                 loadTheme(null);
 
-                if (mS3db)
-                    mMap.layers().add(new S3DBLayer(mMap, mTileLayer));
-                else
-                    mMap.layers().add(new BuildingLayer(mMap, mTileLayer));
-                mMap.layers().add(new LabelLayer(mMap, mTileLayer));
-
-                mMapScaleBar = new DefaultMapScaleBar(mMap);
-                mMapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
-                mMapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
-                mMapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
-                mMapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
-
-                MapScaleBarLayer mapScaleBarLayer = new MapScaleBarLayer(mMap, mMapScaleBar);
-                BitmapRenderer renderer = mapScaleBarLayer.getRenderer();
-                renderer.setPosition(GLViewport.Position.BOTTOM_LEFT);
-                renderer.setOffset(5 * CanvasAdapter.getScale(), 0);
-                mMap.layers().add(mapScaleBarLayer);
-
-                MapInfo info = mTileSource.getMapInfo();
-                if (!info.boundingBox.contains(mMap.getMapPosition().getGeoPoint())) {
-                    MapPosition pos = new MapPosition();
-                    pos.setByBoundingBox(info.boundingBox, Tile.SIZE * 4, Tile.SIZE * 4);
-                    mMap.setMapPosition(pos);
-                    mPrefs.clear();
-                }
+//                if (mS3db)
+//                    mMap.layers().add(new S3DBLayer(mMap, mTileLayer));
+//                else
+//                    mMap.layers().add(new BuildingLayer(mMap, mTileLayer));
+//                mMap.layers().add(new LabelLayer(mMap, mTileLayer));
+//
+//                mMapScaleBar = new DefaultMapScaleBar(mMap);
+//                mMapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
+//                mMapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
+//                mMapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
+//                mMapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
+//
+//                MapScaleBarLayer mapScaleBarLayer = new MapScaleBarLayer(mMap, mMapScaleBar);
+//                BitmapRenderer renderer = mapScaleBarLayer.getRenderer();
+//                renderer.setPosition(GLViewport.Position.BOTTOM_LEFT);
+//                renderer.setOffset(5 * CanvasAdapter.getScale(), 0);
+//                mMap.layers().add(mapScaleBarLayer);
+//
+//                MapInfo info = mTileSource.getMapInfo();
+//                if (!info.boundingBox.contains(mMap.getMapPosition().getGeoPoint())) {
+//                    MapPosition pos = new MapPosition();
+//                    pos.setByBoundingBox(info.boundingBox, Tile.SIZE * 4, Tile.SIZE * 4);
+//                    mMap.setMapPosition(pos);
+//                    mPrefs.clear();
+//                }
             }
         } else if (requestCode == SELECT_THEME_FILE) {
             if (resultCode != RESULT_OK || intent == null || intent.getStringExtra(FilePicker.SELECTED_FILE) == null) {

@@ -1,9 +1,15 @@
 package com.mobileaviationtools.nav_fly.Route;
 
 import com.mobileaviationtools.nav_fly.GlobalVars;
+import com.mobileaviationtools.nav_fly.Route.HeightMap.RoutePoints;
 
 import org.oscim.backend.canvas.Color;
+import org.oscim.core.GeoPoint;
 import org.oscim.layers.vector.VectorLayer;
+import org.oscim.layers.vector.geometries.CircleDrawable;
+import org.oscim.layers.vector.geometries.JtsDrawable;
+import org.oscim.layers.vector.geometries.LineDrawable;
+import org.oscim.layers.vector.geometries.PointDrawable;
 import org.oscim.layers.vector.geometries.PolygonDrawable;
 import org.oscim.layers.vector.geometries.Style;
 import org.oscim.map.Map;
@@ -23,7 +29,7 @@ public class LegBufferLayer extends VectorLayer {
     }
 
     private Route route;
-    private ArrayList<PolygonDrawable> buffers;
+    private ArrayList<JtsDrawable> buffers;
 
     public void ShowRouteBuffers()
     {
@@ -49,10 +55,42 @@ public class LegBufferLayer extends VectorLayer {
         this.update();
     }
 
+    public void showRoutePoints()
+    {
+        Style s = Style.builder()
+                .fixed(true)
+                .strokeColor(Color.RED)
+
+                .strokeWidth(5)
+                .build();
+
+        if (buffers == null)
+        {
+            buffers = new ArrayList<>();
+        }
+
+        RoutePoints points = route.getRoutePoints();
+
+
+
+        if (points != null)
+        {
+//            LineDrawable lineDrawable = new LineDrawable(points.getRoutePoints(), s);
+//            buffers.add(lineDrawable);
+//            this.add(lineDrawable);
+            for (GeoPoint p : points.getRoutePoints())
+            {
+                CircleDrawable pd = new CircleDrawable(p, .2, s);
+                buffers.add(pd);
+                this.add(pd);
+            }
+        }
+    }
+
     public void ClearLayer()
     {
         if (buffers != null)
-            for(PolygonDrawable d : buffers) {
+            for(JtsDrawable d : buffers) {
                 this.remove(d);
                 this.update();
             }

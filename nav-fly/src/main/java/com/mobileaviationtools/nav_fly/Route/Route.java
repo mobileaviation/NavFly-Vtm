@@ -1,8 +1,8 @@
 package com.mobileaviationtools.nav_fly.Route;
 
-import android.content.Context;
 import android.util.Log;
 
+import com.example.aircraft.Aircraft;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -13,26 +13,13 @@ import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Info.Cities;
 import com.mobileaviationtools.nav_fly.Info.City;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
-import com.mobileaviationtools.nav_fly.R;
-import com.mobileaviationtools.weater_notam_data.Elevation.ElevationResponseEvent;
-import com.mobileaviationtools.weater_notam_data.Elevation.elevation;
-import com.mobileaviationtools.weater_notam_data.services.ElevationService;
+import com.mobileaviationtools.nav_fly.Route.HeightMap.RoutePoints;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.oscim.android.canvas.AndroidGraphics;
-import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.event.Gesture;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.marker.MarkerItem;
-import org.oscim.layers.vector.PathLayer;
-import org.oscim.layers.vector.geometries.Style;
 import org.oscim.map.Map;
-import org.oscim.renderer.bucket.TextureItem;
-import org.oscim.theme.styles.LineStyle;
-import org.oscim.tiling.source.mapfile.Way;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +31,7 @@ public class Route extends ArrayList<Waypoint> {
         this.id = -1l;
         this.vars = vars;
         this.createdDate = new Date();
+        this.aircraft = vars.aircraft;
         legs = new Legs();
     }
 
@@ -53,7 +41,11 @@ public class Route extends ArrayList<Waypoint> {
     public Long id;
     public Date createdDate;
     public Date modifiedDate;
+    public String elevation_json;
     public GlobalVars vars;
+
+    private Aircraft aircraft;
+    public Aircraft getAircraft() { return  aircraft; }
 
     private Airport SelectedStartAirport;
 
@@ -96,7 +88,7 @@ public class Route extends ArrayList<Waypoint> {
         return indicatedAirspeed;
     }
 
-    private double proposedAltitude = 2000;
+    private double proposedAltitude = 3000;
 
     public double getProposedAltitude() { return proposedAltitude; }
 
@@ -125,7 +117,7 @@ public class Route extends ArrayList<Waypoint> {
 
     private Legs legs;
 
-    public ArrayList<Leg> getLegs() {
+    public Legs getLegs() {
         return legs;
     }
 
@@ -199,17 +191,22 @@ public class Route extends ArrayList<Waypoint> {
                 waypointLayer.PlaceMarker(w);
             }
 
-            setupRoutePoints();
             legBufferLayer.ShowRouteBuffers();
             routePathLayer.update();
         }
     }
 
     private RoutePoints routePoints;
-    private void setupRoutePoints()
+    public RoutePoints getRoutePoints() { return routePoints; }
+    public void setupRoutePoints(RoutePoints.RoutePointsEvents routePointsEvents, Boolean parseFromService)
     {
-        routePoints = new RoutePoints();
-        routePoints.SetupPoints(this);
+        routePoints = new RoutePoints(vars);
+        routePoints.SetupPoints(this, routePointsEvents, parseFromService);
+    }
+
+    public void drawRoutePoints()
+    {
+        legBufferLayer.showRoutePoints();
     }
 
 
@@ -276,7 +273,7 @@ public class Route extends ArrayList<Waypoint> {
 
     private void createNewPathLayer(Map map)
     {
-        routePathLayer = new RoutePathLayer(map, 0xFF84e900, 10){
+        routePathLayer = new RoutePathLayer(map, 0xFF84e900, 10, vars){
             @Override
             public boolean onGesture(Gesture g, MotionEvent e) {
                 if (g instanceof Gesture.Tap) {
@@ -372,16 +369,26 @@ public class Route extends ArrayList<Waypoint> {
         this.clear();
     }
 
-    public void saveRoute(String name)
+    public com.mobileaviationtools.airnavdata.Entities.Route getRouteEntity()
     {
-        AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(vars.context);
-
         com.mobileaviationtools.airnavdata.Entities.Route routeEntity = new
                 com.mobileaviationtools.airnavdata.Entities.Route();
         routeEntity.name = name;
         this.modifiedDate = new Date();
         routeEntity.modifiedDate = this.modifiedDate.getTime();
         routeEntity.createdDate = this.createdDate.getTime();
+        routeEntity.elevation_json = this.elevation_json;
+        return routeEntity;
+    }
+
+    public void saveRoute(String name)
+    {
+        AirnavRouteDatabase db = AirnavRouteDatabase.getInstance(vars.context);
+
+        this.name = name;
+        com.mobileaviationtools.airnavdata.Entities.Route routeEntity =
+                getRouteEntity();
+
 
         this.id = db.getRoute().InsertRoute(routeEntity);
 
@@ -435,6 +442,7 @@ public class Route extends ArrayList<Waypoint> {
         this.name = routeEntity.name;
         this.createdDate = new Date(routeEntity.createdDate);
         this.modifiedDate = new Date(routeEntity.modifiedDate);
+        this.elevation_json = routeEntity.elevation_json;
 
         com.mobileaviationtools.airnavdata.Entities.Waypoint[] waypoints = db.getWaypoint().GetWaypointsByRouteID(routeId);
 

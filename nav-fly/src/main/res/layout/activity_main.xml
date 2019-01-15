@@ -19,6 +19,18 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <fragment
+        android:id="@+id/heightMapFragment"
+        android:name="com.mobileaviationtools.nav_fly.Route.HeightMap.HeightMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/dashboardFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <fragment
         android:id="@+id/routeListFragment"
         android:name="com.mobileaviationtools.nav_fly.Route.RouteListFragment"
         android:layout_width="300dp"
@@ -57,17 +69,7 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <fragment
-        android:id="@+id/heightMapFragment"
-        android:name="com.mobileaviationtools.nav_fly.Route.HeightMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/dashboardFragment"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+
 
     <fragment
         android:name="com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment"

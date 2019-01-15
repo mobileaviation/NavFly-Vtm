@@ -11,7 +11,7 @@ import com.mobileaviationtools.nav_fly.Classes.BitmapHelpers;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
 
-import org.jeo.filter.In;
+//import org.jeo.filter.In;
 import org.oscim.android.canvas.AndroidBitmap;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.MarkerItem;

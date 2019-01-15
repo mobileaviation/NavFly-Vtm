@@ -8,7 +8,7 @@
     android:layout_height="wrap_content"
     android:alpha=".9"
     android:background="@color/secundaryColorA3"
-    tools:context=".Route.HeightMapFragment">
+    tools:context=".Route.HeightMap.HeightMapFragment">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/heightMapLayout"
@@ -42,7 +42,7 @@
     <ImageView
         android:id="@+id/heightMapImageView"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"

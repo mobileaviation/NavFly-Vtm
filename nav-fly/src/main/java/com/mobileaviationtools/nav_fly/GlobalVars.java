@@ -3,6 +3,7 @@ package com.mobileaviationtools.nav_fly;
 import android.app.Activity;
 import android.content.Context;
 
+import com.example.aircraft.Aircraft;
 import com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment;
 import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.DeviationLineLayer;
@@ -25,6 +26,8 @@ public class GlobalVars {
     public DeviationLineLayer deviationLineLayer;
     public DashboardFragment dashboardFragment;
 
+    public Aircraft aircraft;
+
     public MapDirectionType mapDirectionType = MapDirectionType.north;
 
     public GroupLayer baseGroupLayer;
@@ -35,7 +38,7 @@ public class GlobalVars {
     public final int AIRSPACE_GROUP = 20;
     public final int AVIATIONMARKERS_GROUP = 25;
     public final int ROUTE_GROUP = 40;
-    public final int ROUTE_BUFFERS_GROUP = 41;
+    public final int ROUTE_BUFFERS_GROUP = 30;  // 41
     public final int TRACK_GROUP = 50;
     public final int DEVIATIONLINE_GROUP = 55;
     public final int AIRPLANEMARKER_GROUP = 60;

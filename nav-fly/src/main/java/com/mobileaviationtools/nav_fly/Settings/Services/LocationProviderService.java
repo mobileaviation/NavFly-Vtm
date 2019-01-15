@@ -7,7 +7,7 @@ import com.mobileaviationtools.airnavdata.Entities.Property;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Location.LocationProviderType;
 
-import org.jeo.carto.Prop;
+//import org.jeo.carto.Prop;
 
 public class LocationProviderService {
     public LocationProviderService(GlobalVars vars)

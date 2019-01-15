@@ -23,14 +23,14 @@ import android.view.View;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.jeo.map.Style;
-import org.jeo.vector.VectorDataset;
+//import org.jeo.map.Style;
+//import org.jeo.vector.VectorDataset;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Color;
-import org.oscim.layers.OSMIndoorLayer;
+//import org.oscim.layers.OSMIndoorLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
-import org.oscim.test.JeoTest;
+//import org.oscim.test.JeoTest;
 import org.oscim.theme.VtmThemes;
 import org.oscim.theme.styles.TextStyle;
 import org.oscim.utils.IOUtils;
@@ -49,7 +49,7 @@ public class JeoIndoorActivity extends BaseMapActivity {
     // from http://overpass-turbo.eu/s/2vp
     String PATH = "https://gist.githubusercontent.com/anonymous/09062103a66844a96048f25626078c8d/raw/1d3af6a5a55e9ea4adc9551fa633a051a44a5a9c/overpass.geojson";
 
-    private OSMIndoorLayer mIndoorLayer;
+    //private OSMIndoorLayer mIndoorLayer;
 
     public JeoIndoorActivity() {
         super(R.layout.jeo_indoor_map);
@@ -93,23 +93,23 @@ public class JeoIndoorActivity extends BaseMapActivity {
     }
 
     void loadJson(InputStream is) {
-        showToast("got data");
-
-        VectorDataset data = JeoTest.readGeoJson(is);
-        Style style = JeoTest.getStyle();
-        TextStyle textStyle = TextStyle.builder()
-                .isCaption(true)
-                .fontSize(16 * CanvasAdapter.getScale()).color(Color.BLACK)
-                .strokeWidth(2.2f * CanvasAdapter.getScale()).strokeColor(Color.WHITE)
-                .build();
-        mIndoorLayer = new OSMIndoorLayer(mMap, data, style, textStyle);
-        mMap.layers().add(mIndoorLayer);
-
-        showToast("data ready");
-        mMap.updateMap(true);
-
-        mIndoorLayer.activeLevels[0] = true;
-        shift();
+//        showToast("got data");
+//
+//        VectorDataset data = JeoTest.readGeoJson(is);
+//        Style style = JeoTest.getStyle();
+//        TextStyle textStyle = TextStyle.builder()
+//                .isCaption(true)
+//                .fontSize(16 * CanvasAdapter.getScale()).color(Color.BLACK)
+//                .strokeWidth(2.2f * CanvasAdapter.getScale()).strokeColor(Color.WHITE)
+//                .build();
+//        mIndoorLayer = new OSMIndoorLayer(mMap, data, style, textStyle);
+//        mMap.layers().add(mIndoorLayer);
+//
+//        showToast("data ready");
+//        mMap.updateMap(true);
+//
+//        mIndoorLayer.activeLevels[0] = true;
+//        shift();
     }
 
     public void showToast(final String text) {
@@ -134,12 +134,12 @@ public class JeoIndoorActivity extends BaseMapActivity {
             @Override
             public void run() {
                 for (int i = 0; i < 10; i++) {
-                    if (mIndoorLayer.activeLevels[i]) {
-                        mIndoorLayer.activeLevels[i] = false;
-                        mIndoorLayer.activeLevels[(i + 1) % 9] = true;
-                        mIndoorLayer.update();
-                        break;
-                    }
+//                    if (mIndoorLayer.activeLevels[i]) {
+//                        mIndoorLayer.activeLevels[i] = false;
+//                        mIndoorLayer.activeLevels[(i + 1) % 9] = true;
+//                        mIndoorLayer.update();
+//                        break;
+//                    }
                 }
                 shift();
             }
@@ -150,8 +150,8 @@ public class JeoIndoorActivity extends BaseMapActivity {
     public void onClick(View v) {
         mShift = false;
 
-        if (mIndoorLayer == null)
-            return;
+//        if (mIndoorLayer == null)
+//            return;
 
         int i = 0;
 
@@ -163,11 +163,11 @@ public class JeoIndoorActivity extends BaseMapActivity {
         if (i < 0 || i > 9)
             i = 0;
 
-        mIndoorLayer.activeLevels[i] ^= true;
-        if (v instanceof ToggleButton)
-            ((ToggleButton) v).setChecked(mIndoorLayer.activeLevels[i]);
-        log.debug(Arrays.toString(mIndoorLayer.activeLevels));
-        mIndoorLayer.update();
+//        mIndoorLayer.activeLevels[i] ^= true;
+//        if (v instanceof ToggleButton)
+//            ((ToggleButton) v).setChecked(mIndoorLayer.activeLevels[i]);
+//        log.debug(Arrays.toString(mIndoorLayer.activeLevels));
+//        mIndoorLayer.update();
     }
 
     @Override

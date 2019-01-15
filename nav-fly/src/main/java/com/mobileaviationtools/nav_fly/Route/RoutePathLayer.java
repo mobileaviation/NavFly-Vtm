@@ -1,5 +1,7 @@
 package com.mobileaviationtools.nav_fly.Route;
 
+import com.mobileaviationtools.nav_fly.GlobalVars;
+
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.vector.PathLayer;
@@ -15,13 +17,15 @@ public class RoutePathLayer extends PathLayer {
     private Route route;
     private Integer selectedLegColor = 0xFF7277d8;// 0xFFF43D6B;//0xFFFFBC00;
     private float lineWidth;
+    private GlobalVars vars;
 
     public RoutePathLayer(Map map, Style style) {
         super(map, style);
     }
 
-    public RoutePathLayer(Map map, int lineColor, float lineWidth) {
+    public RoutePathLayer(Map map, int lineColor, float lineWidth, GlobalVars vars) {
         super(map, lineColor, lineWidth);
+        this.vars = vars;
         this.lineWidth = lineWidth;
         createOutlinePathLayer(map, Color.DKGRAY, lineWidth+4);
         createSelectedLegLayer(map);
@@ -35,10 +39,10 @@ public class RoutePathLayer extends PathLayer {
     public void AddLayer(Map map, Route route)
     {
         this.route = route;
-        map.layers().add(outlinePathLayer);
-        map.layers().add(this);
-        map.layers().add(selectedLegLayer);
-        map.layers().add(legMarkersLayer);
+        map.layers().add(outlinePathLayer, vars.ROUTE_GROUP);
+        map.layers().add(this, vars.ROUTE_GROUP);
+        map.layers().add(selectedLegLayer, vars.ROUTE_GROUP);
+        map.layers().add(legMarkersLayer, vars.ROUTE_GROUP);
     }
 
     public void SelectLeg(Leg selectedLeg)

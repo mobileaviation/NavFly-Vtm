@@ -58,9 +58,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':airnavdata')
+    implementation project(':aircraft')
     implementation project(':vtm-android')
     implementation project(':vtm-http')
-    implementation project(':vtm-jeo')
+//    implementation project(':vtm-jeo')
     implementation project(':vtm-json')
     implementation project(':vtm-jts')
     implementation project(':vtm-mvt')

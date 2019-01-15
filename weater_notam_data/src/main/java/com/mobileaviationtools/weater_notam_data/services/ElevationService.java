@@ -61,7 +61,8 @@ public class ElevationService {
                 //NotamCounts counts = new Gson().fromJson(notamsJson, NotamCounts.class);
 
                 elevation _elevation = new Gson().fromJson(elevationJson, elevation.class);
-                if (elevationResponseEvent != null) elevationResponseEvent.OnElevationResponse(_elevation, response.message());
+                if (elevationResponseEvent != null) elevationResponseEvent.
+                        OnElevationResponse(_elevation,elevationJson, response.message());
 
             }
         });
