@@ -265,10 +265,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars.map.layers().addGroup(vars.OVERLAYCHARTS_GROUP);
         vars.map.layers().addGroup(vars.AVIATIONMARKERS_GROUP);
         vars.map.layers().addGroup(vars.AIRSPACE_GROUP);
-
-        vars.map.layers().addGroup(vars.ROUTE_GROUP);
         vars.map.layers().addGroup(vars.ROUTE_BUFFERS_GROUP);
-
+        vars.map.layers().addGroup(vars.ROUTE_GROUP);
         vars.map.layers().addGroup(vars.TRACK_GROUP);
         vars.map.layers().addGroup(vars.DEVIATIONLINE_GROUP);
         vars.map.layers().addGroup(vars.AIRPLANEMARKER_GROUP);

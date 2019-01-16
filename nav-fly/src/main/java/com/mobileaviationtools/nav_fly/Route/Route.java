@@ -389,8 +389,14 @@ public class Route extends ArrayList<Waypoint> {
         com.mobileaviationtools.airnavdata.Entities.Route routeEntity =
                 getRouteEntity();
 
-
-        this.id = db.getRoute().InsertRoute(routeEntity);
+        if (this.id>0)
+        {
+            this.modifiedDate = new Date();
+            db.getRoute().UpdateRoute(this.id, this.modifiedDate.getTime());
+            db.getWaypoint().DeleteWaypointsByRouteID(this.id);
+        }
+        else
+            this.id = db.getRoute().InsertRoute(routeEntity);
 
         for (Waypoint p: this)
         {

@@ -2,6 +2,7 @@ package com.mobileaviationtools.nav_fly.Route;
 
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.transition.Visibility;
@@ -16,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
@@ -477,6 +479,40 @@ public class RouteListFragment extends Fragment {
 
     private void saveRouteDialogs()
     {
+        if (vars.route != null) {
+            if (vars.route.id >0)
+            {
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+                dialogBuilder.setIcon(android.R.drawable.ic_input_get);
+                dialogBuilder.setTitle("Save or Save-as");
+                dialogBuilder.setMessage("Save this route with a new name or update the already saved version?");
+                dialogBuilder.setPositiveButton("New", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        doSaveRoute();
+                    }
+                });
+                dialogBuilder.setNegativeButton("Update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        vars.route.saveRoute(vars.route.name);
+                    }
+                });
+
+                dialogBuilder.show();
+            }
+            else
+                doSaveRoute();
+        }
+        else
+        {
+            Toast noRouteToast = Toast.makeText(vars.context, "There is no Route open at this moment", Toast.LENGTH_LONG);
+            noRouteToast.show();
+        }
+    }
+
+    private void doSaveRoute()
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Save Route");
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.text_input, (ViewGroup) getView(), false);
@@ -493,9 +529,9 @@ public class RouteListFragment extends Fragment {
                 final com.mobileaviationtools.airnavdata.Entities.Route r = db.getRoute().getRouteByName(routeName);
                 if (r == null) {
                     dialogInterface.dismiss();
+                    vars.route.id = -1l;
                     vars.route.saveRoute(routeName);
-                } else
-                {
+                } else {
                     AlertDialog.Builder ov_builder = new AlertDialog.Builder(getContext());
                     ov_builder.setTitle("Overwrite route?");
                     ov_builder.setMessage("There is already a route with this name in the database..");
@@ -530,5 +566,7 @@ public class RouteListFragment extends Fragment {
             }
         });
         builder.show();
+
+
     }
 }

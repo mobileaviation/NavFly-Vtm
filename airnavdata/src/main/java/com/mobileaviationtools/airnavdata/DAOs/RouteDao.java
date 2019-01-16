@@ -15,6 +15,9 @@ public abstract class RouteDao {
     @Insert
     public abstract long InsertRoute(Route route);
 
+    @Query("UPDATE tbl_Route set modifiedDate=:modifiedDate WHERE id=:id")
+    public abstract void UpdateRoute(Long id, Long modifiedDate);
+
     @Query("UPDATE tbl_Route SET elevation_json=:elevation_json WHERE id=:id")
     public abstract void UpdateRouteElevationJson(String elevation_json, Long id);
 
