@@ -6,6 +6,7 @@ import com.mobileaviationtools.airnavdata.Entities.Country;
 import org.locationtech.jts.geom.Coordinate;
 
 import java.util.Comparator;
+import java.util.Date;
 
 public class ExtCoordinate extends Coordinate {
     public ExtCoordinate(double x, double y)
@@ -25,6 +26,8 @@ public class ExtCoordinate extends Coordinate {
     public double elevation;
     public double altitude;
     public double distanceToNext_meter;
+
+    public Date date;
 
     public FlightStage stage;
 

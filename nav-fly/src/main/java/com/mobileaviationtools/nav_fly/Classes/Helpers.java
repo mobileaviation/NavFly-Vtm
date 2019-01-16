@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly.Classes;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -53,5 +54,10 @@ public class Helpers {
     {
         File dbFile = context.getDatabasePath(dbName);
         return dbFile.exists();
+    }
+
+    public static int dpToPx(int pd)
+    {
+        return (int) (pd / Resources.getSystem().getDisplayMetrics().density);
     }
 }

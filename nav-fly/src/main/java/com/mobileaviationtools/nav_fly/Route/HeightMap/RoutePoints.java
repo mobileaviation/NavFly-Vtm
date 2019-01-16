@@ -2,6 +2,8 @@ package com.mobileaviationtools.nav_fly.Route.HeightMap;
 
 import com.badlogic.gdx.utils.GdxNativesLoader;
 import com.mobileaviationtools.nav_fly.GlobalVars;
+import com.mobileaviationtools.nav_fly.Route.HeightMap.Comparators.CompAltitude;
+import com.mobileaviationtools.nav_fly.Route.HeightMap.Comparators.CompElevation;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Route.Waypoint;
 import com.mobileaviationtools.weater_notam_data.Elevation.elevation;
@@ -31,26 +33,6 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
     private RoutePointsEvents routePointsEvents;
     private GlobalVars vars;
     private double totalDistance_meter;
-
-    public class CompElevation implements Comparator<ExtCoordinate>
-    {
-        public int compare(ExtCoordinate a, ExtCoordinate b)
-        {
-            if (a.elevation < b.elevation) return -1;
-            if (a.elevation == b.elevation) return 0;
-            return 1;
-        }
-    }
-
-    public class CompAltitude implements Comparator<ExtCoordinate>
-    {
-        public int compare(ExtCoordinate a, ExtCoordinate b)
-        {
-            if (a.altitude < b.altitude) return -1;
-            if (a.altitude == b.altitude) return 0;
-            return 1;
-        }
-    }
 
     public RoutePoints(GlobalVars vars)
     {

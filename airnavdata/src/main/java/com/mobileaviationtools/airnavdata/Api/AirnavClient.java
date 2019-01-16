@@ -76,7 +76,13 @@ public class AirnavClient {
             statisticsAPIDataSource.GetStatisticsByContinent(continent);
     }
 
-    private void retrieveDatabases(Statistics statistics, String continent){
+    public void StartDownloadIndividualTable(TableType tableType, Statistics statistics, String continent)
+    {
+        retrieveDatabaseByType(statistics, continent, tableType);
+    }
+
+    private void retrieveNavaids(Statistics statistics, String continent)
+    {
         NavaidAPIDataSource navaidAPIDataSource = new NavaidAPIDataSource(context, retrofit);
         navaidAPIDataSource.SetStatusEvent(clientStatus);
         if (continent.length()==0) {
@@ -86,7 +92,10 @@ public class AirnavClient {
         {
             navaidAPIDataSource.loadNavaidsByContinent(statistics.NavaidsCount, continent);
         }
+    }
 
+    private void retrieveAirports(Statistics statistics, String continent)
+    {
         AirportsAPIDataSource airportsAPIDataSource= new AirportsAPIDataSource(context, retrofit);
         airportsAPIDataSource.SetStatusEvent(clientStatus);
         if (continent.length()==0) {
@@ -96,19 +105,27 @@ public class AirnavClient {
         {
             airportsAPIDataSource.loadAirportsByContinent(statistics.AirportsCount, continent);
         }
+    }
 
-        CountriesAPIDataSource countriesAPIDataSource= new CountriesAPIDataSource(context, retrofit);
+    private void retrieveCountries(Statistics statistics, String continent) {
+        CountriesAPIDataSource countriesAPIDataSource = new CountriesAPIDataSource(context, retrofit);
         countriesAPIDataSource.SetStatusEvent(clientStatus);
         countriesAPIDataSource.loadcountries(statistics.CountriesCount);
+    }
 
+    private void retrieveRegions(Statistics statistics, String continent) {
         RegionsAPIDataSource regionsAPIDataSource= new RegionsAPIDataSource(context, retrofit);
         regionsAPIDataSource.SetStatusEvent(clientStatus);
         regionsAPIDataSource.loadRegions(statistics.RegionsCount);
+    }
 
-        FirsAPIDataSource firsAPIDataSource= new FirsAPIDataSource(context, retrofit);
+    private void retrieveFirs(Statistics statistics, String continent) {
+        FirsAPIDataSource firsAPIDataSource = new FirsAPIDataSource(context, retrofit);
         firsAPIDataSource.SetStatusEvent(clientStatus);
         firsAPIDataSource.loadfirs(statistics.FirsCount);
+    }
 
+    private void retrieveFixes(Statistics statistics, String continent) {
         FixesAPIDataSource fixesAPIDataSource= new FixesAPIDataSource(context, retrofit);
         fixesAPIDataSource.SetStatusEvent(clientStatus);
         if (continent.length()==0) {
@@ -118,7 +135,10 @@ public class AirnavClient {
         {
             fixesAPIDataSource.loadfixesByContinent(statistics.FixesCount, continent);
         }
+    }
 
+    private void retrieveAirspaces(Statistics statistics, String continent)
+    {
         AirspaceAPIDataSource airspaceAPIDataSource= new AirspaceAPIDataSource(context, retrofit);
         airspaceAPIDataSource.SetStatusEvent(clientStatus);
         if (continent.length()==0) {
@@ -128,11 +148,17 @@ public class AirnavClient {
         {
             airspaceAPIDataSource.loadAirspacesByContinent(statistics.AirspacesCount, continent);
         }
+    }
 
+    private void retrieveCharts(Statistics statistics, String continent)
+    {
         MBTilesAPIDataSource mbTilesAPIDataSource= new MBTilesAPIDataSource(context, retrofit);
         mbTilesAPIDataSource.SetStatusEvent(clientStatus);
         mbTilesAPIDataSource.loadTiles(statistics.MBTilesCount);
+    }
 
+    private void retrieveCities(Statistics statistics, String continent)
+    {
         CitiesAPIDataSource citiesAPIDataSource = new CitiesAPIDataSource(context, retrofit);
         citiesAPIDataSource.SetStatusEvent(clientStatus);
         if (continent.length()==0) {
@@ -142,6 +168,51 @@ public class AirnavClient {
         {
             citiesAPIDataSource.loadcitiesByContinent(statistics.CitiesCount, continent);
         }
+    }
+
+    private void retrieveDatabaseByType(Statistics statistics, String continent, TableType tableType)
+    {
+        switch (tableType) {
+            case airports:
+                retrieveAirports(statistics, continent);
+                break;
+            case airspaces:
+                retrieveAirspaces(statistics, continent);
+                break;
+            case firs:
+                retrieveFirs(statistics, continent);
+                break;
+            case fixes:
+                retrieveFixes(statistics,continent);
+                break;
+            case navaids:
+                retrieveNavaids(statistics, continent);
+                break;
+            case countries:
+                retrieveCountries(statistics, continent);
+                break;
+            case regions:
+                retrieveRegions(statistics, continent);
+                break;
+            case mbtiles:
+                retrieveCharts(statistics, continent);
+                break;
+            case cities:
+                retrieveCities(statistics, continent);
+                break;
+        }
+    }
+
+    private void retrieveDatabases(Statistics statistics, String continent){
+        retrieveNavaids(statistics, continent);
+        retrieveAirports(statistics, continent);
+        retrieveCountries(statistics, continent);
+        retrieveFirs(statistics, continent);
+        retrieveAirspaces(statistics, continent);
+        retrieveCharts(statistics, continent);
+        retrieveCities(statistics, continent);
+        retrieveFixes(statistics, continent);
+        retrieveRegions(statistics, continent);
     }
 
     private void setClientDownloadStatus()

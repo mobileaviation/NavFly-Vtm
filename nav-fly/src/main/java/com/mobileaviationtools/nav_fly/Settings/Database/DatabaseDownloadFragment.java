@@ -58,6 +58,8 @@ public class DatabaseDownloadFragment extends Fragment {
     private DialogFragment parentDialog;
     private Boolean startup;
     private StartupDialog.NextPrevEventListener nextEvent;
+    private Statistics statistics;
+
     public void SetNextEventListener(StartupDialog.NextPrevEventListener listener)
     {
         nextEvent = listener;
@@ -73,7 +75,19 @@ public class DatabaseDownloadFragment extends Fragment {
     private ProgressBar airspacesProgressBar;
     private ProgressBar chartsProgressBar;
     private ProgressBar citiesProgressBar;
+
     private RadioGroup continentsGroup;
+
+    private int airportsRetry = 0;
+    private int navaidsRetry = 0;
+    private int countriesRetry = 0;
+    private int regionsRetry = 0;
+    private int firsRetry = 0;
+    private int fixesRetry = 0;
+    private int airspacesRetry = 0;
+    private int chartsRetry = 0;
+    private int citiesRetry = 0;
+
 
     private TextView dbDownloadHelpTextView;
 
@@ -129,7 +143,7 @@ public class DatabaseDownloadFragment extends Fragment {
             @Override
             public void onClick(final View view) {
                 if (!(Boolean)actionBtn.getTag()) {
-                    AirnavClient airnavClient = new AirnavClient(vars.context);
+                    final AirnavClient airnavClient = new AirnavClient(vars.context);
                     actionBtn.setEnabled(false);
                     finishedCount = 0;
 
@@ -195,11 +209,55 @@ public class DatabaseDownloadFragment extends Fragment {
                         @Override
                         public void OnError(String message, TableType tableType) {
                             Toast.makeText(vars.context, "Error downloading database, please try again in a few minutes!", Toast.LENGTH_LONG);
-                            actionBtn.setEnabled(true);
+
+                            if (tableType != null) {
+                                Statistics statistics = DatabaseDownloadFragment.this.statistics;
+                                switch (tableType) {
+                                    case airports:
+                                        airportsRetry++;
+                                        if (airportsRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case airspaces:
+                                        airspacesRetry++;
+                                        if (airspacesRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case firs:
+                                        firsRetry++;
+                                        if (firsRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case fixes:
+                                        fixesRetry++;
+                                        if (fixesRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case navaids:
+                                        navaidsRetry++;
+                                        if (navaidsRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case countries:
+                                        countriesRetry++;
+                                        if (countriesRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case regions:
+                                        regionsRetry++;
+                                        if (regionsRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case mbtiles:
+                                        chartsRetry++;
+                                        if (chartsRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case cities:
+                                        citiesRetry++;
+                                        if (citiesRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                }
+                            }
+                            else
+                                actionBtn.setEnabled(true);
                         }
 
                         @Override
                         public void OnStatistics(Statistics statistics) {
+                            DatabaseDownloadFragment.this.statistics = statistics;
                             ((TextView) getView().findViewById(R.id.airportCountTxt)).setText(statistics.AirportsCount.toString());
                             ((TextView) getView().findViewById(R.id.airspacesCountTxt)).setText(statistics.AirspacesCount.toString());
                             ((TextView) getView().findViewById(R.id.regionsCountTxt)).setText(statistics.RegionsCount.toString());

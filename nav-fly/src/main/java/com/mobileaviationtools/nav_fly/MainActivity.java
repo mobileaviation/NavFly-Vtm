@@ -22,6 +22,7 @@ import com.example.aircraft.Types.PiperArcher;
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
+import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
@@ -151,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         //AirnavClient.deleteDatabaseFile(this, "room_airnav_chart.db");
         //AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
         //AirnavClient.deleteDatabaseFile(this, "room_airnav_settings.db");
+        //AirnavClient.deleteDatabaseFile(this, "room_airnav_route.db");
 
         super.onCreate(savedInstanceState);
 
@@ -880,6 +882,9 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 //
 //            }
 //        });
+        HeightMapFragment heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
+        heightMapFragment.setVisibility(View.VISIBLE);
+
     }
 
     private void setHeightMapFragment(Route route, Boolean parseFromService)
@@ -888,7 +893,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         HeightMapFragment heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
         heightMapFragment.setVisibility(View.VISIBLE);
 
-        heightMapFragment.setupHeightMap(vars, null, parseFromService);
+        heightMapFragment.setupRouteHeightMap(vars, null, parseFromService);
     }
 
     private SearchDialog searchDialog;
