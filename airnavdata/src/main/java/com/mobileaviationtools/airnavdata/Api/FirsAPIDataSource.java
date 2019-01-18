@@ -78,6 +78,8 @@ public class FirsAPIDataSource {
                 }
                 else
                 {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
                     Log.e(TAG, "Error recieving Firs results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.firs);
                 }

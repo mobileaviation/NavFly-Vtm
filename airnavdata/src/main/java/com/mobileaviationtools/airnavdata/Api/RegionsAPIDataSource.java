@@ -78,6 +78,8 @@ public class RegionsAPIDataSource {
                 }
                 else
                 {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
                     Log.e(TAG, "Error recieving Regions results: " + response.message());
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.regions);
                 }

@@ -101,6 +101,8 @@ public class AirportsAPIDataSource {
                 }
                 else
                 {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
                     Log.e(TAG, "Error recieving results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.airports);
                 }

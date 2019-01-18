@@ -87,6 +87,7 @@ public class DatabaseDownloadFragment extends Fragment {
     private int airspacesRetry = 0;
     private int chartsRetry = 0;
     private int citiesRetry = 0;
+    private int statisticsRetry = 0;
 
 
     private TextView dbDownloadHelpTextView;
@@ -248,6 +249,10 @@ public class DatabaseDownloadFragment extends Fragment {
                                     case cities:
                                         citiesRetry++;
                                         if (citiesRetry < 5) airnavClient.StartDownloadIndividualTable(tableType, statistics, continent);
+                                        break;
+                                    case statistics:
+                                        statisticsRetry++;
+                                        if (statisticsRetry < 5) airnavClient.StartDownload(continent);
                                         break;
                                 }
                             }

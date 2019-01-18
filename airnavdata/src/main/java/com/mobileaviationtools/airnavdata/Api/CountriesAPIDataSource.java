@@ -78,6 +78,8 @@ public class CountriesAPIDataSource {
                 }
                 else
                 {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
                     Log.e(TAG, "Error recieving Countries results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.countries);
                 }

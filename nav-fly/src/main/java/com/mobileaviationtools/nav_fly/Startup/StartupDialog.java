@@ -2,6 +2,7 @@ package com.mobileaviationtools.nav_fly.Startup;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.InsetDrawable;
@@ -24,6 +25,8 @@ import com.mobileaviationtools.nav_fly.Settings.Database.DatabaseDownloadFragmen
 import com.mobileaviationtools.nav_fly.Settings.HomeAirport.HomeAirportFragment;
 import com.mobileaviationtools.nav_fly.Settings.LocationProviderSetupFragment;
 import com.mobileaviationtools.nav_fly.Settings.ViewPagerAdapter;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class StartupDialog extends DialogFragment {
     public interface NextPrevEventListener
@@ -136,6 +139,10 @@ public class StartupDialog extends DialogFragment {
             @Override
             public void OnClose(Fragment fragment)
             {
+                SharedPreferences.Editor databasePrefsEditor =
+                        vars.context.getSharedPreferences("Database", MODE_PRIVATE).edit();
+                databasePrefsEditor.putBoolean("databaseInitialized", true);
+                databasePrefsEditor.apply();
                 dismiss();
             }
         };

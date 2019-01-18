@@ -96,6 +96,8 @@ public class NavaidAPIDataSource {
                 }
                 else
                 {
+                    db.setTransactionSuccessful();
+                    db.endTransaction();
                     Log.e(TAG, "Error recieving Navaid results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.navaids);
                 }

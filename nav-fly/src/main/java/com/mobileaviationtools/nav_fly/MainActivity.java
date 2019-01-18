@@ -2,6 +2,7 @@ package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -162,8 +163,13 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars.aircraft = new PiperArcher();
 
         Boolean test = false;
+        doSetupWakeLock();
 
-        if ((!Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) || test) {
+        SharedPreferences databasePrefs = this.getSharedPreferences("Database", MODE_PRIVATE);
+        Boolean databaseInitialized = databasePrefs.getBoolean("databaseInitialized", false);
+
+        //if ((!Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) || test) {
+        if(!databaseInitialized){
             fromMenu = false;
             StartupDialog startupDialog = StartupDialog.getInstance(vars);
             startupDialog.show(getSupportFragmentManager(), "Startup");
@@ -227,18 +233,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET_ACCESS_SETUPAPP );
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED )
-        {
-            // set wakelock
-            setupWakeLock();
-        }
-        else
-        {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WAKE_LOCK}, REQUEST_WAKELOCK_SETUPAPP );
-        }
-
-
+        doSetupWakeLock();
     }
 
     private void setupApp()
@@ -626,6 +621,20 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                 airspacesInfoFragment.ShowAirspacesInfo(airspaces);
             }
         });
+    }
+
+    private void doSetupWakeLock()
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED )
+        {
+            // set wakelock
+            setupWakeLock();
+        }
+        else
+        {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WAKE_LOCK}, REQUEST_WAKELOCK_SETUPAPP );
+        }
     }
 
     private void setupWakeLock()
