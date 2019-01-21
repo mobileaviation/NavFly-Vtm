@@ -28,6 +28,8 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.Database;
+import com.mobileaviationtools.nav_fly.Base.BaseChart;
+import com.mobileaviationtools.nav_fly.Classes.BaseChartType;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
 import com.mobileaviationtools.nav_fly.Classes.Helpers;
@@ -95,6 +97,7 @@ import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mvt.NextzenMvtTileSource;
+import org.oscim.tiling.source.mvt.OpenMapTilesMvtTileSource;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 import java.io.File;
@@ -119,12 +122,15 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     MapView mMapView;
     CheckMap checkMap;
     MapPreferences mPrefs;
-    VectorTileLayer mBaseLayer;
+    //VectorTileLayer mBaseLayer;
+
+    BaseChart baseChart;
     AirportMarkersLayer mAirportMarkersLayer;
     NaviadMarkersLayer mNavaidsMarkersLayer;
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
     Tracking trackingLayer;
+
     Boolean fromMenu;
 
     Boolean mapPosLockedToAirplanePos = true;
@@ -133,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     Timer weatherTimer;
 
     //private OfflineTileCache mCache;
-    private SettingsObject settingsObject;
-    TileSource mTileSource;
+    //private SettingsObject settingsObject;
+    //TileSource mTileSource;
     protected BitmapTileLayer mBitmapLayer;
 
     private DefaultMapScaleBar mapScaleBar;
@@ -173,8 +179,18 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             fromMenu = false;
             StartupDialog startupDialog = StartupDialog.getInstance(vars);
             startupDialog.show(getSupportFragmentManager(), "Startup");
+            vars.baseChartType = BaseChartType.opensciencemaps;
+            databasePrefs.edit().putString("BaseChartType",vars.baseChartType.toString()).apply();
         }
         else {
+            String baseChartTypeStr = databasePrefs.getString("BaseChartType", "unk");
+            if (baseChartTypeStr.equals("unk"))
+            {
+                vars.baseChartType = BaseChartType.opensciencemaps;
+                databasePrefs.edit().putString("BaseChartType",vars.baseChartType.toString()).apply();
+            }
+            else
+                vars.baseChartType = BaseChartType.valueOf(baseChartTypeStr);
             startApp();
         }
     }
@@ -269,8 +285,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         vars.map.layers().addGroup(vars.AIRPLANEMARKER_GROUP);
 
         // add overlay layers
-        settingsObject.setupChartsOverlayLayers();
-        settingsObject.setupOnlineTileProviders();
+        vars.settingsObject.setupChartsOverlayLayers();
+        vars.settingsObject.setupOnlineTileProviders();
 
         setupAirspacesLayer();
         addMarkerLayers();
@@ -441,8 +457,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
     private void createSettingsObject()
     {
-        settingsObject = new SettingsObject(vars);
-        settingsObject.SetSettingsEvent(new SettingsObject.SettingsEvent() {
+        vars.settingsObject = new SettingsObject(vars);
+        vars.settingsObject.SetSettingsEvent(new SettingsObject.SettingsEvent() {
             @Override
             public void OnSettingChanged(SettingsObject.SettingType type, SettingsObject object) {
 
@@ -472,8 +488,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         routeListFragment.setChartEvents(new ChartEvents() {
             @Override
             public void OnChartCheckedEvent(Chart chart, Boolean checked) {
-                settingsObject.chartsOverlayLayers.setChart(chart);
-                settingsObject.updateChartsFromDB();
+                vars.settingsObject.chartsOverlayLayers.setChart(chart);
+                vars.settingsObject.updateChartsFromDB();
             }
 
             @Override
@@ -715,66 +731,72 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 //        chartsOverlayLayers.InitChartsFromDB();
 //    }
 
+
     void setupMap()
     {
-//        mTileSource = OSciMap4TileSource.builder()
-//                .httpFactory(new OkHttpEngine.OkHttpFactory())
-//                .build();
+        baseChart = new BaseChart(vars);
+        baseChart.setBaseCharts(vars.baseChartType);
+//        boolean LoadMapforgeMaps = false;
 //
-        boolean loadNextZenMaps = true;
-        boolean LoadMapforgeMaps = false;
-        boolean OSciMaps = false;
-
-        VtmThemes defaultTheme = VtmThemes.DEFAULT;
-
-        if (OSciMaps)
-        {
-            mTileSource = OSciMap4TileSource.builder()
-                .httpFactory(new OkHttpEngine.OkHttpFactory())
-                .build();
-            defaultTheme = VtmThemes.DEFAULT;
-        }
-
-
-        if (LoadMapforgeMaps) {
-            // Mapforge mas test
-            File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File mapFile = new File(downloadDir.toString() + "/netherlands.map");
-            if (mapFile.exists()) {
-                Log.i(TAG, "Found netherlands.map !!");
-                mTileSource = new MapFileTileSource();
-                String path = mapFile.getAbsolutePath();
-                if (((MapFileTileSource) mTileSource).setMapFile(path)) {
-                    Log.i(TAG, "Netherlands map loaded");
-                }
-            }
-            defaultTheme = VtmThemes.DEFAULT;
-        }
-
-        if (loadNextZenMaps) {
-            mTileSource = NextzenMvtTileSource.builder()
-                    .apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
-                    .httpFactory(new OkHttpEngine.OkHttpFactory())
-                    //.locale("en")
-                    .build();
-
-//        mTileSource = MapilionMvtTileSource.builder()
+//        VtmThemes defaultTheme = VtmThemes.DEFAULT;
+//
+//        // Test
+//        vars.baseChartType = BaseChartType.openmaptiles;
+//
+//        if (vars.baseChartType == BaseChartType.opensciencemaps)
+//        {
+//            mTileSource = OSciMap4TileSource.builder()
 //                .httpFactory(new OkHttpEngine.OkHttpFactory())
 //                .build();
-//        String url = ((MapilionMvtTileSource) mTileSource).getUrl().toString();
-
-            String url = ((NextzenMvtTileSource) mTileSource).getNextzenUrl();
-            settingsObject.setBaseCache(mTileSource, url);
-            defaultTheme = VtmThemes.MAPZEN;
-        }
-
-
-
-        mBaseLayer = vars.map.setBaseMap(mTileSource);
-
-        vars.map.setTheme(defaultTheme);
-
-        vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer), vars.BASE_GROUP);
+//            defaultTheme = VtmThemes.DEFAULT;
+//
+//            String url = ((OSciMap4TileSource) mTileSource).getUrl().toString();
+//            settingsObject.setBaseCache(mTileSource, url, vars.baseChartType);
+//        }
+//
+//
+//        if (LoadMapforgeMaps) {
+//            // Mapforge mas test
+//            File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//            File mapFile = new File(downloadDir.toString() + "/netherlands.map");
+//            if (mapFile.exists()) {
+//                Log.i(TAG, "Found netherlands.map !!");
+//                mTileSource = new MapFileTileSource();
+//                String path = mapFile.getAbsolutePath();
+//                if (((MapFileTileSource) mTileSource).setMapFile(path)) {
+//                    Log.i(TAG, "Netherlands map loaded");
+//                }
+//            }
+//            defaultTheme = VtmThemes.DEFAULT;
+//        }
+//
+//        if (vars.baseChartType == BaseChartType.nextzen) {
+//            mTileSource = NextzenMvtTileSource.builder()
+//                    .apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
+//                    .httpFactory(new OkHttpEngine.OkHttpFactory())
+//                    //.locale("en")
+//                    .build();
+//
+//            String url = ((NextzenMvtTileSource) mTileSource).getNextzenUrl();
+//            settingsObject.setBaseCache(mTileSource, url, vars.baseChartType);
+//            defaultTheme = VtmThemes.MAPZEN;
+//        }
+//
+//        if (vars.baseChartType == BaseChartType.openmaptiles){
+//            mTileSource = OpenMapTilesMvtTileSource.builder()
+//                    .apiKey("29WrAEe6HeyBZgOaLFda")
+//                    .httpFactory(new OkHttpEngine.OkHttpFactory())
+//                    .build();
+//            String url = ((OpenMapTilesMvtTileSource) mTileSource).getUrl().toString();
+//            settingsObject.setBaseCache(mTileSource, url, vars.baseChartType);
+//            defaultTheme = VtmThemes.OPENMAPTILES;
+//        }
+//
+//
+//
+//        mBaseLayer = vars.map.setBaseMap(mTileSource);
+//        vars.map.setTheme(defaultTheme);
+//        vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer), vars.BASE_GROUP);
     }
 
     void setupInitialLocation()
@@ -821,7 +843,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     }
                     case maptype:
                     {
-                        ChartSettingsDialog chartSettingsDialog = ChartSettingsDialog.getInstance(MainActivity.this, settingsObject);
+                        ChartSettingsDialog chartSettingsDialog = ChartSettingsDialog.getInstance(MainActivity.this, vars.settingsObject);
                         fromMenu = true;
                         chartSettingsDialog.show(getSupportFragmentManager(), "ChartSettings");
                         break;
@@ -1023,7 +1045,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     @Override
     protected void onPause() {
         //mPrefs.save(mMapView.map());
-        mMapView.onPause();
+        if (mMapView != null)
+            mMapView.onPause();
 
         super.onPause();
     }
@@ -1036,7 +1059,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         if (mapScaleBar != null)
             mapScaleBar.destroy();
 
-        settingsObject.dispose();
+        vars.settingsObject.dispose();
         mMapView.onDestroy();
         super.onDestroy();
     }

@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.example.aircraft.Aircraft;
+import com.mobileaviationtools.nav_fly.Classes.BaseChartType;
 import com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment;
 import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.DeviationLineLayer;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Menus.MapDirectionType;
 import com.mobileaviationtools.nav_fly.Route.Route;
+import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 
 import org.oscim.layers.GroupLayer;
 import org.oscim.map.Map;
@@ -25,6 +27,8 @@ public class GlobalVars {
     public AircraftLocationLayer mAircraftLocationLayer;
     public DeviationLineLayer deviationLineLayer;
     public DashboardFragment dashboardFragment;
+    public BaseChartType baseChartType;
+    public SettingsObject settingsObject;
 
     public Aircraft aircraft;
 

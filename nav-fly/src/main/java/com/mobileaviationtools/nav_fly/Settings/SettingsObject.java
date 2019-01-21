@@ -9,6 +9,7 @@ import com.mobileaviationtools.airnavdata.Classes.OnlineTileProviders;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
 import com.mobileaviationtools.airnavdata.Entities.OnlineTileProvider;
+import com.mobileaviationtools.nav_fly.Classes.BaseChartType;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Layers.ChartsOverlayLayers;
 import com.mobileaviationtools.nav_fly.Settings.Overlays.ChartSettingsItemAdapter;
@@ -48,9 +49,6 @@ public class SettingsObject  {
 
     public SettingsObject(GlobalVars vars)
     {
-        baseCache = new OfflineTileCache(vars.context, null, "airnav_nextzen_tiles_cache.db");
-        long s = 512 * (1 << 10);
-        baseCache.setCacheSize(512 * (1 << 10));
         this.vars = vars;
 
         onlineTileProviders = new ArrayList<>();
@@ -129,8 +127,13 @@ public class SettingsObject  {
     }
 
     private OfflineTileCache baseCache;
-    public void setBaseCache(TileSource source, String url)
+    public void setBaseCache(TileSource source, String url, BaseChartType baseChartType)
     {
+        baseCache = new OfflineTileCache(vars.context, null, "airnav_" +
+                baseChartType.toString() + "_tiles_cache.db");
+        long s = 512 * (1 << 10);
+        baseCache.setCacheSize(512 * (1 << 10));
+
         tiles_url = url;
         source.tileCache = baseCache;
     }

@@ -8,6 +8,7 @@ import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
+import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Info.Cities;
@@ -15,6 +16,8 @@ import com.mobileaviationtools.nav_fly.Info.City;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Route.HeightMap.RoutePoints;
 
+import org.oscim.backend.CanvasAdapter;
+import org.oscim.backend.canvas.Canvas;
 import org.oscim.core.GeoPoint;
 import org.oscim.event.Gesture;
 import org.oscim.event.MotionEvent;
@@ -191,7 +194,7 @@ public class Route extends ArrayList<Waypoint> {
                 waypointLayer.PlaceMarker(w);
             }
 
-            legBufferLayer.ShowRouteBuffers();
+            //legBufferLayer.ShowRouteBuffers();
             routePathLayer.update();
         }
     }
@@ -273,7 +276,7 @@ public class Route extends ArrayList<Waypoint> {
 
     private void createNewPathLayer(Map map)
     {
-        routePathLayer = new RoutePathLayer(map, 0xFF84e900, 10, vars){
+        routePathLayer = new RoutePathLayer(map, 0xFF84e900, CanvasAdapter.getScale() * 5, vars){
             @Override
             public boolean onGesture(Gesture g, MotionEvent e) {
                 if (g instanceof Gesture.Tap) {
