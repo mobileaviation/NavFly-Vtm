@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
 
 public class ChartSettingsDialog extends DialogFragment {
@@ -22,11 +23,12 @@ public class ChartSettingsDialog extends DialogFragment {
         super();
     }
 
-    public static ChartSettingsDialog getInstance(Context context, SettingsObject object)
+    public static ChartSettingsDialog getInstance(Context context, SettingsObject object, GlobalVars vars)
     {
         ChartSettingsDialog chartSettingsDialog = new ChartSettingsDialog();
         chartSettingsDialog.context = context;
         chartSettingsDialog.settingsObject = object;
+        chartSettingsDialog.vars = vars;
         return chartSettingsDialog;
     }
 
@@ -52,6 +54,7 @@ public class ChartSettingsDialog extends DialogFragment {
 
     private SettingsObject settingsObject;
     private Context context;
+    private GlobalVars vars;
 
     public void setup(View view)
     {
@@ -59,7 +62,7 @@ public class ChartSettingsDialog extends DialogFragment {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 
         // Add Fragments to adapter one by one
-        adapter.addFragment(SettingsFragmentBaseChart.getInstance(context, settingsObject), "Base Chart");
+        adapter.addFragment(SettingsFragmentBaseChart.getInstance(context, vars), "Base Chart");
         adapter.addFragment(SettingsFragmentAdditionalCharts.getInstance(context, settingsObject), "Extra Charts");
         adapter.addFragment(SettingsFragmentOffline.getInstance(context, settingsObject), "Offline");
         adapter.addFragment(SettingsFragmentOverlays.getInstance(context, settingsObject), "Overlays");

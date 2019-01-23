@@ -22,6 +22,8 @@ public class TrackHeightMapBitmap {
     private Integer imageWidth;
     private Integer imageHeight;
 
+    private Float meterToFeet = 3.2808399f;
+
     public Bitmap drawTrack(TrackPoints points)
     {
         Canvas canvas = new Canvas(bitmap);
@@ -32,7 +34,7 @@ public class TrackHeightMapBitmap {
 
     private void doDraw(Canvas canvas, TrackPoints points)
     {
-        double maxAltitude = points.getMaxAltitude().altitude;
+        double maxAltitude = points.getMaxAltitude().getAltitudeFt();
         double maxAltitudePlus = maxAltitude + (maxAltitude * .15);
         double minElevation = 0;
 
@@ -43,12 +45,12 @@ public class TrackHeightMapBitmap {
         pLine.setStrokeWidth(Helpers.dpToPx(20));
 
         double startX = Helpers.dpToPx(50);
-        double startY = calcYFrom(points.get(0).altitude, minElevation, maxAltitudePlus);
+        double startY = calcYFrom(points.get(0).getAltitudeFt(), minElevation, maxAltitudePlus);
         for (ExtCoordinate c: points) {
             double addX = (c.distanceToNext_meter==0) ? 0 :
                     ((double)imageWidth / (double)points.getTotalDistance_meter()) * c.distanceToNext_meter;
             double nextX = startX + addX;
-            double nextY = calcYFrom(c.altitude, minElevation, maxAltitudePlus);
+            double nextY = calcYFrom(c.getAltitudeFt(), minElevation, maxAltitudePlus);
             canvas.drawLine((float)startX, (float)startY, (float)nextX, (float)nextY, pLine);
             startX = nextX;
             startY = nextY;

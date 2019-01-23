@@ -257,7 +257,7 @@ public class FspSimLocationProvider implements IFspLocationProvider{
             double he = 0d;
             if (o != null) {
                 he = Double.parseDouble(o.Value);
-                he = he * 3.2808399d; // meters to feet
+                //he = he * 3.2808399d; // meters to feet
                 location.setAltitude(he);
             }
         }

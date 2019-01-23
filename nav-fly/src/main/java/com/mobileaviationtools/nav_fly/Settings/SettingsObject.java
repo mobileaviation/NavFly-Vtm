@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly.Settings;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.icu.text.CollationKey;
 
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
@@ -25,6 +26,8 @@ import org.oscim.tiling.TileSource;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class SettingsObject  {
     public enum SettingType
     {
@@ -46,16 +49,29 @@ public class SettingsObject  {
     private ArrayList<MBTileChart> mbTileCharts;
     private ArrayList<OnlineTileProviderSet> onlineTileProviders;
     public ChartsOverlayLayers chartsOverlayLayers;
+    private Boolean baseCacheEnabled;
 
     public SettingsObject(GlobalVars vars)
     {
         this.vars = vars;
+        baseCacheEnabled = getCache();
 
         onlineTileProviders = new ArrayList<>();
         mbTileCharts = new ArrayList<>();
 
         setupOnlineTileProviderChangeEvent();
         loadMBTileChartsOverlays();
+    }
+
+    private Boolean getCache()
+    {
+        SharedPreferences databasePrefs = getSharedPreferences();
+        return databasePrefs.getBoolean("BaseChartCache", true);
+    }
+
+    private SharedPreferences getSharedPreferences()
+    {
+        return vars.mainActivity.getSharedPreferences("Database", MODE_PRIVATE);
     }
 
     public void setupChartsOverlayLayers()
@@ -126,6 +142,11 @@ public class SettingsObject  {
         };
     }
 
+
+    public void setBaseCacheEnabled(Boolean baseCacheEnabled)
+    {
+        this.baseCacheEnabled = baseCacheEnabled;
+    }
     private OfflineTileCache baseCache;
     public void setBaseCache(TileSource source, String url, BaseChartType baseChartType)
     {
@@ -135,7 +156,14 @@ public class SettingsObject  {
         baseCache.setCacheSize(512 * (1 << 10));
 
         tiles_url = url;
-        source.tileCache = baseCache;
+
+        if (baseCacheEnabled) {
+            source.tileCache = baseCache;
+        }
+        else
+        {
+            source.tileCache = null;
+        }
     }
     public OfflineTileCache getBaseCache()
     {

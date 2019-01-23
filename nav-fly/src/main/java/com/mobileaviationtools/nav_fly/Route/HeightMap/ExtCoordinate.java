@@ -25,6 +25,10 @@ public class ExtCoordinate extends Coordinate {
 
     public double elevation;
     public double altitude;
+    public double getAltitudeFt()
+    {
+        return altitude * 3.2808399f;
+    }
     public double distanceToNext_meter;
 
     public Date date;

@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     MapPreferences mPrefs;
     //VectorTileLayer mBaseLayer;
 
-    BaseChart baseChart;
+
     AirportMarkersLayer mAirportMarkersLayer;
     NaviadMarkersLayer mNavaidsMarkersLayer;
     SelectionLayer mAirportSelectionLayer;
@@ -734,8 +734,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
     void setupMap()
     {
-        baseChart = new BaseChart(vars);
-        baseChart.setBaseCharts(vars.baseChartType);
+        vars.baseChart = new BaseChart(vars);
+        vars.baseChart.setBaseCharts(vars.baseChartType);
 //        boolean LoadMapforgeMaps = false;
 //
 //        VtmThemes defaultTheme = VtmThemes.DEFAULT;
@@ -843,7 +843,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                     }
                     case maptype:
                     {
-                        ChartSettingsDialog chartSettingsDialog = ChartSettingsDialog.getInstance(MainActivity.this, vars.settingsObject);
+                        ChartSettingsDialog chartSettingsDialog = ChartSettingsDialog.getInstance(MainActivity.this, vars.settingsObject, vars);
                         fromMenu = true;
                         chartSettingsDialog.show(getSupportFragmentManager(), "ChartSettings");
                         break;
@@ -915,6 +915,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 //        });
         HeightMapFragment heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
         heightMapFragment.setVisibility(View.VISIBLE);
+
+        heightMapFragment.setupTrackHeightMap(vars, trackLogId);
 
     }
 

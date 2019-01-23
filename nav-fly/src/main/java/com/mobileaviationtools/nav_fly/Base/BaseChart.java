@@ -43,11 +43,19 @@ public class BaseChart {
         vars.baseChartType = baseChartType;
         baseLayer = vars.map.setBaseMap(tileSource);
         vars.map.setTheme(defaultTheme);
-        vars.map.layers().add(new LabelLayer(vars.map, baseLayer), vars.BASE_GROUP);
+        labelLayer = new LabelLayer(vars.map, baseLayer);
+        vars.map.layers().add(labelLayer, vars.BASE_GROUP);
+    }
+
+    public void removeBaseLayers()
+    {
+        vars.map.layers().remove(labelLayer);
+        tileSource = null;
     }
 
     private TileSource tileSource;
     private VectorTileLayer baseLayer;
+    private LabelLayer labelLayer;
     private VtmThemes defaultTheme;
     private GlobalVars vars;
 
@@ -77,11 +85,12 @@ public class BaseChart {
 
     private void setOpenTilesMap()
     {
+        String openTilesMapKey = "29WrAEe6HeyBZgOaLFda";
         tileSource = OpenMapTilesMvtTileSource.builder()
-                .apiKey("29WrAEe6HeyBZgOaLFda")
+                .apiKey(openTilesMapKey)
                 .httpFactory(new OkHttpEngine.OkHttpFactory())
                 .build();
-        String url = ((OpenMapTilesMvtTileSource) tileSource).getUrl().toString();
+        String url = ((OpenMapTilesMvtTileSource) tileSource).getOpenTilesMapUrl();
         vars.settingsObject.setBaseCache(tileSource, url, vars.baseChartType);
         defaultTheme = VtmThemes.OPENMAPTILES;
     }

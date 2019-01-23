@@ -28,6 +28,11 @@ public class OpenMapTilesMvtTileSource extends UrlTileSource {
     private static final String DEFAULT_URL = "https://maps.tilehosting.com/data/v3";
     private static final String DEFAULT_PATH = "/{Z}/{X}/{Y}.pbf";
 
+    public String getOpenTilesMapUrl()
+    {
+        return DEFAULT_URL + DEFAULT_PATH + getApiKeyStr();
+    }
+
     public static class Builder<T extends Builder<T>> extends UrlTileSource.Builder<T> {
         private String locale = "";
 

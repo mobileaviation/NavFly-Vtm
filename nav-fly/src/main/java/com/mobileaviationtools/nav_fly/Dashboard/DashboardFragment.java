@@ -29,6 +29,7 @@ public class DashboardFragment extends Fragment {
 
     private Float toKnots = 1.94384449f;
     private Float toKm = 3.6f;
+    private Float meterToFeet = 3.2808399f; // meters to feet
 
 
     @Override
@@ -72,7 +73,7 @@ public class DashboardFragment extends Fragment {
         coarseTextView.setText(String.format("%03d", Math.round(location.getBearing())));
         Float sf = (speedType == SpeedType.knots) ? toKnots : toKm;
         speedTextView.setText(String.format("%03d", Math.round(location.getSpeed() * sf)));
-        heightTextView.setText(String.format("%05d", Math.round(location.getAltitude())));
+        heightTextView.setText(String.format("%05d", Math.round(location.getAltitude() * meterToFeet)));
         Double d = location.GetDistanceRemaining();
         String toDest =  (d==0) ? "UNK-" : String.format("%04d", Math.round(d));
 

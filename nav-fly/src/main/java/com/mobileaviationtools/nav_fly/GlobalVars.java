@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.example.aircraft.Aircraft;
+import com.mobileaviationtools.nav_fly.Base.BaseChart;
 import com.mobileaviationtools.nav_fly.Classes.BaseChartType;
 import com.mobileaviationtools.nav_fly.Dashboard.DashboardFragment;
 import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
@@ -29,6 +30,7 @@ public class GlobalVars {
     public DashboardFragment dashboardFragment;
     public BaseChartType baseChartType;
     public SettingsObject settingsObject;
+    public BaseChart baseChart;
 
     public Aircraft aircraft;
 

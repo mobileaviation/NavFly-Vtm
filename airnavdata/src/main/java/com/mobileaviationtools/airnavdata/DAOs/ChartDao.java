@@ -26,7 +26,7 @@ public abstract class ChartDao {
     @Query("SELECT * FROM tbl_Charts WHERE airport_ref=:ref")
     public abstract Chart[] getChartsByAirportRef(long ref);
 
-    @Query("SELECT * FROM tbl_Charts WHERE active=:active")
+    @Query("SELECT * FROM tbl_Charts WHERE active=:active ORDER BY id DESC")
     public abstract Chart[] getActiveCharts(Boolean active);
 
     @Query("SELECT * FROM tbl_Charts WHERE active=:active AND type=:type")
