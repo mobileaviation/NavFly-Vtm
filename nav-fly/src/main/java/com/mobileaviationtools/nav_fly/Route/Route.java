@@ -19,6 +19,7 @@ import com.mobileaviationtools.nav_fly.Route.HeightMap.RoutePoints;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Canvas;
 import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
 import org.oscim.event.Gesture;
 import org.oscim.event.MotionEvent;
 import org.oscim.layers.marker.MarkerItem;
@@ -35,6 +36,7 @@ public class Route extends ArrayList<Waypoint> {
         this.vars = vars;
         this.createdDate = new Date();
         this.aircraft = vars.aircraft;
+        this.indicatedAirspeed = this.aircraft.IndicatedAirspeed();
         legs = new Legs();
     }
 
@@ -73,7 +75,7 @@ public class Route extends ArrayList<Waypoint> {
         return (SelectedEndAirport != null);
     }
 
-    private double indicatedAirspeed = 100;
+    private double indicatedAirspeed;
 
     public double getWindSpeed() {
         return windSpeed;
@@ -94,14 +96,23 @@ public class Route extends ArrayList<Waypoint> {
     private double proposedAltitude = 3000;
 
     public double getProposedAltitude() { return proposedAltitude; }
+    public void setProposedAltitude(Integer proposedAltitude, Boolean update)
+    {
+        this.proposedAltitude = proposedAltitude;
+        if (update) {
+            setupRouteVariables();
+            if (routeEvents != null) routeEvents.RouteUpdated(this);
+        }
+    }
 
-    public void setWindAndAirspeed(double windDirection, double windSpeed, double indicatedAirspeed)
+    public void setWind(double windDirection, double windSpeed, Boolean update)
     {
         this.windDirection = windDirection;
         this.windSpeed = windSpeed;
-        this.indicatedAirspeed = indicatedAirspeed;
-        setupRouteVariables();
-        if (routeEvents != null) routeEvents.RouteUpdated(this);
+        if (update) {
+            setupRouteVariables();
+            if (routeEvents != null) routeEvents.RouteUpdated(this);
+        }
     }
 
     private void setupRouteVariables()
@@ -509,6 +520,9 @@ public class Route extends ArrayList<Waypoint> {
         updateLegData();
         vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
         vars.dashboardFragment.setLocation(vars.airplaneLocation, indicatedAirspeed);
+        MapPosition pos = vars.map.getMapPosition();
+        pos.setPosition(vars.airplaneLocation.getGeopoint());
+        vars.map.setMapPosition(pos);
 
         setDeviationLineStartLocation(this.get(0).point);
     }

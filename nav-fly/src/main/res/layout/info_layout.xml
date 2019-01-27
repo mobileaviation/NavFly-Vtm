@@ -75,15 +75,19 @@
             android:src="@drawable/fix_info" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/infoItemsListView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:listSelector="@drawable/info_item_selector"
-        android:choiceMode="singleChoice"
-        android:dividerHeight="1dp"
-        android:divider="@android:color/white"></ListView>
+        android:layout_height="200dp">
+
+        <ListView
+            android:id="@+id/infoItemsListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/white"
+            android:dividerHeight="1dp"
+            android:listSelector="@drawable/info_item_selector"></ListView>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -128,50 +132,55 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/additionalInfoItemLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:background="@color/design_default_color_primary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Charts"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold|italic" />
+
         <LinearLayout
-            android:id="@+id/additionalInfoItemLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:background="@color/design_default_color_primary"
-            android:gravity="center_vertical"
+            android:gravity="right|center_vertical"
             android:orientation="horizontal">
 
-            <TextView
+            <ImageButton
+                android:id="@+id/assignChartbtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:layout_margin="5dp"
+                android:background="@color/complementaryColor5"
                 android:padding="5dp"
-                android:text="Charts"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:textStyle="bold|italic" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right|center_vertical"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/assignChartbtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_margin="5dp"
-                    android:background="@color/complementaryColor5"
-                    android:padding="5dp"
-                    android:src="@drawable/new_icon" />
-            </LinearLayout>
-
+                android:src="@drawable/new_icon" />
         </LinearLayout>
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/airportChartsListView"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="@android:color/white"
-        android:dividerHeight="1dp" />
+        android:layout_height="match_parent">
+
+
+        <ListView
+            android:id="@+id/airportChartsListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/white"
+            android:dividerHeight="1dp" />
+    </LinearLayout>
 </LinearLayout>

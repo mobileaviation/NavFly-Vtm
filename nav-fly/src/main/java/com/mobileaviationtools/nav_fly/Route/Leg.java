@@ -66,8 +66,21 @@ public class Leg {
 
         // time calculation
         groundspeed = indicatedAirspeed;
+        heading = bearing;
+
+        double windrad = Math.toRadians(windDirection);
+        double dirrad = Math.toRadians(bearing);
+        double zijwind = Math.sin(windrad-dirrad) * windSpeed;
+        double langswind = Math.cos(windrad-dirrad) * windSpeed;
+        double opstuurhoek = (zijwind/indicatedAirspeed) * 60;
+        heading = bearing + opstuurhoek;
+        if (heading<0) heading = 360 + heading;
+        if (heading>359) heading = heading - 360;
+
+        double gs = indicatedAirspeed - langswind;
+
         //TODO calculate the speed with the current winds
-        timeMin = (getDistanceNM() / indicatedAirspeed) * 60;
+        timeMin = (getDistanceNM() / gs) * 60;
     }
 
     private void createRouteSymbol()
@@ -139,11 +152,13 @@ public class Leg {
         return timeMin;
     }
 
-    private double bearing;
+    private double bearing;   // True to magnetic
+    private double heading;   // To Fly, corrected for the wind
 
     public double getBearing() {
         return bearing;
     }
+    public double getHeading() { return heading; }
 
     private double indicatedAirspeed = 100;
 

@@ -7,6 +7,7 @@ public interface Aircraft {
     public Integer Vso();
     public Integer Vne();
     public Integer Vno();
+    public Integer IndicatedAirspeed();
 
     public Integer climbRate();
 }

@@ -27,7 +27,7 @@ public class RouteLegSymbol extends MarkerSymbol {
 
     public static android.graphics.Bitmap DrawRouteLegIcon(Leg leg, Context context)
     {
-        return GetIcon((float)leg.getDistanceNM(), (float)leg.getBearing(), context);
+        return GetIcon((float)leg.getDistanceNM(), (float)leg.getHeading(), context);
     }
 
     public static android.graphics.Bitmap GetIcon(float distance, float compass_heading, Context context)

@@ -2,6 +2,7 @@ package com.mobileaviationtools.nav_fly.Route.HeightMap;
 
 import com.badlogic.gdx.utils.GdxNativesLoader;
 import com.mobileaviationtools.nav_fly.GlobalVars;
+import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Route.HeightMap.Comparators.CompAltitude;
 import com.mobileaviationtools.nav_fly.Route.HeightMap.Comparators.CompElevation;
 import com.mobileaviationtools.nav_fly.Route.Route;
@@ -33,6 +34,7 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
     private RoutePointsEvents routePointsEvents;
     private GlobalVars vars;
     private double totalDistance_meter;
+    private LengthIndexedLine lengthIndexedLine;
 
     public RoutePoints(GlobalVars vars)
     {
@@ -74,7 +76,7 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
         if (routeGeom.getLength()==0) return false;
 
         this.routeGeom = routeGeom;
-        LengthIndexedLine lil = new LengthIndexedLine(routeGeom);
+        lengthIndexedLine = new LengthIndexedLine(routeGeom);
         //LocationIndexedLine locil = new LocationIndexedLine(routeGeom);
         Double totalLength = routeGeom.getLength();
         Double lengthInc = totalLength / pointsCount;
@@ -82,8 +84,8 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
 
 
         for (Integer i=1; i<pointsCount; i++) {
-            ExtCoordinate c1 = new ExtCoordinate(lil.extractPoint(lengthInc * (i-1)));
-            ExtCoordinate c2 = new ExtCoordinate(lil.extractPoint(lengthInc * i));
+            ExtCoordinate c1 = new ExtCoordinate(lengthIndexedLine.extractPoint(lengthInc * (i-1)));
+            ExtCoordinate c2 = new ExtCoordinate(lengthIndexedLine.extractPoint(lengthInc * i));
 
             GeoPoint p1 = new GeoPoint(c1.y, c1.x);
             GeoPoint p2 = new GeoPoint(c2.y, c2.x);
@@ -96,6 +98,22 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
 
         return true;
 
+    }
+
+    public Double getIndexForLocation(FspLocation location)
+    {
+        Coordinate n = new Coordinate(location.getLongitude(), location.getLatitude());
+        return lengthIndexedLine.indexOf(n);
+    }
+
+    public Double getStartIndex()
+    {
+        return lengthIndexedLine.getStartIndex();
+    }
+
+    public Double getEndIndex()
+    {
+        return lengthIndexedLine.getEndIndex();
     }
 
     public ArrayList<GeoPoint> getRoutePoints()

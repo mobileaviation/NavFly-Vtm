@@ -923,10 +923,10 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     private void setHeightMapFragment(Route route, Boolean parseFromService)
     {
         vars.route = route;
-        HeightMapFragment heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
-        heightMapFragment.setVisibility(View.VISIBLE);
+        vars.heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
+        vars.heightMapFragment.setVisibility(View.VISIBLE);
 
-        heightMapFragment.setupRouteHeightMap(vars, null, parseFromService);
+        vars.heightMapFragment.setupRouteHeightMap(vars, null, parseFromService);
     }
 
     private SearchDialog searchDialog;
@@ -1006,6 +1006,10 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                                 vars.dashboardFragment.setLocation(vars.airplaneLocation, 100d);
                             }
 
+                            if (vars.heightMapFragment != null)
+                            {
+                                vars.heightMapFragment.setLocation(location);
+                            }
 
                             vars.map.setMapPosition(pos);
                         }

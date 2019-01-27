@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView25"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="end"
+        android:text="Proposed Flight Altitude (Feet)"
+        app:layout_constraintBottom_toBottomOf="@+id/proposedRouteAltitideEditBox"
+        app:layout_constraintEnd_toStartOf="@+id/proposedRouteAltitideEditBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/proposedRouteAltitideEditBox" />
+
+    <EditText
+        android:id="@+id/proposedRouteAltitideEditBox"
+        android:layout_width="208dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:inputType="number"
+        android:text="3000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView25"
+        tools:layout_editor_absoluteY="2dp" />
+
+    <EditText
+        android:id="@+id/windDirectionText"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:inputType="number"
+        android:text="000"
+        app:layout_constraintBottom_toBottomOf="@+id/windSpeedText"
+        app:layout_constraintEnd_toStartOf="@+id/windSpeedText"
+        app:layout_constraintStart_toEndOf="@+id/textView26"
+        app:layout_constraintTop_toTopOf="@+id/windSpeedText" />
+
+    <TextView
+        android:id="@+id/textView26"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="end"
+        android:text="Wind Direction (Degree) / Speed (knots)"
+        app:layout_constraintBottom_toBottomOf="@+id/windDirectionText"
+        app:layout_constraintEnd_toStartOf="@+id/windDirectionText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/windDirectionText" />
+
+    <EditText
+        android:id="@+id/windSpeedText"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:inputType="number"
+        android:text="0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/proposedRouteAltitideEditBox" />
+</android.support.constraint.ConstraintLayout>

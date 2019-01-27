@@ -378,6 +378,16 @@
                             android:src="@drawable/new_icon" />
 
                         <ImageButton
+                            android:id="@+id/routeEditBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right|center_vertical"
+                            android:layout_margin="5dp"
+                            android:background="@color/primaryColor1"
+                            android:padding="5dp"
+                            android:src="@drawable/edit" />
+
+                        <ImageButton
                             android:id="@+id/routeLoadBtn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

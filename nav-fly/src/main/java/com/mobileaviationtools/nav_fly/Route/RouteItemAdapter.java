@@ -110,8 +110,8 @@ public class RouteItemAdapter extends BaseAdapter {
         else {
             legLayout.setVisibility(View.VISIBLE);
             Leg l = route.getLeg(i);
-            legHeadingText.setText(((Long)Math.round(l.getBearing())).toString()+ "º");
-            compasImage.setRotation((float)l.getBearing());
+            legHeadingText.setText(((Long)Math.round(l.getHeading())).toString()+ "º");
+            compasImage.setRotation((float)l.getHeading());
             legDistanceText.setText(((Long)Math.round(l.getDistanceNM())).toString());
             timeText.setText(((Long)Math.round(l.getLegTimeMinutes())).toString());
             legTotalDistanceText.setText((((Long)Math.round(l.getTotalDistanceNm())).toString()));

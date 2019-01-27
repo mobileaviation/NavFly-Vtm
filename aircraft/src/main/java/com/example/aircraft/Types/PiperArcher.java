@@ -9,6 +9,7 @@ public class PiperArcher implements Aircraft {
     public Integer Vso() { return  44; }        //Knots
     public Integer Vne() { return  154; }       //Knots
     public Integer Vno() { return  125; }        //Knots
+    public Integer IndicatedAirspeed() { return 110; } //Knots
 
     public Integer climbRate() { return  700; }  // Feet per Minute
 }

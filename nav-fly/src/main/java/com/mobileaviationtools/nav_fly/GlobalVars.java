@@ -11,6 +11,7 @@ import com.mobileaviationtools.nav_fly.Layers.AircraftLocationLayer;
 import com.mobileaviationtools.nav_fly.Layers.DeviationLineLayer;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Menus.MapDirectionType;
+import com.mobileaviationtools.nav_fly.Route.HeightMap.HeightMapFragment;
 import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 
@@ -28,6 +29,7 @@ public class GlobalVars {
     public AircraftLocationLayer mAircraftLocationLayer;
     public DeviationLineLayer deviationLineLayer;
     public DashboardFragment dashboardFragment;
+    public HeightMapFragment heightMapFragment;
     public BaseChartType baseChartType;
     public SettingsObject settingsObject;
     public BaseChart baseChart;

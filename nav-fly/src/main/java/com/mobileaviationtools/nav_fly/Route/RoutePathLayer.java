@@ -28,7 +28,8 @@ public class RoutePathLayer extends PathLayer {
         this.vars = vars;
         this.lineWidth = lineWidth;
         createOutlinePathLayer(map, Color.DKGRAY, lineWidth+4);
-        createSelectedLegLayer(map);
+        //createSelectedLegLayer(map);
+        createSelectedLegPathLayer(map);
         createLegMarkersLayer(map);
     }
 
@@ -38,10 +39,13 @@ public class RoutePathLayer extends PathLayer {
 
     public void AddLayer(Map map, Route route)
     {
+
+
         this.route = route;
         map.layers().add(outlinePathLayer, vars.ROUTE_GROUP);
         map.layers().add(this, vars.ROUTE_GROUP);
-        map.layers().add(selectedLegLayer, vars.ROUTE_GROUP);
+        //map.layers().add(selectedLegLayer, vars.ROUTE_GROUP);
+        map.layers().add(selectedLegPathLayer, vars.ROUTE_GROUP);
         map.layers().add(legMarkersLayer, vars.ROUTE_GROUP);
     }
 
@@ -50,25 +54,30 @@ public class RoutePathLayer extends PathLayer {
         UnselectLeg();
 
         this.selectedLeg = selectedLeg;
-        Style selectedLineStyle = Style.builder()
-                .fixed(true)
-                .strokeColor(selectedLegColor)
-                .strokeWidth(lineWidth)
-                .build();
-        ArrayList<GeoPoint> points = new ArrayList<>();
-        points.add(this.selectedLeg.startWaypoint.point);
-        points.add(this.selectedLeg.endWaypoint.point);
-        selectedLegDrawable = new LineDrawable(points, selectedLineStyle);
-        selectedLegLayer.add(selectedLegDrawable);
-        selectedLegLayer.update();
+//        Style selectedLineStyle = Style.builder()
+//                .fixed(true)
+//                .strokeColor(selectedLegColor)
+//                .strokeWidth(lineWidth)
+//                .build();
+//        ArrayList<GeoPoint> points = new ArrayList<>();
+//        points.add(this.selectedLeg.startWaypoint.point);
+//        points.add(this.selectedLeg.endWaypoint.point);
+//        selectedLegDrawable = new LineDrawable(points, selectedLineStyle);
+//        selectedLegLayer.add(selectedLegDrawable);
+//        selectedLegLayer.update();
+
+        selectedLegPathLayer.addPoint(this.selectedLeg.startWaypoint.point);
+        selectedLegPathLayer.addPoint(this.selectedLeg.endWaypoint.point);
+        selectedLegPathLayer.update();
     }
 
     public void UnselectLeg()
     {
         if (this.selectedLeg != null) {
-            selectedLegLayer.remove(selectedLegDrawable);
+            //selectedLegLayer.remove(selectedLegDrawable);
             selectedLeg = null;
-            selectedLegDrawable = null;
+            selectedLegPathLayer.clearPath();
+            //selectedLegDrawable = null;
         }
     }
 
@@ -76,6 +85,7 @@ public class RoutePathLayer extends PathLayer {
     private Drawable selectedLegDrawable;
     private PathLayer outlinePathLayer;
     private VectorLayer selectedLegLayer;
+    private PathLayer selectedLegPathLayer;
     private LegMarkersLayer legMarkersLayer;
 
     private void createOutlinePathLayer(Map map, int lineColor, float lineWidth)
@@ -91,6 +101,11 @@ public class RoutePathLayer extends PathLayer {
     private void createSelectedLegLayer(Map map)
     {
         selectedLegLayer = new VectorLayer(map);
+    }
+
+    private void createSelectedLegPathLayer(Map map)
+    {
+        selectedLegPathLayer = new PathLayer(map, selectedLegColor, lineWidth);
     }
 
     public void AddWaypoint(Waypoint waypoint)
@@ -112,7 +127,8 @@ public class RoutePathLayer extends PathLayer {
     @Override
     public void update() {
         super.update();
-        selectedLegLayer.update();
+        //selectedLegLayer.update();
+        selectedLegPathLayer.update();
         outlinePathLayer.update();
         legMarkersLayer.UpdateLegs(route);
     }

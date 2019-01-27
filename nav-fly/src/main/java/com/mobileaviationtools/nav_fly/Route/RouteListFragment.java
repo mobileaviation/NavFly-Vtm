@@ -82,6 +82,7 @@ public class RouteListFragment extends Fragment {
     private ImageButton routeNewBtn;
     private ImageButton routeOpenBtn;
     private ImageButton routeSaveBtn;
+    private ImageButton routeEditBtn;
 
     private ProgressBar weatherProgressBar;
     private ProgressBar notamsProgressBar;
@@ -172,6 +173,7 @@ public class RouteListFragment extends Fragment {
         routeNewBtn = (ImageButton) view.findViewById(R.id.routeNewBtn);
         routeOpenBtn = (ImageButton) view.findViewById(R.id.routeLoadBtn);
         routeSaveBtn = (ImageButton) view.findViewById(R.id.routeSaveBtn);
+        routeEditBtn = (ImageButton) view.findViewById(R.id.routeEditBtn);
 
         routeLayout = (LinearLayout) view.findViewById(R.id.routeListLayout);
         routeLayout.setVisibility(View.GONE);
@@ -412,6 +414,45 @@ public class RouteListFragment extends Fragment {
                 }
                 else {
                     setupNewRoute();
+                }
+            }
+        });
+
+        routeEditBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (vars.route != null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Edit Route");
+                    View inflatedView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_route_settings, (ViewGroup) getView(), false);
+                    final EditText proposedRouteAltitideEditBox = inflatedView.findViewById(R.id.proposedRouteAltitideEditBox);
+                    final EditText windSpeedText = inflatedView.findViewById(R.id.windSpeedText);
+                    final EditText windDirectionText = inflatedView.findViewById(R.id.windDirectionText);
+                    proposedRouteAltitideEditBox.setText(Long.toString(Math.round(vars.route.getProposedAltitude())));
+                    windSpeedText.setText(Long.toString(Math.round(vars.route.getWindSpeed())));
+                    windDirectionText.setText(Long.toString(Math.round(vars.route.getWindDirection())));
+                    builder.setView(inflatedView);
+                    builder.setIcon(android.R.drawable.ic_input_get);
+                    builder.setMessage("Edit route Variables");
+                    builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Integer proposedAltitude = Integer.parseInt(proposedRouteAltitideEditBox.getText().toString());
+                            Double windSpeed = Double.parseDouble(windSpeedText.getText().toString());
+                            Double windDirection = Double.parseDouble(windDirectionText.getText().toString());
+
+                            vars.route.setWind(windDirection, windSpeed, false);
+                            vars.route.setProposedAltitude(proposedAltitude, true);
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.show();
                 }
             }
         });

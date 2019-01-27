@@ -92,6 +92,11 @@ public class TrackPoints extends ArrayList<ExtCoordinate> {
         return factory.createLinearRing((ExtCoordinate[])this.toArray());
     }
 
+    public String getTrackLogName()
+    {
+        return trackLog.name;
+    }
+
     public ExtCoordinate getMaxAltitude()
     {
         return Collections.max(this, new CompAltitude());
