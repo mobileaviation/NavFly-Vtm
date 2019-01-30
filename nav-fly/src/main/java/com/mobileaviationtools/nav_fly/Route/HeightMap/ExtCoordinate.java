@@ -29,10 +29,10 @@ public class ExtCoordinate extends Coordinate {
     {
         return altitude * 3.2808399f;
     }
+
     public double distanceToNext_meter;
-
     public Date date;
-
     public FlightStage stage;
+    public double index;
 
 }

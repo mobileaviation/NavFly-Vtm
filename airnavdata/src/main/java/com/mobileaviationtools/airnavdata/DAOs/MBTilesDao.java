@@ -25,4 +25,10 @@ public abstract class MBTilesDao {
 
     @Query("SELECT * FROM tbl_MbTiles")
     public abstract MBTile[] getAllMBTiles();
+
+    @Query("DELETE FROM tbl_MbTiles")
+    public abstract void deleteAllMbTiles();
+
+    @Query("SELECT * FROM tbl_MbTiles WHERE id=:id")
+    public abstract MBTile getMBTileById(Integer id);
 }

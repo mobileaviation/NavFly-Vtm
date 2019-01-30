@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 public class Fix {
     @PrimaryKey(autoGenerate = true)
     public Integer id;
+    public String continent;
     public String name;
     public String ident;
     public Double latitude_deg;

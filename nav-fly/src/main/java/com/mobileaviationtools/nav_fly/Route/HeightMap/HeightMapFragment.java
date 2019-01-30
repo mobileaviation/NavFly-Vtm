@@ -1,13 +1,9 @@
 package com.mobileaviationtools.nav_fly.Route.HeightMap;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +11,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
@@ -163,7 +158,7 @@ public class HeightMapFragment extends Fragment {
 //                canvas.drawCircle((float)mapXpos, 100f, 5f, pLine);
 //                heightMapImage.setImageBitmap(heightMapBitmap);
 
-                heightMapBitmap = routeHeightMapBitmap.drawPoistionOnTop(index, startIndex, endIndex, location.getAltitude());
+                heightMapBitmap = routeHeightMapBitmap.drawPositionOnTop(index, startIndex, endIndex, location.getAltitude());
                 heightMapImage.setImageBitmap(heightMapBitmap);
 
             }

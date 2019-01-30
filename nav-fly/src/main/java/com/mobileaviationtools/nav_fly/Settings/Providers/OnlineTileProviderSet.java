@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.Classes.OnlineTileProviders;
 import com.mobileaviationtools.nav_fly.GlobalVars;
+
+import org.oscim.android.cache.OfflineTileCache;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.tiling.source.bitmap.BitmapTileSource;
 
@@ -57,6 +59,7 @@ public class OnlineTileProviderSet {
 
     private BitmapTileSource tileSource;
     private BitmapTileLayer layer;
+    private OfflineTileCache baseCache;
 
     public BitmapTileSource getTileSource() {
         if (tileSource == null)
@@ -68,16 +71,40 @@ public class OnlineTileProviderSet {
     public void addLayer(GlobalVars vars)
     {
         BitmapTileSource source = getTileSource();
+        if (cache) setupCache(vars, source);
         if (layer == null)
             layer = new BitmapTileLayer(vars.map, source);
+
         vars.map.layers().add(layer, vars.ONLINETILES_GROUP);
     }
+
+    private void setupCache(GlobalVars vars, BitmapTileSource source)
+    {
+        if (baseCache == null) {
+            baseCache = new OfflineTileCache(vars.context, null, "airnav_" +
+                    provider.getName().toLowerCase().replace(' ', '_') + "_tiles_cache.db");
+            long s = 512 * (1 << 10);
+            baseCache.setCacheSize(512 * (1 << 10));
+        }
+        source.setCache(baseCache);
+    }
+
+    public void removeCache()
+    {
+        if (tileSource != null)
+            tileSource.tileCache = null;
+        baseCache = null;
+    }
+
+
 
     public void removeLayer(GlobalVars vars)
     {
         if (layer != null)
         {
             vars.map.layers().remove(layer);
+            layer = null;
+            tileSource = null;
         }
     }
 }

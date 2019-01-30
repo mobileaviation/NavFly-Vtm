@@ -121,23 +121,37 @@ public class SettingsObject  {
         onlineTileProviderschangeEvent = new OnlineTileProviderSet.TileProviderSetChanged() {
             @Override
             public void onTileProviderSetActivated(OnlineTileProviderSet tileProviderSet, OnlineTileProviderSet.ChangeType type) {
-                if (type==OnlineTileProviderSet.ChangeType.active)
-                {
+                if (type==OnlineTileProviderSet.ChangeType.active) {
                     if (tileProviderSet.active) tileProviderSet.addLayer(vars);
                     else
                         tileProviderSet.removeLayer(vars);
-
-                    OnlineTileProvider provider = new OnlineTileProvider();
-                    AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
-
-                    provider.active = tileProviderSet.active;
-                    provider.cache = tileProviderSet.cache;
-                    provider.type = tileProviderSet.provider;
-                    provider.id = tileProviderSet.id;
-                    if (provider.id==-1) db.getOnlineTileProviders().InsertOnlineTileProvider(provider);
-                    else
-                        db.getOnlineTileProviders().UpdateOnlineTileProvider(provider);
                 }
+
+                if (type==OnlineTileProviderSet.ChangeType.cache)
+                {
+                    if (tileProviderSet.cache)
+                    {
+                        tileProviderSet.removeCache();
+                        tileProviderSet.removeLayer(vars);
+                        if (tileProviderSet.active) tileProviderSet.addLayer(vars);
+                    }
+                    else
+                    {
+                        tileProviderSet.removeCache();
+                    }
+                }
+
+                OnlineTileProvider provider = new OnlineTileProvider();
+                AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
+
+                provider.active = tileProviderSet.active;
+                provider.cache = tileProviderSet.cache;
+                provider.type = tileProviderSet.provider;
+                provider.id = tileProviderSet.id;
+                if (provider.id==-1) db.getOnlineTileProviders().InsertOnlineTileProvider(provider);
+                else
+                    db.getOnlineTileProviders().UpdateOnlineTileProvider(provider);
+
             }
         };
     }
@@ -189,7 +203,28 @@ public class SettingsObject  {
     private Chart[] getChartsFromDB()
     {
         AirnavChartsDatabase airnavChartsDatabase = AirnavChartsDatabase.getInstance(vars.context);
-        return airnavChartsDatabase.getCharts().getAllCharts();
+        Chart[] charts = airnavChartsDatabase.getCharts().getAllCharts();
+
+        ArrayList<Chart> retCharts = new ArrayList<>();
+        // remove MBTiles for the charts list that are not present in the DB anymore (due to update oid)
+        for (Chart c: charts)
+        {
+            if (c.mbtile_id>0)
+            {
+                if (mbTilePresent(c))
+                {
+                    retCharts.add(c);
+                }
+                else
+                {
+                    AirnavChartsDatabase db = AirnavChartsDatabase.getInstance(vars.context);
+                    db.getCharts().DeleteChart(c);
+                }
+            }
+
+        }
+
+        return retCharts.toArray(new Chart[retCharts.size()]);
     }
 
     private MBTile[] getTilesFromDB()
@@ -225,6 +260,13 @@ public class SettingsObject  {
                 exChart.setChart(chart);
             }
         }
+    }
+
+    private boolean mbTilePresent(Chart chart)
+    {
+        AirnavDatabase db = AirnavDatabase.getInstance(vars.context);
+        MBTile t = db.getTiles().getMBTileById(chart.mbtile_id);
+        return (t != null);
     }
 
     private void loadMBTileChartsOverlays()

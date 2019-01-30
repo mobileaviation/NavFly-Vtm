@@ -102,10 +102,17 @@ public class NotamService {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String notamsJson = response.body().string();
-                Notams notams = new Gson().fromJson(notamsJson, Notams.class);
-                Log.i(TAG, "Retrieved Notams");
-                count.notams = notams;
-                if (event != null) event.OnNotamsResponse(notams, count, response.message());
+                try {
+                    Notams notams = new Gson().fromJson(notamsJson, Notams.class);
+                    Log.i(TAG, "Retrieved Notams");
+                    count.notams = notams;
+                    if (event != null) event.OnNotamsResponse(notams, count, response.message());
+                }
+                catch (Exception ee)
+                {
+                    Log.e(TAG, "Notams Parse error: " + ee.getMessage());
+                    if (event != null) event.OnFailure("NotamsCall error: " + ee.getMessage());
+                }
             }
         });
     }

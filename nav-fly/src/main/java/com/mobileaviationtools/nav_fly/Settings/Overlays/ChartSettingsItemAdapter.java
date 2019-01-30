@@ -68,6 +68,7 @@ public class ChartSettingsItemAdapter extends BaseAdapter {
 
         chartSetupTxt.setText(chart.getName());
 
+
         switch (chart.chartType)
         {
             case fsp:{

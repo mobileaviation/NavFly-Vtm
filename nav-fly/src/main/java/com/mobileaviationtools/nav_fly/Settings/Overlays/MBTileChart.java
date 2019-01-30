@@ -95,8 +95,8 @@ public class MBTileChart {
 
     public String getName()
     {
+        if (this.tile != null) return "(" + this.tile.version.toString() + ") "+ this.tile.name;
         if (this.chart != null) return this.chart.name;
-        if (this.tile != null) return this.tile.name;
         return localfile.getName();
     }
 

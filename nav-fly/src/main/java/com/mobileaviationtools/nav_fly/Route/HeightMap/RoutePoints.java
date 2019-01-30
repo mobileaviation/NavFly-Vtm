@@ -26,7 +26,6 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
         public void OnPointsLoaded(RoutePoints route);
     }
 
-
     private Double pointsCount = 100d;
     private Geometry routeGeom;
     public String TAG = "RoutePoints";
@@ -35,6 +34,7 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
     private GlobalVars vars;
     private double totalDistance_meter;
     private LengthIndexedLine lengthIndexedLine;
+    private Route route;
 
     public RoutePoints(GlobalVars vars)
     {
@@ -48,6 +48,7 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
     public Boolean SetupPoints(Route route, RoutePointsEvents routePointsEvents, Boolean parseFromService)
     {
         this.routePointsEvents = routePointsEvents;
+        this.route = route;
         ExtCoordinate[] c = new ExtCoordinate[route.size()];
         Integer i=0;
         for (Waypoint p: route)
@@ -92,6 +93,7 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
 
             c1.distanceToNext_meter = p1.sphericalDistance(p2);
             this.totalDistance_meter = this.totalDistance_meter + c1.distanceToNext_meter;
+            c1.index = lengthIndexedLine.indexOf(c1);
 
             this.add(c1);
         }
@@ -104,6 +106,34 @@ public class RoutePoints extends ArrayList<ExtCoordinate> {
     {
         Coordinate n = new Coordinate(location.getLongitude(), location.getLatitude());
         return lengthIndexedLine.indexOf(n);
+    }
+
+    public Double[] getWaypointIndexes()
+    {
+        if (route != null) {
+            Double[] waypointIndexes = new Double[route.size()];
+            int i=0;
+            for (Waypoint w : route) {
+                Coordinate n = new Coordinate(w.point.getLongitude(), w.point.getLatitude());
+                waypointIndexes[i++] = lengthIndexedLine.indexOf(n);
+            }
+            return waypointIndexes;
+        }
+        else
+             return null;
+    }
+
+    public ExtCoordinate findPointNearestTo(Double index)
+    {
+        ExtCoordinate c = this.get(0);
+        for (ExtCoordinate c1: this)
+        {
+            double dif = Math.abs(c1.index-index);
+            if (dif < Math.abs(c.index-index))
+                c = c1;
+        }
+
+        return c;
     }
 
     public Double getStartIndex()

@@ -36,6 +36,7 @@ public class Navaid {
     public double longitude_deg;
     public Integer elevation_ft;
     public String iso_country;
+    public String continent;
     public double dme_frequency_khz;
     public double dme_channel;
     public double dme_latitude_deg;

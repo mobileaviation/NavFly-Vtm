@@ -46,6 +46,7 @@ public class Airspace {
     public AirspaceCategory category;
     public long airspace_id;
     public String country;
+    public String continent;
     public String transponder_mandatory_code;
     public long altLimit_top;
     @TypeConverters({AltitudeUnitConverter.class})

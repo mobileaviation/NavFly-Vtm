@@ -68,19 +68,19 @@ public class HomeAirportService {
         {
             AirnavDatabase adb = AirnavDatabase.getInstance(vars.context);
             Airport a = adb.getAirport().getAirportByIdent(p.value1);
-            a.runways = adb.getRunways().getRunwaysByAirport(a.id);
-            airport = new SelectedAirport();
-            airport.airport = a;
-            Log.i(TAG, "Found Airport: " + a.name);
-            if (p.value2 != null)
-            {
-                if (p.value2.length()>0)
-                {
-                    Integer r_id = Integer.parseInt(p.value2);
-                    airport.runway = adb.getRunways().getRunwayById(r_id);
-                    airport.runwayIdent = p.value3;
+            if (a != null) {
+                a.runways = adb.getRunways().getRunwaysByAirport(a.id);
+                airport = new SelectedAirport();
+                airport.airport = a;
+                Log.i(TAG, "Found Airport: " + a.name);
+                if (p.value2 != null) {
+                    if (p.value2.length() > 0) {
+                        Integer r_id = Integer.parseInt(p.value2);
+                        airport.runway = adb.getRunways().getRunwayById(r_id);
+                        airport.runwayIdent = p.value3;
 
-                    Log.i(TAG, "Found Runway: " + airport.runwayIdent);
+                        Log.i(TAG, "Found Runway: " + airport.runwayIdent);
+                    }
                 }
             }
         }

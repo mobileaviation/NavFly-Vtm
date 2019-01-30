@@ -1,13 +1,16 @@
 package com.mobileaviationtools.nav_fly.Route.HeightMap;
 
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.GlobalVars;
+import com.mobileaviationtools.nav_fly.R;
 
 public class RouteHeightMapBitmap  {
 
@@ -36,7 +39,7 @@ public class RouteHeightMapBitmap  {
         return this.bitmap;
     }
 
-    public Bitmap drawPoistionOnTop(double index, double startIndex, double endIndex, double altitude)
+    public Bitmap drawPositionOnTop(double index, double startIndex, double endIndex, double altitude)
     {
         double mapXpos =  (((double)imageWidth) / (endIndex-startIndex)) * index;
         mapXpos = mapXpos + Helpers.dpToPx(50);
@@ -93,6 +96,8 @@ public class RouteHeightMapBitmap  {
             startX = nextX;
             startY = nextY;
         }
+
+        drawWaypoints(routePoints, canvas);
     }
 
     private void drawHeightLines(double minElevation, double maxAltitude, Canvas canvas)
@@ -122,6 +127,26 @@ public class RouteHeightMapBitmap  {
         p.setColor(Color.BLACK);
         canvas.drawText(Double.toString(drawAltitude), Helpers.dpToPx(20), (float)Y-Helpers.dpToPx(4), p);
 
+    }
+
+    private void drawWaypoints(RoutePoints points, Canvas canvas)
+    {
+        Double[] waypointIndexes = points.getWaypointIndexes();
+        double startIndex = points.getStartIndex();
+        double endIndex = points.getEndIndex();
+        Resources res = vars.context.getResources();
+        Bitmap markerBitmap = BitmapFactory.decodeResource(res, R.drawable.marker_poi);
+
+
+        for (Double p: waypointIndexes)
+        {
+            ExtCoordinate c = points.findPointNearestTo(p);
+            double mapXpos =  (((double)imageWidth) / (endIndex-startIndex)) * c.index;
+            mapXpos = mapXpos + Helpers.dpToPx(50) - (markerBitmap.getWidth()/2);
+            double mapYpos = calcYFrom(c.altitude, minElevation, maxAltitudePlus) - (markerBitmap.getHeight()/2);
+
+            canvas.drawBitmap(markerBitmap, (float)mapXpos, (float)mapYpos, new Paint());
+        }
     }
 
     private double calcYFrom(double value, double min, double max)

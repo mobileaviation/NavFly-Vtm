@@ -173,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
         SharedPreferences databasePrefs = this.getSharedPreferences("Database", MODE_PRIVATE);
         Boolean databaseInitialized = databasePrefs.getBoolean("databaseInitialized", false);
+        databaseInitialized = databaseInitialized && Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME);
 
         //if ((!Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) || test) {
         if(!databaseInitialized){

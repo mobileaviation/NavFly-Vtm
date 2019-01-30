@@ -52,6 +52,7 @@ public class MBTilesAPIDataSource {
     public void loadTiles(int totalCount) {
         this.totalCount = totalCount;
         this.position= 0;
+        db.getTiles().deleteAllMbTiles();
         db.beginTransaction();
         doCall();
     }
