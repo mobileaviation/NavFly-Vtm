@@ -177,7 +177,8 @@ public class WeatherStations extends ArrayList<Station> {
             if (qindex > -1)
                 qnh = raw.substring(qindex + 1, qindex + 5);
             else {
-                qindex = raw.indexOf("A");
+                int autoIndex = raw.indexOf("AUTO");
+                qindex = raw.indexOf("A", autoIndex + 2);
                 if (qindex > -1)
                     qnh = raw.substring(qindex + 1, qindex + 5);
             }

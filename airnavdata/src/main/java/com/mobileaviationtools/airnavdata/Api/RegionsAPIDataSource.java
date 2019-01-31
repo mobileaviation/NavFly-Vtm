@@ -51,7 +51,7 @@ public class RegionsAPIDataSource {
     public void loadRegions(int totalCount) {
         this.totalCount = totalCount;
         this.position= 0;
-        db.beginTransaction();
+        //db.beginTransaction();
         doCall();
     }
 
@@ -71,15 +71,15 @@ public class RegionsAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Regions");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.regions, "");
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     Log.e(TAG, "Error recieving Regions results: " + response.message());
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.regions);
                 }

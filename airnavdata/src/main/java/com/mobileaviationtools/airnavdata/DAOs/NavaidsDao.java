@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public abstract class NavaidsDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertNavaids(List<Navaid> navaidList);
 
     @Transaction
@@ -35,4 +35,10 @@ public abstract class NavaidsDao {
 
     @Query("SELECT * FROM tbl_Navaids WHERE name like :name OR ident like :name ORDER BY name LIMIT :limit")
     public abstract List<Navaid> searchNaviadsByNameOrIdentLimit(String name, Long limit);
+
+    @Query("DELETE FROM tbl_Navaids WHERE continent=:continent")
+    public abstract void deleteFromNavaidsByContinent(String continent);
+
+    @Query("DELETE FROM tbl_Navaids")
+    public abstract void deleteFromNavaids();
 }

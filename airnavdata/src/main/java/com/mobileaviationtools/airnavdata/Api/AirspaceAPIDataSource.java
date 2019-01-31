@@ -62,7 +62,8 @@ public class AirspaceAPIDataSource {
         totalCount = airspaces_count;
         position = 0;
         continent = "";
-        db.beginTransaction();
+        deleteAirspacesByContinent(continent);
+        //db.beginTransaction();
         doCall();
     }
 
@@ -70,8 +71,21 @@ public class AirspaceAPIDataSource {
         totalCount = airspaces_count;
         position = 0;
         this.continent = continent;
-        db.beginTransaction();
+        deleteAirspacesByContinent(continent);
+        //db.beginTransaction();
         doCall();
+    }
+
+    private void deleteAirspacesByContinent(String continent)
+    {
+        if (continent.length()>0)
+        {
+            db.getAirpaces().deleteFromAirportsByContinent(continent);
+        }
+        else
+        {
+            db.getAirpaces().deleteFromAirspaces();
+        }
     }
 
     private int totalCount;
@@ -97,15 +111,15 @@ public class AirspaceAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Airspaces");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.airspaces, continent);
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                   // db.endTransaction();
                     Log.e(TAG, "Error recieving results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.airspaces);
                 }

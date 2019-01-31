@@ -16,7 +16,7 @@ public abstract class AirspacesDao {
     @Insert
     public abstract void insertAirspaces(List<Airspace> airspaceList);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertAirspace(Airspace airspace);
 
     @Transaction
@@ -49,7 +49,10 @@ public abstract class AirspacesDao {
             + "(:lat<A.lat_top_left AND :lat>A.lat_bottom_right AND :lon>A.lon_top_left AND :lon<A.lot_bottom_right)")
     public abstract Airspace[] getAirspacesSurroundedBy(double lat, double lon);
 
-    @Query("DELETE FROM tbl_Airspaces WHERE country in (SELECT country FROM tbl_Countries WHERE continent=:continent)")
+    @Query("DELETE FROM tbl_Airspaces WHERE continent=:continent")
     public abstract void deleteFromAirportsByContinent(String continent);
+
+    @Query("DELETE FROM tbl_Airspaces")
+    public abstract void deleteFromAirspaces();
 
 }

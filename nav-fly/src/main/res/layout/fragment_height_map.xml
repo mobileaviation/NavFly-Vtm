@@ -57,4 +57,20 @@
 
     </ImageView>
 
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/heightMapImageView"
+        app:layout_constraintEnd_toEndOf="@+id/heightMapImageView"
+        app:layout_constraintStart_toStartOf="@+id/heightMapImageView"
+        app:layout_constraintTop_toTopOf="@+id/heightMapImageView">
+
+        <Button
+            android:id="@+id/dragTestBtn"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="0dp"
+            android:alpha=".8" />
+    </FrameLayout>
+
 </android.support.constraint.ConstraintLayout>

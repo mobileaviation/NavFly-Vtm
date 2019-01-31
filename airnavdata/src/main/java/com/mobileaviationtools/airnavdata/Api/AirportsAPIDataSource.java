@@ -58,7 +58,10 @@ public class AirportsAPIDataSource {
         totalCount = airports_count;
         position = 0;
         continent = "";
-        db.beginTransaction();
+
+        deleteAirportDataByContinent(continent);
+
+        //db.beginTransaction();
         doCall();
     }
 
@@ -66,8 +69,27 @@ public class AirportsAPIDataSource {
         totalCount = airports_count;
         position = 0;
         this.continent = continent;
-        db.beginTransaction();
+
+        deleteAirportDataByContinent(continent);
+
+        //db.beginTransaction();
         doCall();
+    }
+
+    private void deleteAirportDataByContinent(String continent)
+    {
+        if (continent.length()>0) {
+            db.getFrequency().DeleteFromFrequenciesByContinent(continent);
+            db.getRunways().DeleteFromRunwaysByContinent(continent);
+            db.getAirport().deleteFromAirportsByContinent(continent);
+        }
+        else
+        {
+            // delete all data
+            db.getFrequency().deleteFromFrequencies();
+            db.getRunways().deleteFromRunways();
+            db.getAirport().deleteFromAirports();
+        }
     }
 
     private int totalCount;
@@ -94,15 +116,15 @@ public class AirportsAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Airports");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.airports, continent);
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     Log.e(TAG, "Error recieving results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.airports);
                 }

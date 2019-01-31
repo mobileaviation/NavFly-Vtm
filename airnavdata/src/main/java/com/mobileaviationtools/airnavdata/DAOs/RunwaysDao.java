@@ -15,7 +15,7 @@ import static android.icu.text.MessagePattern.ArgType.SELECT;
 
 @Dao
 public abstract class RunwaysDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertRunways(List<Runway> runways);
 
     @Transaction
@@ -32,4 +32,10 @@ public abstract class RunwaysDao {
 
     @Query("SELECT * FROM tbl_Runways WHERE id=:id")
     public abstract Runway getRunwayById(Integer id);
+
+    @Query("DELETE FROM tbl_Runways WHERE airport_ref in (SELECT id FROM tbl_Airports WHERE continent=:continent)")
+    public abstract void DeleteFromRunwaysByContinent(String continent);
+
+    @Query("DELETE FROM tbl_Runways")
+    public abstract void deleteFromRunways();
  }

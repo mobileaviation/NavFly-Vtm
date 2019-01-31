@@ -53,7 +53,7 @@ public class MBTilesAPIDataSource {
         this.totalCount = totalCount;
         this.position= 0;
         db.getTiles().deleteAllMbTiles();
-        db.beginTransaction();
+        //db.beginTransaction();
         doCall();
     }
 
@@ -73,15 +73,15 @@ public class MBTilesAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Countries");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.mbtiles, "");
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     Log.e(TAG, "Error recieving Countries results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.mbtiles);
                 }

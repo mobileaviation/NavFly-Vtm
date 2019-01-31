@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public abstract class FixesDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertFixes(List<Fix> fixes);
 
     @Transaction
@@ -37,4 +37,10 @@ public abstract class FixesDao {
 
     @Query("SELECT * FROM tbl_Fixes WHERE name like :name OR ident like :name ORDER BY name LIMIT :limit")
     public abstract List<Fix> searchFixesByNameOrIdentLimit(String name, Long limit);
+
+    @Query("DELETE FROM tbl_Fixes WHERE continent=:continent")
+    public abstract void deleteFromFixesByContinent(String continent);
+
+    @Query("DELETE FROM tbl_Fixes")
+    public abstract void deleteFromFixes();
 }

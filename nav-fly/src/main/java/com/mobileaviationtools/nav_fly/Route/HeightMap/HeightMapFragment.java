@@ -4,9 +4,13 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,6 +53,8 @@ public class HeightMapFragment extends Fragment {
     private HeightMapType heightMapType;
     private RouteHeightMapBitmap routeHeightMapBitmap;
 
+    private Button dragtestrBtn;
+
     private Bitmap heightMapBitmap;
     private double startIndex;
     private double endIndex;
@@ -70,6 +76,7 @@ public class HeightMapFragment extends Fragment {
         heightMapImage.setImageBitmap(bitmap);
 
         heightMapNameText.setText(trackPoints.getTrackLogName());
+        pointsCount = trackPoints.size();
     }
 
     public void setupRouteHeightMap(final GlobalVars vars, HeightMapFragmentEvents heightMapFragmentEvents, boolean parseFromService)
@@ -102,6 +109,7 @@ public class HeightMapFragment extends Fragment {
                 HeightMapFragment.this.routePoints = routePoints;
                 HeightMapFragment.this.startIndex = routePoints.getStartIndex();
                 HeightMapFragment.this.endIndex = routePoints.getEndIndex();
+                pointsCount = routePoints.size();
 
             }
         }, parseFromService);
@@ -131,6 +139,8 @@ public class HeightMapFragment extends Fragment {
 
         heightMapBaseLayout.setVisibility(View.INVISIBLE);
 
+        dragtestrBtn = (Button) view.findViewById(R.id.dragTestBtn);
+        setupDragBtn();
         return view;
     }
 
@@ -146,6 +156,7 @@ public class HeightMapFragment extends Fragment {
             if (routePoints != null)
             {
                 double index = routePoints.getIndexForLocation(location);
+
                 //Log.i(TAG, "Index on route line: " + index);
 //                double mapXpos =  (((double)imageWidth) / (endIndex-startIndex)) * index;
 //                Log.i(TAG, "X Position on heightmap: " + Double.toString(mapXpos));
@@ -163,5 +174,36 @@ public class HeightMapFragment extends Fragment {
 
             }
         }
+    }
+
+    private int pointsCount;
+    private int[] loc;
+    private void setupDragBtn()
+    {
+        dragtestrBtn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if (event.getAction()==MotionEvent.ACTION_DOWN)
+                {
+                    loc = new int[2];
+                    heightMapImage.getLocationOnScreen(loc);
+                }
+                if (event.getAction()==MotionEvent.ACTION_MOVE) {
+                    int max = heightMapImage.getWidth() - loc[0] -10;
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)v.getLayoutParams();
+                    int l = Math.round(event.getRawX()) - loc[0] - 10;
+                    if (l<0) l=0;
+                    if (l>max) l=max;
+                    params.leftMargin = l;
+                    v.setLayoutParams(params);
+
+                    Long dpos = Math.round(((double)l / (double)max) * (double)pointsCount);
+                    Log.i(TAG, "Position in points: " + dpos.toString());
+                }
+
+                return false;
+            }
+        });
     }
 }

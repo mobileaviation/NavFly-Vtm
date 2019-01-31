@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public abstract class FirsDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertFirs(List<Fir> firs);
 
     @Transaction
@@ -25,4 +25,7 @@ public abstract class FirsDao {
 
     @Query("SELECT * FROM tbl_Firs WHERE ident=:ident")
     public abstract List<Fir> getFirsByIdent(String ident);
+
+    @Query("DELETE FROM tbl_Firs")
+    public abstract void deleteFromFirs();
 }

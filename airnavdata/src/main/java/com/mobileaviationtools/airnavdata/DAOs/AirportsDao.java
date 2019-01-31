@@ -13,7 +13,7 @@ import java.util.List;
 
 @Dao
 public abstract class AirportsDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertAirports(List<Airport> airportList);
 
     @Insert
@@ -57,5 +57,8 @@ public abstract class AirportsDao {
 
     @Query("DELETE FROM tbl_Airports WHERE continent=:continent")
     public abstract void deleteFromAirportsByContinent(String continent);
+
+    @Query("DELETE FROM tbl_Airports")
+    public abstract void deleteFromAirports();
 
 }

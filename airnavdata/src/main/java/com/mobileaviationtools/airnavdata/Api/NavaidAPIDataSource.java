@@ -54,7 +54,8 @@ public class NavaidAPIDataSource {
         this.totalCount = totalCount;
         this.position= 0;
         this.continent = "";
-        db.beginTransaction();
+        deleteByContinent(continent);
+        //db.beginTransaction();
         doCall();
     }
 
@@ -62,8 +63,21 @@ public class NavaidAPIDataSource {
         this.totalCount = totalCount;
         this.position= 0;
         this.continent = continent;
-        db.beginTransaction();
+        deleteByContinent(continent);
+        //db.beginTransaction();
         doCall();
+    }
+
+    private void deleteByContinent(String continent)
+    {
+        if (continent.length()>0)
+        {
+            db.getNavaids().deleteFromNavaidsByContinent(continent);
+        }
+        else
+        {
+            db.getNavaids().deleteFromNavaids();
+        }
     }
 
     private int totalCount;
@@ -89,15 +103,15 @@ public class NavaidAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Navaids");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.navaids, continent);
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     Log.e(TAG, "Error recieving Navaid results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.navaids);
                 }

@@ -51,7 +51,8 @@ public class FirsAPIDataSource {
     public void loadfirs(int totalCount) {
         this.totalCount = totalCount;
         this.position= 0;
-        db.beginTransaction();
+        db.getFirs().deleteFromFirs();
+        //db.beginTransaction();
         doCall();
     }
 
@@ -71,15 +72,15 @@ public class FirsAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Firs");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.firs, "");
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     Log.e(TAG, "Error recieving Firs results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.firs);
                 }

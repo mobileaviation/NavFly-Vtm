@@ -55,7 +55,8 @@ public class FixesAPIDataSource {
         this.totalCount = totalCount;
         this.position= 0;
         this.continent = "";
-        db.beginTransaction();
+        deleteFromFixesByContinent(continent);
+       // db.beginTransaction();
         doCall();
     }
 
@@ -63,8 +64,21 @@ public class FixesAPIDataSource {
         this.totalCount = totalCount;
         this.position= 0;
         this.continent = continent;
-        db.beginTransaction();
+        deleteFromFixesByContinent(continent);
+        //db.beginTransaction();
         doCall();
+    }
+
+    private void deleteFromFixesByContinent(String continent)
+    {
+        if (continent.length()>0)
+        {
+            db.getFixes().deleteFromFixesByContinent(continent);
+        }
+        else
+        {
+            db.getFixes().deleteFromFixes();
+        }
     }
 
     private int totalCount;
@@ -90,15 +104,15 @@ public class FixesAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Fixes");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.fixes, continent);
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     Log.e(TAG, "Error recieving Fixes results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.fixes);
                 }

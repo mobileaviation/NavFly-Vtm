@@ -55,7 +55,8 @@ public class CitiesAPIDataSource {
         this.totalCount = totalCount;
         this.position= 0;
         this.continent = "";
-        db.beginTransaction();
+        deleteFromCitiesByContinent(continent);
+        //db.beginTransaction();
         doCall();
     }
 
@@ -63,8 +64,21 @@ public class CitiesAPIDataSource {
         this.totalCount = totalCount;
         this.position= 0;
         this.continent = continent;
-        db.beginTransaction();
+        deleteFromCitiesByContinent(continent);
+        //db.beginTransaction();
         doCall();
+    }
+
+    private void deleteFromCitiesByContinent(String continent)
+    {
+        if(continent.length()>0)
+        {
+            db.getCities().deleteFromCitiesByContinent(continent);
+        }
+        else
+        {
+            db.getCities().deleteFromCities();
+        }
     }
 
     private int totalCount;
@@ -90,15 +104,15 @@ public class CitiesAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Countries");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.cities, continent);
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     Log.e(TAG, "Error recieving Countries results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.cities);
                 }

@@ -51,7 +51,8 @@ public class CountriesAPIDataSource {
     public void loadcountries(int totalCount) {
         this.totalCount = totalCount;
         this.position= 0;
-        db.beginTransaction();
+        db.getCountries().deleteFromCountries();
+        //db.beginTransaction();
         doCall();
     }
 
@@ -71,15 +72,15 @@ public class CountriesAPIDataSource {
                         doCall();
                     else {
                         Log.i(TAG, "Finished reading Countries");
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
+                        //db.setTransactionSuccessful();
+                        //db.endTransaction();
                         if (statusEvent != null) statusEvent.OnFinished(TableType.countries, "");
                     }
                 }
                 else
                 {
-                    db.setTransactionSuccessful();
-                    db.endTransaction();
+                    //db.setTransactionSuccessful();
+                    //db.endTransaction();
                     Log.e(TAG, "Error recieving Countries results");
                     if (statusEvent != null) statusEvent.OnError(response.message(), TableType.countries);
                 }

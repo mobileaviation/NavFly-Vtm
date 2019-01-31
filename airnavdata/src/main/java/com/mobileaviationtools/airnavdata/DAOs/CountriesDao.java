@@ -12,7 +12,7 @@ import java.util.List;
 
 @Dao
 public abstract class CountriesDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertCountries(List<Country> countries);
 
     @Transaction
@@ -25,4 +25,7 @@ public abstract class CountriesDao {
 
     @Query("SELECT * FROM tbl_Countries WHERE code=:code")
     public abstract List<Country> getCountriesByCode(String code);
+
+    @Query("DELETE FROM tbl_Countries")
+    public abstract void deleteFromCountries();
 }

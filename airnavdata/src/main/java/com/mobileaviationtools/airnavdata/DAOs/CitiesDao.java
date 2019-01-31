@@ -12,9 +12,15 @@ import java.util.List;
 
 @Dao
 public abstract class CitiesDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertCities(List<City> cities);
 
     @Query("SELECT * FROM tbl_Cities WHERE (longitude BETWEEN :Wlon AND :Elon AND latitude BETWEEN :Slat AND :Nlat)")
     public abstract List<City> getCitiesWithinBounds(double Wlon, double Elon, double Nlat, double Slat);
+
+    @Query("DELETE FROM tbl_Cities WHERE country_code in (SELECT country_code FROM tbl_Countries WHERE continent=:continent)")
+    public abstract void deleteFromCitiesByContinent(String continent);
+
+    @Query("DELETE FROM tbl_Cities")
+    public abstract void deleteFromCities();
 }

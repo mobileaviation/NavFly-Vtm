@@ -13,7 +13,7 @@ import java.util.List;
 
 @Dao
 public abstract class FrequenciesDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     public abstract void insertFrequencies(List<Frequency> frequencies);
 
     @Transaction
@@ -27,4 +27,10 @@ public abstract class FrequenciesDao {
 
     @Query("SELECT * FROM tbl_Frequencies WHERE airport_ref=:airport_ref")
     public abstract List<Frequency> getFrequenciesByAirport(Integer airport_ref);
+
+    @Query("DELETE FROM tbl_Frequencies WHERE airport_ref in (SELECT id FROM tbl_Airports WHERE continent=:continent)")
+    public abstract void DeleteFromFrequenciesByContinent(String continent);
+
+    @Query("DELETE FROM tbl_Frequencies")
+    public abstract void deleteFromFrequencies();
 }
