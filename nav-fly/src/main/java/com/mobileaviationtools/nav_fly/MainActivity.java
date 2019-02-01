@@ -562,13 +562,13 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                 routeListFragment.ShowAirportInfo(airport);
             }
         });
-        vars.map.layers().add(mAirportMarkersLayer, vars.AIRPLANEMARKER_GROUP );
+        vars.map.layers().add(mAirportMarkersLayer);//, vars.AVIATIONMARKERS_GROUP );
 
         mNavaidsMarkersLayer = new NaviadMarkersLayer(vars.map, null, this);
-        vars.map.layers().add(mNavaidsMarkersLayer, vars.AIRPLANEMARKER_GROUP );
+        vars.map.layers().add(mNavaidsMarkersLayer);//, vars.AVIATIONMARKERS_GROUP );
 
         mAirportSelectionLayer = new SelectionLayer(vars.map, null, this);
-        vars.map.layers().add(mAirportSelectionLayer, vars.AIRPLANEMARKER_GROUP );
+        vars.map.layers().add(mAirportSelectionLayer);//, vars.AVIATIONMARKERS_GROUP );
     }
 
     public void addTrackingLayer()
@@ -922,7 +922,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         HeightMapFragment heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
         heightMapFragment.setVisibility(View.VISIBLE);
 
-        heightMapFragment.setupTrackHeightMap(vars, trackLogId);
+
         HeightMapFragment.HeightMapFragmentEvents events = new HeightMapFragment.HeightMapFragmentEvents() {
             @Override
             public void OnCloseBtnClicked() {
@@ -941,7 +941,9 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                 playbackLayer.DrawTrack(points);
             }
         };
+        
         heightMapFragment.heightMapFragmentEvents = events;
+        heightMapFragment.setupTrackHeightMap(vars, trackLogId);
     }
 
     private void setHeightMapFragment(Route route, Boolean parseFromService)
