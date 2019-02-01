@@ -54,6 +54,8 @@ public class TrackPoints extends ArrayList<ExtCoordinate> {
             ExtCoordinate c = new ExtCoordinate(item.longitude_deg, item.latitude_deg);
             c.altitude = item.altitude_ft;
             c.date = item.logDate;
+            c.heading = item.true_heading_deg;
+            c.speed = item.ground_speed_kt;
             this.add(c);
         }
 

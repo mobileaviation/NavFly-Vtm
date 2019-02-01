@@ -34,5 +34,6 @@ public class ExtCoordinate extends Coordinate {
     public Date date;
     public FlightStage stage;
     public double index;
-
+    public double heading;
+    public double speed;
 }

@@ -19,6 +19,8 @@ import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
 
+import org.oscim.core.GeoPoint;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -32,6 +34,13 @@ public class HeightMapFragment extends Fragment {
     public interface HeightMapFragmentEvents
     {
         public void OnCloseBtnClicked();
+        public void OnLocationChanged(FspLocation location);
+        public void OnTrackLoaded(TrackPoints points);
+    }
+
+    public interface HeightMapOnLocationChanged
+    {
+        public void OnLocationChanged(FspLocation location);
     }
 
     public HeightMapFragment() {
@@ -52,8 +61,9 @@ public class HeightMapFragment extends Fragment {
     public Integer imageHeight;
     private HeightMapType heightMapType;
     private RouteHeightMapBitmap routeHeightMapBitmap;
+    private TrackPoints trackPoints;
 
-    private Button dragtestrBtn;
+    private Button dragtestBtn;
 
     private Bitmap heightMapBitmap;
     private double startIndex;
@@ -68,7 +78,7 @@ public class HeightMapFragment extends Fragment {
         imageWidth = heightMapImage.getMeasuredWidth();
 
         final Bitmap bitmap = Bitmap.createBitmap(imageWidth, imageHeight, Bitmap.Config.ARGB_8888);
-        TrackPoints trackPoints = new TrackPoints(this.vars);
+        trackPoints = new TrackPoints(this.vars);
         trackPoints.SetupPoints(trackId, null);
 
         TrackHeightMapBitmap trackHeightMapBitmap = new TrackHeightMapBitmap(bitmap, this.vars);
@@ -77,6 +87,9 @@ public class HeightMapFragment extends Fragment {
 
         heightMapNameText.setText(trackPoints.getTrackLogName());
         pointsCount = trackPoints.size();
+        dragtestBtn.setVisibility(View.VISIBLE);
+
+        if (heightMapFragmentEvents != null) heightMapFragmentEvents.OnTrackLoaded(trackPoints);
     }
 
     public void setupRouteHeightMap(final GlobalVars vars, HeightMapFragmentEvents heightMapFragmentEvents, boolean parseFromService)
@@ -115,6 +128,7 @@ public class HeightMapFragment extends Fragment {
         }, parseFromService);
 
         heightMapNameText.setText(vars.route.name);
+        dragtestBtn.setVisibility(View.GONE);
     }
 
     @Override
@@ -139,7 +153,7 @@ public class HeightMapFragment extends Fragment {
 
         heightMapBaseLayout.setVisibility(View.INVISIBLE);
 
-        dragtestrBtn = (Button) view.findViewById(R.id.dragTestBtn);
+        dragtestBtn = (Button) view.findViewById(R.id.dragTestBtn);
         setupDragBtn();
         return view;
     }
@@ -157,30 +171,18 @@ public class HeightMapFragment extends Fragment {
             {
                 double index = routePoints.getIndexForLocation(location);
 
-                //Log.i(TAG, "Index on route line: " + index);
-//                double mapXpos =  (((double)imageWidth) / (endIndex-startIndex)) * index;
-//                Log.i(TAG, "X Position on heightmap: " + Double.toString(mapXpos));
-//
-//                Canvas canvas = new Canvas(heightMapBitmap);
-//                Paint pLine = new Paint();
-//                pLine.setColor(Color.GREEN);
-//                pLine.setStrokeWidth(Helpers.dpToPx(20));
-//
-//                canvas.drawCircle((float)mapXpos, 100f, 5f, pLine);
-//                heightMapImage.setImageBitmap(heightMapBitmap);
-
                 heightMapBitmap = routeHeightMapBitmap.drawPositionOnTop(index, startIndex, endIndex, location.getAltitude());
                 heightMapImage.setImageBitmap(heightMapBitmap);
-
             }
         }
     }
 
     private int pointsCount;
+    private Long cpos = 0l;
     private int[] loc;
     private void setupDragBtn()
     {
-        dragtestrBtn.setOnTouchListener(new View.OnTouchListener() {
+        dragtestBtn.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
@@ -200,6 +202,17 @@ public class HeightMapFragment extends Fragment {
 
                     Long dpos = Math.round(((double)l / (double)max) * (double)pointsCount);
                     Log.i(TAG, "Position in points: " + dpos.toString());
+                    if (dpos != cpos) {
+                        cpos = dpos;
+                        ExtCoordinate c = trackPoints.get(dpos.intValue());
+                        FspLocation f = new FspLocation(new GeoPoint(c.y, c.x), "TrackLog");
+                        f.setAltitude(c.altitude);
+                        f.setBearing((float)c.heading);
+                        f.setSpeed((float)c.speed);
+
+                        if (heightMapFragmentEvents != null)
+                            heightMapFragmentEvents.OnLocationChanged(f);
+                    }
                 }
 
                 return false;

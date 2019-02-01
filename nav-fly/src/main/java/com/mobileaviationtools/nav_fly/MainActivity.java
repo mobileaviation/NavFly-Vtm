@@ -52,6 +52,7 @@ import com.mobileaviationtools.nav_fly.Menus.MenuItemType;
 import com.mobileaviationtools.nav_fly.Menus.NavigationButtonFragment;
 import com.mobileaviationtools.nav_fly.Menus.OnNavigationMemuItemClicked;
 import com.mobileaviationtools.nav_fly.Route.HeightMap.HeightMapFragment;
+import com.mobileaviationtools.nav_fly.Route.HeightMap.TrackPoints;
 import com.mobileaviationtools.nav_fly.Route.Info.ChartEvents;
 import com.mobileaviationtools.nav_fly.Route.Notams.NotamRetrieval;
 import com.mobileaviationtools.nav_fly.Route.Route;
@@ -69,6 +70,7 @@ import com.mobileaviationtools.nav_fly.Settings.ChartSettingsDialog;
 import com.mobileaviationtools.nav_fly.Settings.SettingsObject;
 import com.mobileaviationtools.nav_fly.Startup.StartupDialog;
 import com.mobileaviationtools.nav_fly.Tracks.LoadLogDialog;
+import com.mobileaviationtools.nav_fly.Tracks.PlaybackLayer;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
@@ -77,6 +79,7 @@ import com.mobileaviationtools.weater_notam_data.notams.Notams;
 import org.oscim.android.MapPreferences;
 import org.oscim.android.MapView;
 import org.oscim.backend.CanvasAdapter;
+import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
@@ -130,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
     Tracking trackingLayer;
+    PlaybackLayer playbackLayer;
 
     Boolean fromMenu;
 
@@ -292,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         setupAirspacesLayer();
         addMarkerLayers();
         addTrackingLayer();
+        addPlaybackLayer();
         addAircraftLocationLayer();
         setupHomeLocation();
         addDeviationLineLayer();
@@ -557,18 +562,25 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                 routeListFragment.ShowAirportInfo(airport);
             }
         });
-        vars.map.layers().add(mAirportMarkersLayer);
+        vars.map.layers().add(mAirportMarkersLayer, vars.AIRPLANEMARKER_GROUP );
 
         mNavaidsMarkersLayer = new NaviadMarkersLayer(vars.map, null, this);
-        vars.map.layers().add(mNavaidsMarkersLayer);
+        vars.map.layers().add(mNavaidsMarkersLayer, vars.AIRPLANEMARKER_GROUP );
 
         mAirportSelectionLayer = new SelectionLayer(vars.map, null, this);
-        vars.map.layers().add(mAirportSelectionLayer);
+        vars.map.layers().add(mAirportSelectionLayer, vars.AIRPLANEMARKER_GROUP );
     }
 
     public void addTrackingLayer()
     {
         trackingLayer = new Tracking(vars);
+    }
+
+    public void addPlaybackLayer()
+    {
+        int c = Color.get(0xF4, 0x6E, 0x8F ); //.parseColor("fff46e8f");
+        playbackLayer = new PlaybackLayer(vars.map, c, 3 * CanvasAdapter.getScale() );
+        vars.map.layers().add(playbackLayer, vars.TRACK_GROUP);
     }
 
     public void addAircraftLocationLayer()
@@ -907,18 +919,29 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
     private void setTracklogFragment(Long trackLogId)
     {
-//        PlaybackFragment playbackFragment = (PlaybackFragment)getSupportFragmentManager().findFragmentById(R.id.playbackFragment);
-//        playbackFragment.setTrackLog(trackLogId, vars, new PlaybackFragment.PlaybackFragmentEvents() {
-//            @Override
-//            public void OnCloseBtnClicked() {
-//
-//            }
-//        });
         HeightMapFragment heightMapFragment = (HeightMapFragment)getSupportFragmentManager().findFragmentById(R.id.heightMapFragment);
         heightMapFragment.setVisibility(View.VISIBLE);
 
         heightMapFragment.setupTrackHeightMap(vars, trackLogId);
+        HeightMapFragment.HeightMapFragmentEvents events = new HeightMapFragment.HeightMapFragmentEvents() {
+            @Override
+            public void OnCloseBtnClicked() {
+                playbackLayer.ClearTrack();
+            }
 
+            @Override
+            public void OnLocationChanged(FspLocation location) {
+                // Setup the location of the aircraft and chart
+                setLocation(location);
+            }
+
+            @Override
+            public void OnTrackLoaded(TrackPoints points) {
+                // Draw layer met track
+                playbackLayer.DrawTrack(points);
+            }
+        };
+        heightMapFragment.heightMapFragmentEvents = events;
     }
 
     private void setHeightMapFragment(Route route, Boolean parseFromService)
@@ -972,47 +995,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                         connectStage = ConnectStage.connected;
                         Log.i("OnLocationChanged", "Success Message: " + message);
                         if (location != null) {
-                            vars.airplaneLocation.Assign(location);
-                            vars.doDeviationLineFromLocation.Assign(location);
-//                            Log.i("OnLocationChanged", "Location Changed: " + vars.airplaneLocation.getLatitude() + " "
-//                                    + vars.airplaneLocation.getLongitude() + " " + vars.airplaneLocation.getBearing() + " " + vars.airplaneLocation.getSpeed());
-                            //location.setBearing(90);
+                            setLocation(location);
                             trackingLayer.setLocation(vars.airplaneLocation);
-                            vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
-
-                            //mMap.render();
-
-                            MapPosition pos = vars.map.getMapPosition();
-                            if (mapPosLockedToAirplanePos)
-                            {
-                                pos.setPosition(vars.airplaneLocation.getGeopoint());
-                                vars.map.setMapPosition(pos);
-                            }
-
-                            if (vars.mapDirectionType==MapDirectionType.flight)
-                            {
-                                pos.setBearing(360-vars.airplaneLocation.getBearing());
-                            }
-
-                            if (vars.route != null)
-                            {
-                                if (vars.route.getLegs().size()>0)
-                                {
-                                    vars.route.setAirplaneLocation(location);
-                                }
-                                vars.dashboardFragment.setLocation(vars.airplaneLocation, vars.route.getIndicatedAirspeed());
-                            }
-                            else
-                            {
-                                vars.dashboardFragment.setLocation(vars.airplaneLocation, 100d);
-                            }
-
-                            if (vars.heightMapFragment != null)
-                            {
-                                vars.heightMapFragment.setLocation(location);
-                            }
-
-                            vars.map.setMapPosition(pos);
                         }
                     }
                     else
@@ -1038,6 +1022,46 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             }
             connectStage = ConnectStage.disconnected;
         }
+    }
+
+    private void setLocation(FspLocation location)
+    {
+        vars.airplaneLocation.Assign(location);
+        vars.doDeviationLineFromLocation.Assign(location);
+
+        vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
+
+        MapPosition pos = vars.map.getMapPosition();
+        if (mapPosLockedToAirplanePos)
+        {
+            pos.setPosition(vars.airplaneLocation.getGeopoint());
+            vars.map.setMapPosition(pos);
+        }
+
+        if (vars.mapDirectionType==MapDirectionType.flight)
+        {
+            pos.setBearing(360-vars.airplaneLocation.getBearing());
+        }
+
+        if (vars.route != null)
+        {
+            if (vars.route.getLegs().size()>0)
+            {
+                vars.route.setAirplaneLocation(location);
+            }
+            vars.dashboardFragment.setLocation(vars.airplaneLocation, vars.route.getIndicatedAirspeed());
+        }
+        else
+        {
+            vars.dashboardFragment.setLocation(vars.airplaneLocation, 100d);
+        }
+
+        if (vars.heightMapFragment != null)
+        {
+            vars.heightMapFragment.setLocation(location);
+        }
+
+        vars.map.setMapPosition(pos);
     }
 
     @Override
