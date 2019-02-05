@@ -6,6 +6,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import org.oscim.backend.CanvasAdapter;
+
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -56,8 +58,10 @@ public class Helpers {
         return dbFile.exists();
     }
 
-    public static int dpToPx(int pd)
+    public static float dpToPx(int pd)
     {
-        return (int) (pd / Resources.getSystem().getDisplayMetrics().density);
+        return pd * CanvasAdapter.getScale();
+
+        //return (int) (pd / Resources.getSystem().getDisplayMetrics().density);
     }
 }

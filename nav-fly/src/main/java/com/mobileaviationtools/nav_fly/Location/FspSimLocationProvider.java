@@ -123,13 +123,15 @@ public class FspSimLocationProvider implements IFspLocationProvider{
             @Override
             public void OnRetrievedOffsets(List<OffsetResponse> response) {
                 HashMap<Integer, OffsetResponse> offsetMap = new HashMap<>();
-                for(OffsetResponse resp: response)
-                {
-                    offsetMap.put(resp.Address, resp);
+                if (response != null) {
+                    for (OffsetResponse resp : response) {
+                        offsetMap.put(resp.Address, resp);
+                    }
+                    FspLocation location = caculateLocation(offsetMap);
+                    if (locationEvents != null)
+                        locationEvents.OnLocationChanged(LocationProviderType.simulator,
+                                location, "Offsets : New Sim Location", connected);
                 }
-                FspLocation location = caculateLocation(offsetMap);
-                if (locationEvents != null) locationEvents.OnLocationChanged(LocationProviderType.simulator,
-                        location, "Offsets : New Sim Location", connected);
             }
 
             @Override

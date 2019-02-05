@@ -34,7 +34,7 @@ public class RouteHeightMapBitmap  {
     public Bitmap drawRoute(RoutePoints points)
     {
         Canvas canvas = new Canvas(bitmap);
-        imageWidth = imageWidth - Helpers.dpToPx(100);
+        imageWidth = imageWidth - Math.round(Helpers.dpToPx(25));
         doDrawRoute(canvas, points);
         return this.bitmap;
     }
@@ -42,7 +42,7 @@ public class RouteHeightMapBitmap  {
     public Bitmap drawPositionOnTop(double index, double startIndex, double endIndex, double altitude)
     {
         double mapXpos =  (((double)imageWidth) / (endIndex-startIndex)) * index;
-        mapXpos = mapXpos + Helpers.dpToPx(50);
+        mapXpos = mapXpos + Helpers.dpToPx(10);
         double altitudeFt = altitude * meterToFeet;
 
         double mapYpos = calcYFrom(altitudeFt, minElevation, maxAltitudePlus);
@@ -50,9 +50,9 @@ public class RouteHeightMapBitmap  {
         Canvas canvas = new Canvas(bitmap);
         Paint pLine = new Paint();
         pLine.setColor(Color.RED);
-        pLine.setStrokeWidth(Helpers.dpToPx(20));
+        pLine.setStrokeWidth(Helpers.dpToPx(5));
 
-        canvas.drawCircle((float)mapXpos, (float) mapYpos, Helpers.dpToPx(10), pLine);
+        canvas.drawCircle((float)mapXpos, (float) mapYpos, Helpers.dpToPx(2), pLine);
         return bitmap;
     }
 
@@ -70,9 +70,9 @@ public class RouteHeightMapBitmap  {
 
         Paint pLine = new Paint();
         pLine.setColor(Color.GREEN);
-        pLine.setStrokeWidth(Helpers.dpToPx(20));
+        pLine.setStrokeWidth(Helpers.dpToPx(5));
 
-        double startX = Helpers.dpToPx(50);
+        double startX = Helpers.dpToPx(10);
         double startY = calcYFrom(routePoints.get(0).elevation, minElevation, maxAltitudePlus);
         for (ExtCoordinate c: routePoints) {
             double addX = (double)imageWidth / (double)routePoints.size();
@@ -85,7 +85,7 @@ public class RouteHeightMapBitmap  {
 
         pLine.setColor(Color.BLUE);
 
-        startX = Helpers.dpToPx(50);
+        startX = Helpers.dpToPx(10);
         startY = calcYFrom(routePoints.get(0).altitude, minElevation, maxAltitudePlus);
         for (ExtCoordinate c: routePoints) {
             double addX = (c.distanceToNext_meter==0) ? 0 :
@@ -104,8 +104,8 @@ public class RouteHeightMapBitmap  {
     {
         double drawAltitude = ((minElevation-100)<0)? 0 : minElevation -100;
         Paint p = new Paint();
-        p.setStrokeWidth(Helpers.dpToPx(4));
-        p.setTextSize(Helpers.dpToPx(40));
+        p.setStrokeWidth(Helpers.dpToPx(1));
+        p.setTextSize(Helpers.dpToPx(10));
 
         double add = 500;
         if ((maxAltitude - minElevation)>5000) add = 1000;
@@ -117,7 +117,7 @@ public class RouteHeightMapBitmap  {
             p.setColor(Color.GRAY);
             canvas.drawLine(0, (float)Y, (float)imageWidth, (float)Y, p);
             p.setColor(Color.BLACK);
-            canvas.drawText(D.toString(), Helpers.dpToPx(20), (float)Y-Helpers.dpToPx(4), p);
+            canvas.drawText(D.toString(), Helpers.dpToPx(5), (float)Y-Helpers.dpToPx(1), p);
             drawAltitude = drawAltitude + add;
         }
 
@@ -125,7 +125,7 @@ public class RouteHeightMapBitmap  {
         p.setColor(Color.GRAY);
         canvas.drawLine(0, (float)Y, (float)imageWidth, (float)Y, p);
         p.setColor(Color.BLACK);
-        canvas.drawText(Double.toString(drawAltitude), Helpers.dpToPx(20), (float)Y-Helpers.dpToPx(4), p);
+        canvas.drawText(Double.toString(drawAltitude), Helpers.dpToPx(5), (float)Y-Helpers.dpToPx(1), p);
 
     }
 
@@ -142,7 +142,7 @@ public class RouteHeightMapBitmap  {
         {
             ExtCoordinate c = points.findPointNearestTo(p);
             double mapXpos =  (((double)imageWidth) / (endIndex-startIndex)) * c.index;
-            mapXpos = mapXpos + Helpers.dpToPx(50) - (markerBitmap.getWidth()/2);
+            mapXpos = mapXpos + Helpers.dpToPx(10) - (markerBitmap.getWidth()/2);
             double mapYpos = calcYFrom(c.altitude, minElevation, maxAltitudePlus) - (markerBitmap.getHeight()/2);
 
             canvas.drawBitmap(markerBitmap, (float)mapXpos, (float)mapYpos, new Paint());
@@ -154,6 +154,6 @@ public class RouteHeightMapBitmap  {
         double size = max - min;
         double factor = (imageHeight) / size;
         double retValue = factor * (value - min);
-        return imageHeight - (retValue + Helpers.dpToPx(20));
+        return imageHeight - (retValue + Helpers.dpToPx(5));
     }
 }

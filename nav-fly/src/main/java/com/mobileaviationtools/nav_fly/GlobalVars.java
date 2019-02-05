@@ -21,6 +21,7 @@ import org.oscim.map.Map;
 public class GlobalVars {
     public Activity mainActivity;
     public Context context;
+    public Boolean appLocked;
     public Map map;
     public FspLocation airplaneLocation;
     public FspLocation mapCenterLocation;

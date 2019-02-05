@@ -204,14 +204,16 @@ public class HeightMapFragment extends Fragment {
                     Log.i(TAG, "Position in points: " + dpos.toString());
                     if (dpos != cpos) {
                         cpos = dpos;
-                        ExtCoordinate c = trackPoints.get(dpos.intValue());
-                        FspLocation f = new FspLocation(new GeoPoint(c.y, c.x), "TrackLog");
-                        f.setAltitude(c.altitude);
-                        f.setBearing((float)c.heading);
-                        f.setSpeed((float)c.speed);
+                        if (dpos.intValue()<trackPoints.size() && dpos.intValue()>0) {
+                            ExtCoordinate c = trackPoints.get(dpos.intValue());
+                            FspLocation f = new FspLocation(new GeoPoint(c.y, c.x), "TrackLog");
+                            f.setAltitude(c.altitude);
+                            f.setBearing((float) c.heading);
+                            f.setSpeed((float) c.speed);
 
-                        if (heightMapFragmentEvents != null)
-                            heightMapFragmentEvents.OnLocationChanged(f);
+                            if (heightMapFragmentEvents != null)
+                                heightMapFragmentEvents.OnLocationChanged(f);
+                        }
                     }
                 }
 

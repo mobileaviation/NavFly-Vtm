@@ -59,7 +59,7 @@ public class RouteLegSymbol extends MarkerSymbol {
         textPaint.setTextSize(CanvasAdapter.getScale() *14f);
         aircourseCanvas.drawText(d, CanvasAdapter.getScale() * x, CanvasAdapter.getScale() * 62f, textPaint);
         textPaint.setTextSize(CanvasAdapter.getScale() * 10f);
-        aircourseCanvas.drawText("NM", CanvasAdapter.getScale() * x+50f, CanvasAdapter.getScale() * 62f, textPaint);
+        aircourseCanvas.drawText("NM", CanvasAdapter.getScale() * (x+25f), CanvasAdapter.getScale() * 62f, textPaint);
 
         if (compass_heading<180){
             aircourseCanvas.restore();

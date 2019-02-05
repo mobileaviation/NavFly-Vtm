@@ -1,6 +1,7 @@
 package com.mobileaviationtools.nav_fly.Route;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -107,24 +108,30 @@ public class RouteListFragment extends Fragment {
 
     public void ToggleWeatherProgressVisibility(final Boolean visible)
     {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (weatherProgressBar != null) weatherProgressBar.setVisibility(
-                        (visible) ? View.VISIBLE : View.INVISIBLE);
-            }
-        });
+        Activity a = getActivity();
+        if (a!= null) {
+            a.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (weatherProgressBar != null) weatherProgressBar.setVisibility(
+                            (visible) ? View.VISIBLE : View.INVISIBLE);
+                }
+            });
+        }
     }
 
     public void ToggleNotamsProgressVisibility(final Boolean visible)
     {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (notamsProgressBar != null) notamsProgressBar.setVisibility(
-                        (visible) ? View.VISIBLE : View.INVISIBLE);
-            }
-        });
+        Activity a = getActivity();
+        if (a!= null) {
+            a.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (notamsProgressBar != null) notamsProgressBar.setVisibility(
+                            (visible) ? View.VISIBLE : View.INVISIBLE);
+                }
+            });
+        }
     }
 
     public NotamResponseEvent getNotamResponseEvent()

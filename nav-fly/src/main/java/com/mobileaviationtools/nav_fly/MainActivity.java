@@ -1,6 +1,9 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -111,23 +115,10 @@ import java.util.TimerTask;
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
 
-public class MainActivity extends AppCompatActivity implements DialogInterface.OnDismissListener{
-    final static boolean USE_CACHE = true;
-    final static int REQUEST_EXTERNAL_STORAGE_ACCESS = 10;
-    final static int REQUEST_INTERNET_ACCESS_SETUPAPP = 11;
-    final static int REQUEST_LOCATION_GPS = 12;
-    final static int REQUEST_WAKELOCK_SETUPAPP = 13;
-    final static int REQUEST_SEARCH_DIALOG = 14;
+public class MainActivity extends BaseActivity implements DialogInterface.OnDismissListener{
     final String TAG = "MainActivity";
 
-    public GlobalVars vars;
-
-    MapView mMapView;
     CheckMap checkMap;
-    MapPreferences mPrefs;
-    //VectorTileLayer mBaseLayer;
-
-
     AirportMarkersLayer mAirportMarkersLayer;
     NaviadMarkersLayer mNavaidsMarkersLayer;
     SelectionLayer mAirportSelectionLayer;
@@ -141,11 +132,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
     Timer clockTimer;
     Timer weatherTimer;
-
-    //private OfflineTileCache mCache;
-    //private SettingsObject settingsObject;
-    //TileSource mTileSource;
-    protected BitmapTileLayer mBitmapLayer;
 
     private DefaultMapScaleBar mapScaleBar;
 
@@ -164,16 +150,10 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         //AirnavClient.deleteDatabaseFile(this, "room_airnav.db");
         //AirnavClient.deleteDatabaseFile(this, "room_airnav_settings.db");
         //AirnavClient.deleteDatabaseFile(this, "room_airnav_route.db");
-
         super.onCreate(savedInstanceState);
 
-        vars = new GlobalVars();
-        vars.mainActivity = this;
-        vars.context = this;
-        vars.aircraft = new PiperArcher();
-
         Boolean test = false;
-        doSetupWakeLock();
+
 
         SharedPreferences databasePrefs = this.getSharedPreferences("Database", MODE_PRIVATE);
         Boolean databaseInitialized = databasePrefs.getBoolean("databaseInitialized", false);
@@ -218,13 +198,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         Log.i(TAG, dialog.toString());
         if (Helpers.DatabaseExists(this, AirnavDatabase.DB_NAME)) {
 
-//            if (dialog instanceof Dialog)
-//            {
-//                Dialog d = (Dialog)dialog;
-//                int i=0;
-//                d.g
-//            }
-
             if (!fromMenu)
                 startApp();
         }
@@ -237,13 +210,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
     private void startApp()
     {
-        setContentView(R.layout.activity_main);
-        mMapView = (MapView) findViewById(R.id.mapView);
-
-        vars.map = mMapView.map();
-        //mPrefs = new MapPreferences(MainActivity.class.getName(), this);
-        //mPrefs.load(mMapView.map());
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED )
         {
             setupApp();
@@ -253,8 +219,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET_ACCESS_SETUPAPP );
         }
-
-        doSetupWakeLock();
     }
 
     private void setupApp()
@@ -273,11 +237,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
 
         setupMap();
 
-        //setupInitialLocation();
-
         createLayers();
-
-        // Temp test code
 
         vars.map.layers().addGroup(vars.ONLINETILES_GROUP);
         vars.map.layers().addGroup(vars.OVERLAYCHARTS_GROUP);
@@ -611,12 +571,6 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         return true;
     }
 
-    private enum  requestType
-    {
-        mbtiles,
-        bitmap
-    }
-    private requestType request_Type;
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -624,14 +578,8 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
             if (requestCode == REQUEST_INTERNET_ACCESS_SETUPAPP)
                 setupApp();
 
-            if (requestCode == REQUEST_WAKELOCK_SETUPAPP)
-                setupWakeLock();
-
             if (requestCode == REQUEST_SEARCH_DIALOG)
                 showSearchDialog();
-
-//            if (requestCode == REQUEST_LOCATION_GPS)
-//                setupInitialLocation();
 
             return;
         }
@@ -652,176 +600,13 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
         });
     }
 
-    private void doSetupWakeLock()
-    {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED )
-        {
-            // set wakelock
-            setupWakeLock();
-        }
-        else
-        {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WAKE_LOCK}, REQUEST_WAKELOCK_SETUPAPP );
-        }
-    }
-
-    private void setupWakeLock()
-    {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-
-//    void getMBTilesMapPerm()
-//    {
-//
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-//        {
-//            request_Type = requestType.mbtiles;
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
-//        }
-//        else {
-//            getMBTilesMap();
-//        }
-//    }
-//
-//    void getBitmapOverlayPerm()
-//    {
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-//        {
-//            request_Type = requestType.bitmap;
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_ACCESS );
-//        }
-//        else {
-//            getBitmapOverlay();
-//        }
-//    }
-//
-//    void getBitmapOverlay()
-//    {
-//        BoundingBox bb = new BoundingBox(52.31267664,5.38673401, 52.58511188, 5.71289063);
-//        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-//        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
-//
-//        OverlayTileSource overlayTileSource = new OverlayTileSource(folder, bb);
-//        overlayTileSource.open();
-//        mBitmapLayer = new BitmapTileLayer(vars.map, overlayTileSource);
-//        vars.map.layers().add(mBitmapLayer);
-//    }
-//
-//    void viewportTest()
-//    {
-//        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-//        String folder = downloadFolder.getAbsolutePath() + "/VAC_EHLE.png";
-//        BitmapToTile bitmapToTile = new BitmapToTile();
-//        //bitmapToTile.Test(mMapView, mMap, folder);
-//        bitmapToTile.TransformTest();
-//    }
-
-//    void getMBTilesMap()
-//    {
-//        // ehaa_256@2x.mbtiles
-//        File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-//        String folder = downloadFolder.getAbsolutePath() + "/ehaa_256@2x.mbtiles";
-//
-//        File f = new File(folder);
-//        if (f.exists()) {
-//            MBTilesTileSource mbTilesTileSource = new MBTilesTileSource(folder);
-//            mbTilesTileSource.open();
-//            mBitmapLayer = new BitmapTileLayer(vars.map, mbTilesTileSource);
-//            vars.map.layers().add(mBitmapLayer);
-//
-//        }
-//    }
-
-//    void setupChartsOverlayLayers()
-//    {
-////        chartsGroupLayer = new GroupLayer(mMap);
-////        mMap.layers().add(chartsGroupLayer);
-//        int index = mMap.layers().size()-1;
-//
-//        chartsOverlayLayers = new ChartsOverlayLayers(this, mMap, index);
-//        chartsOverlayLayers.InitChartsFromDB();
-//    }
 
 
     void setupMap()
     {
         vars.baseChart = new BaseChart(vars);
         vars.baseChart.setBaseCharts(vars.baseChartType);
-//        boolean LoadMapforgeMaps = false;
-//
-//        VtmThemes defaultTheme = VtmThemes.DEFAULT;
-//
-//        // Test
-//        vars.baseChartType = BaseChartType.openmaptiles;
-//
-//        if (vars.baseChartType == BaseChartType.opensciencemaps)
-//        {
-//            mTileSource = OSciMap4TileSource.builder()
-//                .httpFactory(new OkHttpEngine.OkHttpFactory())
-//                .build();
-//            defaultTheme = VtmThemes.DEFAULT;
-//
-//            String url = ((OSciMap4TileSource) mTileSource).getUrl().toString();
-//            settingsObject.setBaseCache(mTileSource, url, vars.baseChartType);
-//        }
-//
-//
-//        if (LoadMapforgeMaps) {
-//            // Mapforge mas test
-//            File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-//            File mapFile = new File(downloadDir.toString() + "/netherlands.map");
-//            if (mapFile.exists()) {
-//                Log.i(TAG, "Found netherlands.map !!");
-//                mTileSource = new MapFileTileSource();
-//                String path = mapFile.getAbsolutePath();
-//                if (((MapFileTileSource) mTileSource).setMapFile(path)) {
-//                    Log.i(TAG, "Netherlands map loaded");
-//                }
-//            }
-//            defaultTheme = VtmThemes.DEFAULT;
-//        }
-//
-//        if (vars.baseChartType == BaseChartType.nextzen) {
-//            mTileSource = NextzenMvtTileSource.builder()
-//                    .apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
-//                    .httpFactory(new OkHttpEngine.OkHttpFactory())
-//                    //.locale("en")
-//                    .build();
-//
-//            String url = ((NextzenMvtTileSource) mTileSource).getNextzenUrl();
-//            settingsObject.setBaseCache(mTileSource, url, vars.baseChartType);
-//            defaultTheme = VtmThemes.MAPZEN;
-//        }
-//
-//        if (vars.baseChartType == BaseChartType.openmaptiles){
-//            mTileSource = OpenMapTilesMvtTileSource.builder()
-//                    .apiKey("29WrAEe6HeyBZgOaLFda")
-//                    .httpFactory(new OkHttpEngine.OkHttpFactory())
-//                    .build();
-//            String url = ((OpenMapTilesMvtTileSource) mTileSource).getUrl().toString();
-//            settingsObject.setBaseCache(mTileSource, url, vars.baseChartType);
-//            defaultTheme = VtmThemes.OPENMAPTILES;
-//        }
-//
-//
-//
-//        mBaseLayer = vars.map.setBaseMap(mTileSource);
-//        vars.map.setTheme(defaultTheme);
-//        vars.map.layers().add(new LabelLayer(vars.map, mBaseLayer), vars.BASE_GROUP);
-    }
 
-    void setupInitialLocation()
-    {
-
-
-        //TODO Setup for initial location..
-        /* set initial position on first run */
-        MapPosition pos = new MapPosition();
-        vars.map.getMapPosition(pos);
-        if (pos.x == 0.5 && pos.y == 0.5)
-            vars.map.setMapPosition(52.4603, 5.5272, Math.pow(2, 14));
     }
 
     void createLayers() {
@@ -911,6 +696,12 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                         loadLogDialog.show();
                         break;
                     }
+                    case appLocking:
+                    {
+                        vars.appLocked = !vars.appLocked;
+                        menu.SetApplockedIcon(vars.appLocked);
+                        break;
+                    }
                 }
                 return false;
             }
@@ -941,7 +732,7 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
                 playbackLayer.DrawTrack(points);
             }
         };
-        
+
         heightMapFragment.heightMapFragmentEvents = events;
         heightMapFragment.setupTrackHeightMap(vars, trackLogId);
     }
@@ -1067,6 +858,34 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     }
 
     @Override
+    public boolean onKeyDown(final int keyCode, final KeyEvent event)
+    {
+        Log.i(TAG, "Key Pressed: " + keyCode);
+        if (keyCode==4) {
+            if (vars.appLocked)
+                return false;
+            else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Are you sure you want to stop navigating?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                MainActivity.this.finish();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (mMapView != null) {
@@ -1078,10 +897,18 @@ public class MainActivity extends AppCompatActivity implements DialogInterface.O
     @Override
     protected void onPause() {
         //mPrefs.save(mMapView.map());
-        if (mMapView != null)
-            mMapView.onPause();
-
         super.onPause();
+        if (vars.appLocked)
+        {
+            ActivityManager activityManager = (ActivityManager) getApplicationContext()
+                    .getSystemService(Context.ACTIVITY_SERVICE);
+            activityManager.moveTaskToFront(getTaskId(), 0);
+        }
+        else {
+
+            if (mMapView != null)
+                mMapView.onPause();
+        }
     }
 
     @Override

@@ -27,7 +27,7 @@ public class TrackHeightMapBitmap {
     public Bitmap drawTrack(TrackPoints points)
     {
         Canvas canvas = new Canvas(bitmap);
-        imageWidth = imageWidth - Helpers.dpToPx(100);
+        imageWidth = imageWidth - Math.round(Helpers.dpToPx(25));
         doDraw(canvas, points);
         return this.bitmap;
     }
@@ -42,9 +42,9 @@ public class TrackHeightMapBitmap {
 
         Paint pLine = new Paint();
         pLine.setColor(Color.BLUE);
-        pLine.setStrokeWidth(Helpers.dpToPx(20));
+        pLine.setStrokeWidth(Helpers.dpToPx(5));
 
-        double startX = Helpers.dpToPx(50);
+        double startX = Helpers.dpToPx(10);
         double startY = calcYFrom(points.get(0).getAltitudeFt(), minElevation, maxAltitudePlus);
         for (ExtCoordinate c: points) {
             double addX = (c.distanceToNext_meter==0) ? 0 :
@@ -61,8 +61,8 @@ public class TrackHeightMapBitmap {
     {
         double drawAltitude = 0;
         Paint p = new Paint();
-        p.setStrokeWidth(Helpers.dpToPx(4));
-        p.setTextSize(Helpers.dpToPx(40));
+        p.setStrokeWidth(Helpers.dpToPx(1));
+        p.setTextSize(Helpers.dpToPx(10));
 
         while (drawAltitude<maxAltitude)
         {
@@ -70,7 +70,7 @@ public class TrackHeightMapBitmap {
             p.setColor(Color.GRAY);
             canvas.drawLine(0, (float)Y, (float)imageWidth, (float)Y, p);
             p.setColor(Color.BLACK);
-            canvas.drawText(Double.toString(drawAltitude), Helpers.dpToPx(20), (float)Y-Helpers.dpToPx(4), p);
+            canvas.drawText(Double.toString(drawAltitude), Helpers.dpToPx(5), (float)Y-Helpers.dpToPx(1), p);
             drawAltitude = drawAltitude + 500;
         }
 
@@ -78,7 +78,7 @@ public class TrackHeightMapBitmap {
         p.setColor(Color.GRAY);
         canvas.drawLine(0, (float)Y, (float)imageWidth, (float)Y, p);
         p.setColor(Color.BLACK);
-        canvas.drawText(Double.toString(drawAltitude), Helpers.dpToPx(20), (float)Y-Helpers.dpToPx(4), p);
+        canvas.drawText(Double.toString(drawAltitude), Helpers.dpToPx(5), (float)Y-Helpers.dpToPx(1), p);
 
     }
 
@@ -87,6 +87,6 @@ public class TrackHeightMapBitmap {
         double size = max - min;
         double factor = (imageHeight) / size;
         double retValue = factor * value;
-        return imageHeight - (retValue + Helpers.dpToPx(20));
+        return imageHeight - (retValue + Helpers.dpToPx(5));
     }
 }
