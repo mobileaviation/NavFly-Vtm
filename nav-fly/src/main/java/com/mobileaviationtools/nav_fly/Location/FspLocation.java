@@ -7,17 +7,30 @@ import org.oscim.core.GeoPoint;
 public class FspLocation extends Location {
     public FspLocation(String provider) {
         super(provider);
+        createArrays();
     }
 
     public FspLocation(Location l) {
         super(l);
+        createArrays();
     }
 
     public FspLocation(GeoPoint g, String provider)
     {
         super("provider");
         setGeopoint(g);
+        createArrays();
     }
+
+    private void createArrays()
+    {
+        turnCoordination = new Double[2];
+        horizon = new Double[2];
+    }
+
+    public Double verticalSpeed;
+    public Double[] turnCoordination;
+    public Double[] horizon;
 
     private double distanceRemaining;
 

@@ -16,5 +16,6 @@ public enum MenuItemType {
     appLocking,
     mapDirection,
     more,
-    downloaddatabase
+    downloaddatabase,
+    instruments
 }

@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
@@ -32,6 +33,7 @@ public class DashboardFragment extends Fragment {
     private Float meterToFeet = 3.2808399f; // meters to feet
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +44,16 @@ public class DashboardFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_dashboard, container, false);
         return view;
+    }
+
+    public void reloadLayout()
+    {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        ViewGroup viewGroup = (ViewGroup) getView();
+        viewGroup.removeAllViewsInLayout();
+        view = onCreateView(inflater, viewGroup, null);
+        viewGroup.addView(view);
+        //this.getFragmentManager().
     }
 
     private String getZuluTime()

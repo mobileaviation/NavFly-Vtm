@@ -61,7 +61,5 @@ public class Helpers {
     public static float dpToPx(int pd)
     {
         return pd * CanvasAdapter.getScale();
-
-        //return (int) (pd / Resources.getSystem().getDisplayMetrics().density);
     }
 }

@@ -8,6 +8,7 @@ public class City {
     public Double longitude;
     public Double distance;
     public Double heading;
+    public Double radial;
 
     private double meterToNMile = 0.000539956803d;
 
@@ -19,6 +20,7 @@ public class City {
         c.longitude = city.longitude;
         c.distance = location.sphericalDistance(new GeoPoint(c.latitude, c.longitude));
         c.heading = location.bearingTo(new GeoPoint(c.latitude, c.longitude));
+        c.radial = new GeoPoint(c.latitude, c.longitude).bearingTo(location);
         return c;
     }
 
@@ -33,6 +35,11 @@ public class City {
         Double dNm = distance * meterToNMile;
         Long h = Math.round(dNm);
         return h.toString()+ "NM";
+    }
+
+    public Double getRadial()
+    {
+        return radial;
     }
 
 //    @Override

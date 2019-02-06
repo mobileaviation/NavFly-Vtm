@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout5"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context=".Instruments.InstrumentsFragment">
+
+    <LinearLayout
+        android:id="@+id/linearLayout8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.mobileaviationtools.nav_fly.Instruments.AirspeedView
+            android:id="@+id/airspeedView"
+            android:layout_width="124dp"
+            android:layout_height="121dp"
+            android:visibility="visible" />
+
+        <com.mobileaviationtools.nav_fly.Instruments.HorizonView
+            android:id="@+id/horizonView"
+            android:layout_width="124dp"
+            android:layout_height="121dp" />
+
+        <com.mobileaviationtools.nav_fly.Instruments.AltimeterView
+            android:id="@+id/altimeterView"
+            android:layout_width="124dp"
+            android:layout_height="121dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout8">
+
+        <com.mobileaviationtools.nav_fly.Instruments.TurnCoordinatorView
+            android:id="@+id/turnCoordinatorView"
+            android:layout_width="124dp"
+            android:layout_height="121dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/airspeedView" />
+
+        <com.mobileaviationtools.nav_fly.Instruments.CompassView
+            android:id="@+id/compassView"
+            android:layout_width="124dp"
+            android:layout_height="121dp"
+            app:layout_constraintStart_toEndOf="@+id/turnCoordinatorView"
+            app:layout_constraintTop_toBottomOf="@+id/horizonView" />
+
+        <com.mobileaviationtools.nav_fly.Instruments.VerticalSpeedIndicatorView
+            android:id="@+id/vsiView"
+            android:layout_width="124dp"
+            android:layout_height="121dp"
+            app:layout_constraintStart_toEndOf="@+id/compassView"
+            app:layout_constraintTop_toBottomOf="@+id/altimeterView" />
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
@@ -115,7 +116,7 @@ import java.util.TimerTask;
 import static org.oscim.android.canvas.AndroidGraphics.drawableToBitmap;
 
 
-public class MainActivity extends BaseActivity implements DialogInterface.OnDismissListener{
+public class MainActivity extends LocationActivity implements DialogInterface.OnDismissListener{
     final String TAG = "MainActivity";
 
     CheckMap checkMap;
@@ -123,12 +124,9 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
     NaviadMarkersLayer mNavaidsMarkersLayer;
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
-    Tracking trackingLayer;
     PlaybackLayer playbackLayer;
 
     Boolean fromMenu;
-
-    Boolean mapPosLockedToAirplanePos = true;
 
     Timer clockTimer;
     Timer weatherTimer;
@@ -137,9 +135,6 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
 
     private RouteListFragment routeListFragment;
     private NavigationButtonFragment menu;
-
-
-    private ConnectStage connectStage;
 
     private WeatherStations stations;
     private NotamRetrieval notamRetrieval;
@@ -178,6 +173,19 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
                 vars.baseChartType = BaseChartType.valueOf(baseChartTypeStr);
             startApp();
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (vars.dashboardFragment != null) {
+            vars.dashboardFragment.reloadLayout();
+            vars.dashboardFragment.setZuluTime();
+        }
+
+        if (vars.route != null)
+            vars.heightMapFragment.redraw();
     }
 
     private void testDB()
@@ -283,13 +291,13 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
 
                 vars.deviationLineLayer.drawDeviationLine(vars.doDeviationLineFromLocation, vars.mapCenterLocation);
 
-                setMapDirectoinType(vars.mapDirectionType);
+                setMapDirectionType(vars.mapDirectionType);
 
             }
         });
     }
 
-    private void setMapDirectoinType(MapDirectionType type)
+    private void setMapDirectionType(MapDirectionType type)
     {
         vars.mapDirectionType = type;
         MapPosition pos = vars.map.getMapPosition();
@@ -531,11 +539,6 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
         vars.map.layers().add(mAirportSelectionLayer);//, vars.AVIATIONMARKERS_GROUP );
     }
 
-    public void addTrackingLayer()
-    {
-        trackingLayer = new Tracking(vars);
-    }
-
     public void addPlaybackLayer()
     {
         int c = Color.get(0xF4, 0x6E, 0x8F ); //.parseColor("fff46e8f");
@@ -668,7 +671,7 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
                     }
                     case connectDisconnect:
                     {
-                        ConnectionProcess();
+                        ConnectionProcess(menu);
                         break;
                     }
 
@@ -680,7 +683,7 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
                     }
                     case mapDirection:
                     {
-                        setMapDirectoinType(MapDirectionType.getNextDirectionType(vars.mapDirectionType));
+                        setMapDirectionType(MapDirectionType.getNextDirectionType(vars.mapDirectionType));
                         menu.setDirectionBtnIcon(vars.mapDirectionType);
                         break;
                     }
@@ -700,6 +703,11 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
                     {
                         vars.appLocked = !vars.appLocked;
                         menu.SetApplockedIcon(vars.appLocked);
+                        break;
+                    }
+                    case instruments:
+                    {
+                        setInstrumentsVisibility();
                         break;
                     }
                 }
@@ -733,8 +741,7 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
             }
         };
 
-        heightMapFragment.heightMapFragmentEvents = events;
-        heightMapFragment.setupTrackHeightMap(vars, trackLogId);
+        heightMapFragment.setupTrackHeightMap(vars, trackLogId, events);
     }
 
     private void setHeightMapFragment(Route route, Boolean parseFromService)
@@ -766,95 +773,6 @@ public class MainActivity extends BaseActivity implements DialogInterface.OnDism
             }
         });
         searchDialog.show(getSupportFragmentManager(), "Search");
-    }
-
-    private FspLocationProvider locationProvider;
-    private void ConnectionProcess()
-    {
-        if (connectStage == ConnectStage.disconnected) {
-            connectStage = ConnectStage.connecting;
-            menu.SetConnectingIcon();
-            locationProvider = new FspLocationProvider(vars);
-            locationProvider.Start(new LocationEvents() {
-                @Override
-                public void OnLocationChanged(LocationProviderType type, FspLocation location, String message, Boolean success) {
-                    if(success)
-                    {
-                        if (connectStage == ConnectStage.connecting) {
-                            menu.SetConnectDisConnectIcon(true);
-                            trackingLayer.start(vars.route);
-                            Log.i(TAG, "Location tracking started");
-                        }
-                        connectStage = ConnectStage.connected;
-                        Log.i("OnLocationChanged", "Success Message: " + message);
-                        if (location != null) {
-                            setLocation(location);
-                            trackingLayer.setLocation(vars.airplaneLocation);
-                        }
-                    }
-                    else
-                    {
-                        menu.SetConnectDisConnectIcon(false);
-                        connectStage = ConnectStage.disconnected;
-                        trackingLayer.stop();
-                        Log.i("OnLocationChanged", "Error Message: " + message);
-                        if (message.startsWith("Error")) {
-                            Toast error = Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG);
-                            error.show();
-                        }
-                    }
-                }
-            });
-        }
-        if (connectStage == ConnectStage.connected)
-        {
-            menu.SetConnectDisConnectIcon(false);
-            if (locationProvider != null)
-            {
-                locationProvider.Stop();
-            }
-            connectStage = ConnectStage.disconnected;
-        }
-    }
-
-    private void setLocation(FspLocation location)
-    {
-        vars.airplaneLocation.Assign(location);
-        vars.doDeviationLineFromLocation.Assign(location);
-
-        vars.mAircraftLocationLayer.UpdateLocation(vars.airplaneLocation);
-
-        MapPosition pos = vars.map.getMapPosition();
-        if (mapPosLockedToAirplanePos)
-        {
-            pos.setPosition(vars.airplaneLocation.getGeopoint());
-            vars.map.setMapPosition(pos);
-        }
-
-        if (vars.mapDirectionType==MapDirectionType.flight)
-        {
-            pos.setBearing(360-vars.airplaneLocation.getBearing());
-        }
-
-        if (vars.route != null)
-        {
-            if (vars.route.getLegs().size()>0)
-            {
-                vars.route.setAirplaneLocation(location);
-            }
-            vars.dashboardFragment.setLocation(vars.airplaneLocation, vars.route.getIndicatedAirspeed());
-        }
-        else
-        {
-            vars.dashboardFragment.setLocation(vars.airplaneLocation, 100d);
-        }
-
-        if (vars.heightMapFragment != null)
-        {
-            vars.heightMapFragment.setLocation(location);
-        }
-
-        vars.map.setMapPosition(pos);
     }
 
     @Override

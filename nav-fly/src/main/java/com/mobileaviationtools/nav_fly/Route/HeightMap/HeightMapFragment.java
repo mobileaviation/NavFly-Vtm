@@ -27,6 +27,7 @@ import org.oscim.core.GeoPoint;
 public class HeightMapFragment extends Fragment {
     private enum HeightMapType
     {
+        uninitialized,
         routeHeightMap,
         trackHeightMap
     }
@@ -55,13 +56,14 @@ public class HeightMapFragment extends Fragment {
     private ImageButton closeBtn;
     private TextView heightMapNameText;
     private ConstraintLayout heightMapBaseLayout;
-    public HeightMapFragmentEvents heightMapFragmentEvents;
+    private HeightMapFragmentEvents heightMapFragmentEvents;
     public ImageView heightMapImage;
     public Integer imageWidth;
     public Integer imageHeight;
     private HeightMapType heightMapType;
     private RouteHeightMapBitmap routeHeightMapBitmap;
     private TrackPoints trackPoints;
+    private Long trackId;
 
     private Button dragtestBtn;
 
@@ -69,11 +71,16 @@ public class HeightMapFragment extends Fragment {
     private double startIndex;
     private double endIndex;
 
-    public void setupTrackHeightMap(GlobalVars vars, Long trackId)
-    {
+    public void setupTrackHeightMap(GlobalVars vars, Long trackId, HeightMapFragmentEvents heightMapFragmentEvents) {
         this.vars = vars;
+        this.trackId = trackId;
         heightMapType = HeightMapType.trackHeightMap;
+        this.heightMapFragmentEvents = heightMapFragmentEvents;
+        drawTrackHeightMap(trackId);
+    }
 
+    private void drawTrackHeightMap(Long trackId)
+    {
         imageHeight = heightMapImage.getMeasuredHeight();
         imageWidth = heightMapImage.getMeasuredWidth();
 
@@ -92,13 +99,15 @@ public class HeightMapFragment extends Fragment {
         if (heightMapFragmentEvents != null) heightMapFragmentEvents.OnTrackLoaded(trackPoints);
     }
 
-    public void setupRouteHeightMap(final GlobalVars vars, HeightMapFragmentEvents heightMapFragmentEvents, boolean parseFromService)
-    {
+    public void setupRouteHeightMap(final GlobalVars vars, HeightMapFragmentEvents heightMapFragmentEvents, boolean parseFromService) {
         this.vars = vars;
         heightMapType = HeightMapType.routeHeightMap;
-
         this.heightMapFragmentEvents = heightMapFragmentEvents;
+        drawRouteHeightMap(parseFromService);
+    }
 
+    private void drawRouteHeightMap(boolean parseFromService)
+    {
         imageHeight = heightMapImage.getMeasuredHeight();
         imageWidth = heightMapImage.getMeasuredWidth();
 
@@ -136,7 +145,7 @@ public class HeightMapFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         this.view =  inflater.inflate(R.layout.fragment_height_map, container, false);
-
+        heightMapType = HeightMapType.uninitialized;
         heightMapBaseLayout = (ConstraintLayout) view.findViewById(R.id.heightMapBaseLayout);
 
         heightMapImage = (ImageView) view.findViewById(R.id.heightMapImageView);
@@ -161,6 +170,33 @@ public class HeightMapFragment extends Fragment {
     public void setVisibility(int visibility)
     {
         heightMapBaseLayout.setVisibility(visibility);
+    }
+
+    public void redraw()
+    {
+//        Integer vis = heightMapBaseLayout.getVisibility();
+//
+//        LayoutInflater inflater = LayoutInflater.from(getActivity());
+//        ViewGroup viewGroup = (ViewGroup) getView();
+//        viewGroup.removeAllViewsInLayout();
+//        view = onCreateView(inflater, viewGroup, null);
+//        viewGroup.addView(view);
+
+        switch (heightMapType)
+        {
+            case uninitialized: break;
+            case routeHeightMap:
+            {
+                //heightMapBaseLayout.setVisibility(vis);
+                drawRouteHeightMap(false);
+                break;
+            }
+            case trackHeightMap: {
+                //heightMapBaseLayout.setVisibility(vis);
+                drawTrackHeightMap(trackId);
+                break;
+            }
+        }
     }
 
     public void setLocation(FspLocation location)

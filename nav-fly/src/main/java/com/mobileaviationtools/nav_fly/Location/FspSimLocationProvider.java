@@ -185,6 +185,9 @@ public class FspSimLocationProvider implements IFspLocationProvider{
         setLocation(offsetMap, location);
         setHeading(offsetMap, location);
         setAltitude(offsetMap, location);
+        setVsi(offsetMap, location);
+        setTurnCoordination(offsetMap, location);
+        setHorizon(offsetMap, location);
 
         location.setTime((new Date()).getTime());
 
@@ -266,6 +269,68 @@ public class FspSimLocationProvider implements IFspLocationProvider{
         catch (Exception ee)
         {
             Log.e(TAG, "setAltitude exception: " + ee.getMessage());
+        }
+    }
+
+    private void setVsi(HashMap<Integer, OffsetResponse> offsetMap, FspLocation location)
+    {
+        try
+        {
+            OffsetResponse o = offsetMap.get(0x0842);
+            if (o != null)
+            {
+                double vs = Double.parseDouble(o.Value);
+                vs = (vs * 3.2808399d)/100; // meters to feet
+                location.verticalSpeed = vs;
+            }
+        }
+        catch (Exception ee)
+        {
+            Log.e(TAG, "setVsi exception: " + ee.getMessage());
+        }
+    }
+
+    private void setTurnCoordination(HashMap<Integer, OffsetResponse> offsetMap, FspLocation location)
+    {
+        try
+        {
+            OffsetResponse o = offsetMap.get(0x037C);
+            if (o!=null)
+            {
+                double tcp = Double.parseDouble(o.Value);
+                o = offsetMap.get(0x036E);
+                if (o != null)
+                {
+                    double tcb = Double.parseDouble(o.Value);
+                    location.turnCoordination[0] = tcp;
+                    location.turnCoordination[1] = tcb;
+                }
+            }
+        }
+        catch (Exception ee)
+        {
+            Log.e(TAG, "setTurnCoordination exception: " + ee.getMessage());
+        }
+    }
+
+    private void setHorizon(HashMap<Integer, OffsetResponse> offsetMap, FspLocation location)
+    {
+        try
+        {
+            OffsetResponse o = offsetMap.get(0x057C);
+            if (o != null){
+                double bb = (Double.parseDouble(o.Value) * 360d) / (65536d*65536d);
+                o = offsetMap.get(0x0578);
+                if (o != null){
+                    double pi = (Double.parseDouble(o.Value) * 360d) / (65536d*65536d);
+                    location.horizon[0] = bb;
+                    location.horizon[1] = pi;
+                }
+            }
+        }
+        catch (Exception ee)
+        {
+            Log.e(TAG, "setHorizon exception: " + ee.getMessage());
         }
     }
 

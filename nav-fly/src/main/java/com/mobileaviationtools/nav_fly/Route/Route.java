@@ -2,12 +2,14 @@ package com.mobileaviationtools.nav_fly.Route;
 
 import android.util.Log;
 
+import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.example.aircraft.Aircraft;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
+import com.mobileaviationtools.nav_fly.Classes.Direction;
 import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
 import com.mobileaviationtools.nav_fly.GlobalVars;
@@ -332,7 +334,6 @@ public class Route extends ArrayList<Waypoint> {
         newWaypoint.type = WaypointType.waypoint;
         Integer index = indexOf(selectedLeg.endWaypoint);
         Route.this.add(index, newWaypoint);
-
         return  newWaypoint;
     }
 
@@ -343,7 +344,8 @@ public class Route extends ArrayList<Waypoint> {
         if (cities.size()>0)
         {
             City nearestCity = cities.get(cities.getNearestCity());
-            name = nearestCity.name + " " + nearestCity.getDistanceNMStr() + ", " + nearestCity.getBearingStr();
+            Direction dir = Direction.parseHeading(nearestCity.getRadial());
+            name = nearestCity.getDistanceNMStr() + " " + dir.toString() + " of " + nearestCity.name;
         }
 
 //        for (City c : cities)
