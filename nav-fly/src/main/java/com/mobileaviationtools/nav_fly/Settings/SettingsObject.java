@@ -183,6 +183,10 @@ public class SettingsObject  {
     {
         return baseCache;
     }
+    public void ClearBaseCache()
+    {
+        baseCache.deleteAllTiles();
+    }
 
     private SettingsEvent settingsEvent;
     public void SetSettingsEvent(SettingsEvent settingsEvent){ this.settingsEvent = settingsEvent; }

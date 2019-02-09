@@ -39,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class TileCache implements ITileCache {
 
@@ -96,6 +97,7 @@ public class TileCache implements ITileCache {
     private final SQLiteStatement mStmtGetTile;
     private final SQLiteStatement mStmtPutTile;
     private final SQLiteStatement mStmtDelTile;
+    private final SQLiteStatement mStmtDelAllTiles;
 
     //private final SQLiteStatement mStmtUpdateTile;
 
@@ -131,6 +133,9 @@ public class TileCache implements ITileCache {
         mStmtDelTile = mDatabase.compileStatement("" +
                 "DELETE FROM " + TABLE_NAME +
                 " WHERE x=? AND y=? AND z=?");
+
+        mStmtDelAllTiles = mDatabase.compileStatement("" +
+                "DELETE FROM " + TABLE_NAME);
 
         //mStmtUpdateTile = mDatabase.compileStatement("" +
         //        "UPDATE " + TABLE_NAME +
@@ -221,8 +226,8 @@ public class TileCache implements ITileCache {
             mStmtPutTile.bindLong(1, tile.tileX);
             mStmtPutTile.bindLong(2, tile.tileY);
             mStmtPutTile.bindLong(3, tile.zoomLevel);
-            mStmtPutTile.bindLong(4, 0);
-            mStmtPutTile.bindLong(5, 0);
+            mStmtPutTile.bindLong(4, new Date().getTime());   // time
+            mStmtPutTile.bindLong(5, 0);    // lastaccess
             mStmtPutTile.bindBlob(6, bytes);
 
             mStmtPutTile.execute();
@@ -239,6 +244,13 @@ public class TileCache implements ITileCache {
 
             mStmtDelTile.execute();
             mStmtDelTile.clearBindings();
+        }
+    }
+
+    public void deleteAllTiles()
+    {
+        synchronized (mStmtDelAllTiles) {
+            mStmtDelAllTiles.execute();
         }
     }
 

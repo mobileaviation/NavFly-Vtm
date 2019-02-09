@@ -24,7 +24,7 @@ public abstract class RouteDao {
     @Query("SELECT * FROM tbl_Route WHERE id=:id")
     public abstract Route getRouteById(Long id);
 
-    @Query("SELECT * FROM tbl_Route ORDER BY id")
+    @Query("SELECT * FROM tbl_Route ORDER BY id DESC")
     public abstract List<Route> getAllRoutes();
 
     @Query("SELECT * FROM tbl_Route WHERE name=:name")

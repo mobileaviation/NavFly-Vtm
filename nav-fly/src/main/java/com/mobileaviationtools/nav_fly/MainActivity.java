@@ -609,7 +609,6 @@ public class MainActivity extends LocationActivity implements DialogInterface.On
     {
         vars.baseChart = new BaseChart(vars);
         vars.baseChart.setBaseCharts(vars.baseChartType);
-
     }
 
     void createLayers() {

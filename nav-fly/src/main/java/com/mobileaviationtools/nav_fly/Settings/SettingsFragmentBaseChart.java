@@ -1,12 +1,15 @@
 package com.mobileaviationtools.nav_fly.Settings;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
@@ -41,6 +44,7 @@ public class SettingsFragmentBaseChart extends Fragment {
     private Context context;
     private GlobalVars vars;
     private View view;
+    private Button clearCacheBtn;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,7 @@ public class SettingsFragmentBaseChart extends Fragment {
 
         RadioGroup basemapRadioGroup = view.findViewById(R.id.basemapRadioGroup);
         CheckBox cacheMapCheckBox = view.findViewById(R.id.cacheMapCheckBox);
+        clearCacheBtn = view.findViewById(R.id.clearCacheBtn);
 
         int r = 0;
         switch (getSelectedBaseChart())
@@ -78,6 +83,7 @@ public class SettingsFragmentBaseChart extends Fragment {
 
         basemapRadioGroup.check(r);
         cacheMapCheckBox.setChecked(getCache());
+        setupClearCachBtn();
 
         basemapRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -97,6 +103,31 @@ public class SettingsFragmentBaseChart extends Fragment {
         });
 
         return view;
+    }
+
+    private void setupClearCachBtn()
+    {
+        clearCacheBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder clearCacheDialog = new AlertDialog.Builder(getContext());
+                clearCacheDialog.setPositiveButton("Clear", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        vars.settingsObject.ClearBaseCache();
+                    }
+                });
+                clearCacheDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                clearCacheDialog.setTitle("Clear cache");
+                clearCacheDialog.setMessage("Are you sure you want to delete all the maps from the local cache?");
+                clearCacheDialog.show();
+            }
+        });
     }
 
     private BaseChartType getSelectedBaseChart()
