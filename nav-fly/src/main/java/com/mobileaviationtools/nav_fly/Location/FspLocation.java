@@ -4,6 +4,8 @@ import android.location.Location;
 
 import org.oscim.core.GeoPoint;
 
+import java.lang.reflect.Array;
+
 public class FspLocation extends Location {
     public FspLocation(String provider) {
         super(provider);
@@ -24,8 +26,8 @@ public class FspLocation extends Location {
 
     private void createArrays()
     {
-        turnCoordination = new Double[2];
-        horizon = new Double[2];
+        turnCoordination = new Double[]{0d,0d};
+        horizon = new Double[]{0d,0d};
     }
 
     public Double verticalSpeed;

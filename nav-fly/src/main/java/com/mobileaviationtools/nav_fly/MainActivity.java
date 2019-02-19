@@ -1,11 +1,13 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Location;
@@ -125,6 +127,7 @@ public class MainActivity extends LocationActivity implements DialogInterface.On
     SelectionLayer mAirportSelectionLayer;
     AirspaceLayer mAirspaceLayer;
     PlaybackLayer playbackLayer;
+    Integer initial_orientation;
 
     Boolean fromMenu;
 
@@ -233,6 +236,8 @@ public class MainActivity extends LocationActivity implements DialogInterface.On
     {
         connectStage = ConnectStage.disconnected;
         vars.doDeviationLineFromLocation = new FspLocation("DeviationFromLocation");
+
+        initial_orientation = this.getRequestedOrientation();
 
         createSettingsObject();
 
@@ -702,6 +707,12 @@ public class MainActivity extends LocationActivity implements DialogInterface.On
                     {
                         vars.appLocked = !vars.appLocked;
                         menu.SetApplockedIcon(vars.appLocked);
+
+                        if (vars.appLocked)
+                            MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+                        else
+                            MainActivity.this.setRequestedOrientation(initial_orientation);
+
                         break;
                     }
                     case instruments:

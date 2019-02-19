@@ -293,30 +293,28 @@ public class Route extends ArrayList<Waypoint> {
             @Override
             public boolean onGesture(Gesture g, MotionEvent e) {
                 if (g instanceof Gesture.Tap) {
-                    if (contains(e.getX(), e.getY())) {
-                        Log.i(TAG, "Tapped on route, at: " + mMap.viewport().fromScreenPoint(e.getX(), e.getY()));
-                        GeoPoint point = mMap.viewport().fromScreenPoint(e.getX(), e.getY());
+                    if (!vars.appLocked) {
+                        if (contains(e.getX(), e.getY())) {
+                            Log.i(TAG, "Tapped on route, at: " + mMap.viewport().fromScreenPoint(e.getX(), e.getY()));
+                            GeoPoint point = mMap.viewport().fromScreenPoint(e.getX(), e.getY());
 
-                        Leg selectedLeg = legs.findLeg(point);
-                        if (selectedLeg != null)
-                        {
-                            // Test
-                            //routePathLayer.SelectLeg(selectedLeg);
+                            Leg selectedLeg = legs.findLeg(point);
+                            if (selectedLeg != null) {
+                                Waypoint newWaypoint = InsertnewWaypoint(point, selectedLeg);
+                                createLegs();
+                                setupRouteVariables();
+                                clearPathLayer();
+                                DrawRoute(mMap);
+                                setDeviationLineStartLocation(point);
+                                updateLegData();
+                                vars.dashboardFragment.setLocation(vars.airplaneLocation, indicatedAirspeed);
 
+                                if (routeEvents != null)
+                                    routeEvents.NewWaypointInserted(Route.this, newWaypoint);
+                            }
 
-                            Waypoint newWaypoint = InsertnewWaypoint(point, selectedLeg);
-                            createLegs();
-                            setupRouteVariables();
-                            clearPathLayer();
-                            DrawRoute(mMap);
-                            setDeviationLineStartLocation(point);
-                            updateLegData();
-                            vars.dashboardFragment.setLocation(vars.airplaneLocation, indicatedAirspeed);
-
-                            if (routeEvents != null) routeEvents.NewWaypointInserted(Route.this, newWaypoint);
+                            return true;
                         }
-
-                        return true;
                     }
                 }
                 return false;

@@ -18,6 +18,8 @@ import com.mobileaviationtools.nav_fly.R;
  */
 public class InstrumentsFragment extends Fragment {
 
+    private Float meterToFeet = 3.2808399f; // meters to feet
+
     public InstrumentsFragment() {
         // Required empty public constructor
 
@@ -65,8 +67,8 @@ public class InstrumentsFragment extends Fragment {
             setAirspeed(location.getSpeed());
             setAltimeter(location.getAltitude());
             setVsi(location.verticalSpeed);
-            setTurnCoordinator(location.turnCoordination[0], location.turnCoordination[1]);
-            setHorizon(location.horizon[0], location.horizon[1]);
+            setTurnCoordinator(location.turnCoordination);
+            setHorizon(location.horizon);
         }
     }
 
@@ -76,9 +78,10 @@ public class InstrumentsFragment extends Fragment {
             setCompass(90);
             setAirspeed(0);
             setAltimeter(0);
-            setVsi(0);
-            setTurnCoordinator(0, 0);
-            setHorizon(0, 0);
+            setVsi(0d);
+            Double d[] = new Double[]{0d,0d};
+            setTurnCoordinator(d);
+            setHorizon(d);
         }
     }
 
@@ -103,31 +106,41 @@ public class InstrumentsFragment extends Fragment {
     {
         if (instrumentsVisible) {
             AltimeterView a = (AltimeterView) getView().findViewById(R.id.altimeterView);
-            a.setHeight((float)height);
+            a.setHeight((float)height * meterToFeet);
         }
     }
 
-    private void setVsi(double speed)
+    private void setVsi(Double speed)
     {
         if (instrumentsVisible) {
-            VerticalSpeedIndicatorView v = (VerticalSpeedIndicatorView) getView().findViewById(R.id.vsiView);
-            v.setSpeed((float)speed);
+            if (speed != null) {
+                VerticalSpeedIndicatorView v = (VerticalSpeedIndicatorView) getView().findViewById(R.id.vsiView);
+                v.setSpeed(speed.floatValue());
+            }
         }
     }
 
-    private void setTurnCoordinator(double turn, double ball)
+    private void setTurnCoordinator(Double[] turnIndicatorVals)//(double turn, double ball)
     {
         if (instrumentsVisible) {
-            TurnCoordinatorView t = (TurnCoordinatorView) getView().findViewById(R.id.turnCoordinatorView);
-            t.setTurnCoordinator((float)turn, (float)ball);
+            if (turnIndicatorVals != null) {
+                if (turnIndicatorVals.length==2) {
+                    TurnCoordinatorView t = (TurnCoordinatorView) getView().findViewById(R.id.turnCoordinatorView);
+                    t.setTurnCoordinator(turnIndicatorVals[0].floatValue(), turnIndicatorVals[1].floatValue());
+                }
+            }
         }
     }
 
-    private void setHorizon(double bank, double pitch)
+    private void setHorizon(Double[] horizonVals)//(double bank, double pitch)
     {
         if (instrumentsVisible) {
-            HorizonView h = (HorizonView) getView().findViewById(R.id.horizonView);
-            h.setHorizon((float)bank, (float)pitch);
+            if (horizonVals!= null) {
+                if (horizonVals.length==2) {
+                    HorizonView h = (HorizonView) getView().findViewById(R.id.horizonView);
+                    h.setHorizon(horizonVals[0].floatValue(), horizonVals[1].floatValue());
+                }
+            }
         }
     }
 }
