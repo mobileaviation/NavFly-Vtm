@@ -708,8 +708,10 @@ public class MainActivity extends LocationActivity implements DialogInterface.On
                         vars.appLocked = !vars.appLocked;
                         menu.SetApplockedIcon(vars.appLocked);
 
-                        if (vars.appLocked)
+                        if (vars.appLocked) {
+                            initial_orientation = MainActivity.this.getRequestedOrientation();
                             MainActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+                        }
                         else
                             MainActivity.this.setRequestedOrientation(initial_orientation);
 
