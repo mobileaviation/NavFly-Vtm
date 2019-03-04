@@ -1,10 +1,8 @@
 package com.mobileaviationtools.nav_fly.Route.Weather;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -18,15 +16,6 @@ import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
-import com.mobileaviationtools.weater_notam_data.services.WeatherServices;
-import com.mobileaviationtools.weater_notam_data.weather.Metar;
-import com.mobileaviationtools.weater_notam_data.weather.Taf;
-
-import org.oscim.core.MapPosition;
-import org.oscim.map.Map;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WeatherListLayout extends LinearLayout {
     private String TAG = "WeatherListLayout";
@@ -91,9 +80,12 @@ public class WeatherListLayout extends LinearLayout {
                     if (weatherProgressBar != null) weatherProgressBar.setVisibility(VISIBLE);
                     FspLocation loc = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "weatherLoc");
                     if (Helpers.isConnected(vars.context))
-                        stations.getWeatherData(loc, 100l);
+                        stations.getWeatherData(loc, vars.route, 100l);
                     else
-                        stations.getDatabaseWeather(loc.getGeopoint(), 100l);
+                        if(vars.route==null)
+                            stations.getDatabaseWeatherByLocationAndDistance(loc.getGeopoint(), 100l);
+                        else
+                            stations.getDatabaseWeatherByRoute(vars.route.getFlightPathGeometry());
                 }
             }
         });

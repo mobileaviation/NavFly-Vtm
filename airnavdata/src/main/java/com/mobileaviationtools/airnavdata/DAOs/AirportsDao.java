@@ -28,6 +28,9 @@ public abstract class AirportsDao {
     @Query("SELECT * FROM tbl_Airports WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat)")
     public abstract Airport[] getAirportsWithinBounds(double Wlon, double Elon, double Nlat, double Slat);
 
+    @Query("SELECT * FROM tbl_Airports WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat)  AND type IN(:types)")
+    public abstract List<Airport> getAirportListWithinBoundsByTypes(double Wlon, double Elon, double Nlat, double Slat, List<String> types);
+
     @Query("SELECT * FROM tbl_Airports WHERE (longitude_deg BETWEEN :Wlon AND :Elon AND latitude_deg BETWEEN :Slat AND :Nlat) AND type IN(:types)")
     public abstract Airport[] getAirportsWithinBoundsByTypes(double Wlon, double Elon, double Nlat, double Slat, List<String> types);
 

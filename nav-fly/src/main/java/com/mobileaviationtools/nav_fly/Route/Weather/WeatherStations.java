@@ -4,24 +4,17 @@ import android.content.Context;
 import android.util.Log;
 
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
-import com.mobileaviationtools.weater_notam_data.Values;
+import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.weater_notam_data.services.WeatherResponseEvent;
 import com.mobileaviationtools.weater_notam_data.services.WeatherServices;
 import com.mobileaviationtools.weater_notam_data.weather.Metar;
 import com.mobileaviationtools.weater_notam_data.weather.Taf;
 
+import org.locationtech.jts.geom.Geometry;
 import org.oscim.core.GeoPoint;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class WeatherStations extends ArrayList<Station> {
     public interface WeatherDataReceivedEvent
@@ -51,6 +44,8 @@ public class WeatherStations extends ArrayList<Station> {
     private Boolean tafs_received;
     private Boolean metars_received;
 
+    private GeoPoint location;
+
 
     private void setWeatherResponse()
     {
@@ -59,7 +54,7 @@ public class WeatherStations extends ArrayList<Station> {
             public void OnMetarsResponse(List<Metar> metars, GeoPoint location, String message) {
                 //fireEvent++;
                 metars_received = true;
-                setMetars(metars, location);
+                setMetars(metars, (location==null) ? WeatherStations.this.location : location);
                 fireEvent();
             }
 
@@ -72,10 +67,13 @@ public class WeatherStations extends ArrayList<Station> {
             }
 
             @Override
-            public void OnFailure(String message, GeoPoint location, Long distance) {
+            public void OnFailure(String message, GeoPoint location, Long distance, Geometry route) {
                 Log.e(TAG, "Error retrieving weather: " + message);
                 Log.i(TAG, "get stored weather data from the database..");
-                getDatabaseWeather(location, distance);
+                if (location != null && distance!= null)
+                    getDatabaseWeatherByLocationAndDistance(location, distance);
+                if (route != null)
+                    getDatabaseWeatherByRoute(route);
             }
         };
     }
@@ -95,7 +93,8 @@ public class WeatherStations extends ArrayList<Station> {
             {
                 this.add(station);
             }
-            m.distance_to_org_m = (float) location.sphericalDistance(new GeoPoint(m.latitude, m.longitude));
+            if (location != null)
+                m.distance_to_org_m = (float) location.sphericalDistance(new GeoPoint(m.latitude, m.longitude));
             station.setMetar(m);
         }
     }
@@ -130,22 +129,37 @@ public class WeatherStations extends ArrayList<Station> {
         }
     }
 
-    public void getDatabaseWeather(GeoPoint location, long distance)
+    public void getDatabaseWeatherByLocationAndDistance(GeoPoint location, long distance)
     {
         DatabaseWeatherServices databaseWeatherServices = new DatabaseWeatherServices(context);
         databaseWeatherServices.GetMetarsByLocationAndRadius(location, distance, weatherResponseEvent);
         databaseWeatherServices.GetTafsByLocationAndRadius(location, distance, weatherResponseEvent);
     }
 
-    public void getWeatherData(FspLocation location, Long distance)
+    public void getDatabaseWeatherByRoute(Geometry route)
+    {
+        DatabaseWeatherServices databaseWeatherServices = new DatabaseWeatherServices(context);
+        databaseWeatherServices.GetMetarsByRoute(route, weatherResponseEvent);
+        databaseWeatherServices.GetTafsByRoute(route, weatherResponseEvent);
+    }
+
+    public void getWeatherData(FspLocation location, Route route, Long distance)
     {
         fireEvent = 0;
         this.clear();
         GeoPoint pos = new GeoPoint(location.getLatitude(), location.getLongitude());
+        this.location = pos;
 
         WeatherServices weatherServices = new WeatherServices();
-        weatherServices.GetTafsByLocationAndRadius(pos, distance, weatherResponseEvent);
-        weatherServices.GetMetarsByLocationAndRadius(pos, distance, weatherResponseEvent);
+        if (route == null) {
+            weatherServices.GetTafsByLocationAndRadius(pos, distance, weatherResponseEvent);
+            weatherServices.GetMetarsByLocationAndRadius(pos, distance, weatherResponseEvent);
+        } else
+        {
+            this.location = pos;
+            weatherServices.GetTafsByRoute(route.getFlightPathGeometry(), weatherResponseEvent);
+            weatherServices.GetMetarsByRoute(route.getFlightPathGeometry(), weatherResponseEvent);
+        }
     }
 
     private Integer getStationNearestToOrg(GeoPoint location)

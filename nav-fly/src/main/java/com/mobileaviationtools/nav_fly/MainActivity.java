@@ -1,7 +1,6 @@
 package com.mobileaviationtools.nav_fly;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,25 +11,19 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Toast;
 
-import com.example.aircraft.Types.PiperArcher;
 import com.mobileaviationtools.airnavdata.AirnavChartsDatabase;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavUserSettingsDatabase;
-import com.mobileaviationtools.airnavdata.Api.AirnavClient;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
@@ -47,10 +40,6 @@ import com.mobileaviationtools.nav_fly.Layers.AirspaceLayer;
 import com.mobileaviationtools.nav_fly.Layers.DeviationLineLayer;
 import com.mobileaviationtools.nav_fly.Layers.SelectionLayer;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
-import com.mobileaviationtools.nav_fly.Location.FspLocationProvider;
-import com.mobileaviationtools.nav_fly.Location.LocationEvents;
-import com.mobileaviationtools.nav_fly.Location.LocationProviderType;
-import com.mobileaviationtools.nav_fly.Location.Tracking;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkersLayer;
 import com.mobileaviationtools.nav_fly.Markers.Airport.AirportSelected;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NaviadMarkersLayer;
@@ -83,17 +72,11 @@ import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
 
-import org.oscim.android.MapPreferences;
-import org.oscim.android.MapView;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.event.Event;
-import org.oscim.layers.tile.bitmap.BitmapTileLayer;
-import org.oscim.layers.tile.buildings.BuildingLayer;
-import org.oscim.layers.tile.vector.VectorTileLayer;
-import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Map;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.GLViewport;
@@ -102,15 +85,7 @@ import org.oscim.scalebar.ImperialUnitAdapter;
 import org.oscim.scalebar.MapScaleBar;
 import org.oscim.scalebar.MapScaleBarLayer;
 import org.oscim.scalebar.MetricUnitAdapter;
-import org.oscim.theme.VtmThemes;
-import org.oscim.tiling.TileSource;
-import org.oscim.tiling.source.OkHttpEngine;
-import org.oscim.tiling.source.mapfile.MapFileTileSource;
-import org.oscim.tiling.source.mvt.NextzenMvtTileSource;
-import org.oscim.tiling.source.mvt.OpenMapTilesMvtTileSource;
-import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
-import java.io.File;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -371,9 +346,13 @@ public class MainActivity extends LocationActivity implements DialogInterface.On
             public void run() {
                 FspLocation location = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "Weatherlocation");
                 if (Helpers.isConnected(MainActivity.this))
-                    stations.getWeatherData(location, 100l);
-                else
-                    stations.getDatabaseWeather(location.getGeopoint(), 100l);
+                    stations.getWeatherData(location, vars.route, 100l);
+                else {
+                    if (vars.route != null)
+                        stations.getDatabaseWeatherByRoute(vars.route.getFlightPathGeometry());
+                    else
+                        stations.getDatabaseWeatherByLocationAndDistance(location.getGeopoint(), 100l);
+                }
 
                 notamRetrieval.startNotamRetrieval(false);
 
@@ -404,10 +383,12 @@ public class MainActivity extends LocationActivity implements DialogInterface.On
         });
         FspLocation loc = new FspLocation(vars.map.getMapPosition().getGeoPoint(), "weatherLoc");
         if (Helpers.isConnected(this))
-            stations.getWeatherData(loc, 100l);
+            stations.getWeatherData(loc, vars.route, 100l);
         else
-            stations.getDatabaseWeather(loc.getGeopoint(), 100l);
-        // TODO Add code to retrieve notams
+            if (vars.route != null)
+                stations.getDatabaseWeatherByRoute(vars.route.getFlightPathGeometry());
+            else
+                stations.getDatabaseWeatherByLocationAndDistance(loc.getGeopoint(), 100l);
     }
 
     private void setupNotamsRetrieval()

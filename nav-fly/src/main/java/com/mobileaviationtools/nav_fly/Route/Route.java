@@ -6,10 +6,12 @@ import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.example.aircraft.Aircraft;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;
+import com.mobileaviationtools.airnavdata.Classes.AirportType;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
 import com.mobileaviationtools.airnavdata.Entities.Fix;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
 import com.mobileaviationtools.nav_fly.Classes.Direction;
+import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.Classes.MarkerDragEvent;
 import com.mobileaviationtools.nav_fly.GlobalVars;
@@ -18,6 +20,11 @@ import com.mobileaviationtools.nav_fly.Info.City;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Route.HeightMap.RoutePoints;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Canvas;
 import org.oscim.core.GeoPoint;
@@ -29,6 +36,9 @@ import org.oscim.map.Map;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import static org.locationtech.jts.operation.buffer.BufferParameters.CAP_ROUND;
 
 public class Route extends ArrayList<Waypoint> {
     public Route(String name, GlobalVars vars)
@@ -225,10 +235,65 @@ public class Route extends ArrayList<Waypoint> {
         legBufferLayer.showRoutePoints();
     }
 
-
     private void createNewBufferLayer()
     {
         legBufferLayer = new LegBufferLayer(vars, this, true);
+    }
+
+    public ArrayList<String> getAirportWithinRouteBuffer()
+    {
+        final double radius = 0.25d;
+
+        Geometry routeBuffer = getRouteBuffer(radius);
+        Geometry routeEnvelope = routeBuffer.getEnvelope();
+
+        ArrayList<String> result = new ArrayList<>();
+
+        if (routeEnvelope.getNumPoints()>3) {
+            Coordinate[] coordinates = routeEnvelope.getCoordinates();
+            AirnavDatabase db1 = AirnavDatabase.getInstance(vars.context);
+
+            ArrayList<String> types = new ArrayList<>();
+            types.add(AirportType.large_airport.toString());
+            types.add(AirportType.medium_airport.toString());
+            types.add(AirportType.small_airport.toString());
+            List<Airport> _airports = db1.getAirport().getAirportListWithinBoundsByTypes(
+                    coordinates[0].x,
+                    coordinates[2].x,
+                    coordinates[2].y,
+                    coordinates[0].y,
+                    types);
+
+            for(Airport a: _airports)
+            {
+                Geometry p = new GeometryFactory().createPoint(new Coordinate(a.longitude_deg, a.latitude_deg));
+                if (routeBuffer.contains(p))
+                {
+                    result.add(a.ident);
+                }
+            }
+            return result;
+        }
+
+        return result;
+    }
+
+    public Geometry getRouteBuffer(double radius)
+    {
+        return getFlightPathGeometry().buffer(radius, 20, CAP_ROUND);
+    }
+
+    public Geometry getFlightPathGeometry()
+    {
+        Coordinate[] coordinates = new Coordinate[this.size()];
+        int i=0;
+        for (Waypoint a: this)
+        {
+            coordinates[i++] = GeometryHelpers.getCoordinate(a.point);
+        }
+
+        GeometryFactory f = new GeometryFactory();
+        return f.createLineString(coordinates);
     }
 
     private void createNewMarkerLayer(Map map)

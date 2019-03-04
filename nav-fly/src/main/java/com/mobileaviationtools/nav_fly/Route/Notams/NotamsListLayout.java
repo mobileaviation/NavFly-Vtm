@@ -100,7 +100,6 @@ public class NotamsListLayout extends LinearLayout {
                         setNotamItemListClickItem();
                     }
                 });
-                toggleNotamsProgressVisibility(false);
             }
 
             @Override
@@ -134,7 +133,10 @@ public class NotamsListLayout extends LinearLayout {
     {
         NotamRetrieval notamRetrieval = new NotamRetrieval(vars);
         notamRetrieval.setNotamsRetrievedResponseEvent(notamResponseEvent);
-        notamRetrieval.startNotamRetrieval(fromDatabase);
+        if (vars.route != null)
+            notamRetrieval.startNotamRetrievalByRouteBuffer(fromDatabase, vars.route);
+        else
+            notamRetrieval.startNotamRetrieval(fromDatabase);
     }
 
     private void setNotamItemListClickItem()

@@ -29,6 +29,11 @@ public class GeometryHelpers {
         }
     }
 
+    public static Coordinate getCoordinate(GeoPoint point)
+    {
+        return new Coordinate(point.getLongitude(), point.getLatitude());
+    }
+
     public static GeoPoint midPoint(GeoPoint point1 ,GeoPoint point2){
 
         double dLon = Math.toRadians(point2.getLongitude() - point1.getLongitude());

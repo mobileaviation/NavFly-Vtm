@@ -3,17 +3,18 @@ package com.mobileaviationtools.weater_notam_data.services;
 import com.mobileaviationtools.weater_notam_data.Values;
 import com.mobileaviationtools.weater_notam_data.weather.MetarsResponse;
 import com.mobileaviationtools.weater_notam_data.weather.TafsResponse;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.oscim.core.GeoPoint;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -29,6 +30,7 @@ public class WeatherServices {
 
     private GeoPoint location;
     private Long distance;
+    private Geometry route;
 
     public void GetMetarsByLocationAndRadius(GeoPoint location, Long distance, WeatherResponseEvent weatherResponseEvent)
     {
@@ -46,6 +48,22 @@ public class WeatherServices {
         doCall(cmd, request, weatherResponseEvent);
     }
 
+    public void GetMetarsByRoute(Geometry route, WeatherResponseEvent weatherResponseEvent)
+    {
+        String cmd = "metars";
+        HttpUrl.Builder urlBuilder = buildBaseUrl(cmd);
+        Request request = getDataByRoute(route, urlBuilder);
+        doCall(cmd, request, weatherResponseEvent);
+    }
+
+    public void GetTafsByRoute(Geometry route, WeatherResponseEvent weatherResponseEvent)
+    {
+        String cmd = "tafs";
+        HttpUrl.Builder urlBuilder = buildBaseUrl(cmd);
+        Request request = getDataByRoute(route, urlBuilder);
+        doCall(cmd, request, weatherResponseEvent);
+    }
+
     private Request getDataByLocationAndRadius(GeoPoint location, Long distance, HttpUrl.Builder urlBuilder)
     {
         this.location = location;
@@ -57,6 +75,30 @@ public class WeatherServices {
         command = command.replace("#LAT#", Double.toString(location.getLatitude()));
 
         urlBuilder.addQueryParameter("radialDistance", command);
+        urlBuilder.addQueryParameter("hoursBeforeNow", "1");
+        urlBuilder.addQueryParameter("mostRecentForEachStation", "true");
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build().toString())
+                .build();
+
+        return request;
+    }
+
+    private Request getDataByRoute(Geometry route, HttpUrl.Builder urlBuilder)
+    {
+        this.route = route;
+
+        String fp = "30;";
+        for (Coordinate c: route.getCoordinates())
+        {
+            String loc = Double.toString(c.x) + "," + Double.toString(c.y);
+            fp = fp + loc + ";";
+        }
+
+        fp = fp.substring(0, fp.length()-1);
+
+        urlBuilder.addQueryParameter("flightPath", fp);
         urlBuilder.addQueryParameter("hoursBeforeNow", "1");
         urlBuilder.addQueryParameter("mostRecentForEachStation", "true");
 
@@ -100,7 +142,7 @@ public class WeatherServices {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if (event != null) event.OnFailure(e.getMessage(), location, distance);
+                if (event != null) event.OnFailure(e.getMessage(), location, distance, route);
             }
 
             @Override
@@ -126,7 +168,7 @@ public class WeatherServices {
         catch (Exception e)
         {
             if (event != null) event.OnFailure(e.getMessage() + "Metar Response: "
-                    + responseMessage + " XML: " + xml, location, distance);
+                    + responseMessage + " XML: " + xml, location, distance, route);
         }
     }
 
@@ -142,7 +184,7 @@ public class WeatherServices {
         catch (Exception e)
         {
             if (event != null) event.OnFailure(e.getMessage() + "TAF Response: "
-                    + responseMessage + " XML: " + xml, location, distance);
+                    + responseMessage + " XML: " + xml, location, distance, route);
         }
     }
 }

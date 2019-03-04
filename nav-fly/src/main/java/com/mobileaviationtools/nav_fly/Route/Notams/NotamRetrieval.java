@@ -4,12 +4,13 @@ import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavAirportInfoDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Airport;
-import com.mobileaviationtools.airnavdata.Entities.Metar;
 import com.mobileaviationtools.airnavdata.Entities.Notam;
+//import com.mobileaviationtools.airnavdata.Entities.Route;
 import com.mobileaviationtools.nav_fly.Classes.GeometryHelpers;
 import com.mobileaviationtools.nav_fly.Classes.Helpers;
 import com.mobileaviationtools.nav_fly.Classes.MapperHelper;
 import com.mobileaviationtools.nav_fly.GlobalVars;
+import com.mobileaviationtools.nav_fly.Route.Route;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCount;
 import com.mobileaviationtools.weater_notam_data.notams.NotamCounts;
 import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
@@ -18,6 +19,7 @@ import com.mobileaviationtools.weater_notam_data.services.NotamService;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 
@@ -90,33 +92,61 @@ public class NotamRetrieval {
 
     private NotamCounts retrieveNotamCountsFromDB(GeoPoint location, Long radius)
     {
-        AirnavAirportInfoDatabase db = AirnavAirportInfoDatabase.getInstance(vars.context);
         NotamCounts counts = new NotamCounts();
-        ArrayList<NotamCount> countList = new ArrayList<>();
 
         Long m = radius * 1609;
         Geometry c = GeometryHelpers.getCircle(location, m);
-        Geometry b = c.getEnvelope();
-        if (b.getNumPoints()>3) {
+
+        ArrayList<NotamCount> countList = getCountsListByGeometry(c);
+
+        if (countList.size()>0) {
+            counts.counts = countList.toArray(new NotamCount[countList.size()]);
+            counts.totalNumberOfNOTAMs = Long.valueOf(counts.counts.length);
+
+            return counts;
+        }
+
+        return null;
+    }
+
+    private NotamCounts retrieveNotamCountsByBufferFromDB(Geometry buffer)
+    {
+        ArrayList<NotamCount> countList = getCountsListByGeometry(buffer);
+        NotamCounts counts = new NotamCounts();
+
+        if (countList.size()>0) {
+            counts.counts = countList.toArray(new NotamCount[countList.size()]);
+            counts.totalNumberOfNOTAMs = Long.valueOf(counts.counts.length);
+
+            return counts;
+        }
+
+        return null;
+    }
+
+    private ArrayList<NotamCount> getCountsListByGeometry(Geometry geometry) {
+        ArrayList<NotamCount> countList = new ArrayList<>();
+        AirnavAirportInfoDatabase db = AirnavAirportInfoDatabase.getInstance(vars.context);
+
+        Geometry b = geometry.getEnvelope();
+        if (b.getNumPoints() > 3) {
             Coordinate[] coordinates = b.getCoordinates();
             List<Notam> stations = db.getNotam().getStationsListWithinBoundsLimit(coordinates[0].x,
                     coordinates[2].x,
                     coordinates[2].y,
                     coordinates[0].y);
-            for (Notam n : stations)
-            {
-                NotamCount count = new NotamCount();
-                count.icaoId = n.icaoId;
-                count.name = n.airportName;
-                count.notamCount = 0l;
-                count.notamsRetrievedDate = new Date(n.loadedDate);
-                countList.add(count);
+            for (Notam n : stations) {
+                Geometry p = new GeometryFactory().createPoint(new Coordinate(n.longitude, n.latitude));
+                if (geometry.contains(p)) {
+                    NotamCount count = new NotamCount();
+                    count.icaoId = n.icaoId;
+                    count.name = n.airportName;
+                    count.notamCount = 0l;
+                    count.notamsRetrievedDate = new Date(n.loadedDate);
+                    countList.add(count);
+                }
             }
-
-            counts.counts = countList.toArray(new NotamCount[countList.size()]);
-            counts.totalNumberOfNOTAMs = Long.valueOf(counts.counts.length);
-
-            return counts;
+            return countList;
         }
         return null;
     }
@@ -135,22 +165,53 @@ public class NotamRetrieval {
         MapPosition pos = vars.map.getMapPosition();
 
         if (fromDatabase)
-            startNotalRetrievalFromDatabase(pos.getGeoPoint());
+            startNotamRetrievalFromDatabaseByPoint(pos.getGeoPoint());
         else
             if (Helpers.isConnected(vars.context)) {
                 NotamService notamService = new NotamService();
                 notamService.GetCountsByLocationAndRadius(pos.getGeoPoint(), 100l, notamResponseEvent);
             } else
-                startNotalRetrievalFromDatabase(pos.getGeoPoint());
+                startNotamRetrievalFromDatabaseByPoint(pos.getGeoPoint());
 
     }
 
-    private void startNotalRetrievalFromDatabase(GeoPoint pos)
+    public void startNotamRetrievalByRouteBuffer(Boolean fromDatabase, Route route)
+    {
+        NotamCounts counts = new NotamCounts();
+        ArrayList<NotamCount> countList = new ArrayList<>();
+
+        if (fromDatabase)
+        {
+            counts = retrieveNotamCountsByBufferFromDB(route.getRouteBuffer(.25d));
+        }
+        else {
+            ArrayList<String> airports = route.getAirportWithinRouteBuffer();
+
+            for (String n : airports) {
+                NotamCount count = new NotamCount();
+                count.icaoId = n;
+                count.name = n;
+                count.notamCount = 0l;
+                count.notamsRetrievedDate = new Date();
+                countList.add(count);
+            }
+
+            counts.counts = countList.toArray(new NotamCount[countList.size()]);
+            counts.totalNumberOfNOTAMs = Long.valueOf(counts.counts.length);
+        }
+
+        if (notamsRetrievedResponseEvent != null)
+            notamsRetrievedResponseEvent.OnNotamsCountResponse(counts, "Notam stations from routebuffer retrieved");
+    }
+
+    private void startNotamRetrievalFromDatabaseByPoint(GeoPoint pos)
     {
         NotamCounts counts = retrieveNotamCountsFromDB(pos, 100l);
         Log.i(TAG, "Notam stations from DB retrieved");
         if (notamsRetrievedResponseEvent != null)
             notamsRetrievedResponseEvent.OnNotamsCountResponse(counts, "Notam stations from DB retrieved");
     }
+
+
 
 }
