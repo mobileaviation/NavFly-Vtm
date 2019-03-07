@@ -122,50 +122,50 @@ public class AirspaceLayer extends VectorLayer {
     private void drawAirspace(Airspace a)
     {
         Geometry outerGeomety = a.getAirspaceGeometry();
-        if (!outerGeomety.isEmpty()) {
-            if (a.category.getTexture()) {
+        if (outerGeomety != null) {
+            if (!outerGeomety.isEmpty()) {
+                if (a.category.getTexture()) {
 
-                TextureItem tex = getTextureItem(a.category);
+                    TextureItem tex = getTextureItem(a.category);
 
-                Style lineStyle = Style.builder()
-                        .stippleColor(a.category.getOutlineColor())
-                        .stipple(a.category.getOutlineWidth())
-                        .stippleWidth(1)
-                        .strokeWidth(a.category.getStrokeWidth())
-                        .strokeColor(a.category.getStrokeColor())
-                        .fixed(true)
-                        .texture(tex)
-                        .randomOffset(false)
-                        .build();
+                    Style lineStyle = Style.builder()
+                            .stippleColor(a.category.getOutlineColor())
+                            .stipple(a.category.getOutlineWidth())
+                            .stippleWidth(1)
+                            .strokeWidth(a.category.getStrokeWidth())
+                            .strokeColor(a.category.getStrokeColor())
+                            .fixed(true)
+                            .texture(tex)
+                            .randomOffset(false)
+                            .build();
 
-                Style polygonStyle = Style.builder()
-                        .strokeColor(Color.TRANSPARENT)
-                        .strokeWidth(0)
-                        .fillColor(a.category.getFillColor())
-                        .fillAlpha(Color.aToFloat(a.category.getFillColor()))
-                        .build();
+                    Style polygonStyle = Style.builder()
+                            .strokeColor(Color.TRANSPARENT)
+                            .strokeWidth(0)
+                            .fillColor(a.category.getFillColor())
+                            .fillAlpha(Color.aToFloat(a.category.getFillColor()))
+                            .build();
 
 
-                a.airspacePolygon1 = new PolygonDrawable(outerGeomety, polygonStyle);
-                a.airspacePolygon2 = new LineDrawable(GeometryHelpers.getGeoPoints(outerGeomety), lineStyle);
+                    a.airspacePolygon1 = new PolygonDrawable(outerGeomety, polygonStyle);
+                    a.airspacePolygon2 = new LineDrawable(GeometryHelpers.getGeoPoints(outerGeomety), lineStyle);
 
-                //add(a.airspacePolygon2);
+                    //add(a.airspacePolygon2);
 
-                //add(a.airspacePolygon1);
+                    //add(a.airspacePolygon1);
+
+                } else {
+                    Style lineStyle = Style.builder()
+                            .strokeColor(a.category.getStrokeColor())
+                            .strokeWidth(a.category.getStrokeWidth())
+                            .fillColor(a.category.getFillColor())
+                            .fillAlpha(Color.aToFloat(a.category.getFillColor()))
+                            .build();
+                    a.airspacePolygon1 = new PolygonDrawable(outerGeomety, lineStyle);
+                    //add(a.airspacePolygon1);
+                }
 
             }
-            else
-            {
-                Style lineStyle = Style.builder()
-                        .strokeColor(a.category.getStrokeColor())
-                        .strokeWidth(a.category.getStrokeWidth())
-                        .fillColor(a.category.getFillColor())
-                        .fillAlpha(Color.aToFloat(a.category.getFillColor()))
-                        .build();
-                a.airspacePolygon1 = new PolygonDrawable(outerGeomety, lineStyle);
-                //add(a.airspacePolygon1);
-            }
-
         }
     }
 

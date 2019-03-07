@@ -24,7 +24,6 @@ public class WeatherStations extends ArrayList<Station> {
 
     public WeatherStations(Context context)
     {
-        fireEvent = 0;
         tafs_received = false;
         metars_received = false;
         this.context = context;
@@ -40,7 +39,6 @@ public class WeatherStations extends ArrayList<Station> {
     {
         this.weatherDataReceivedEvent = weatherDataReceivedEvent;
     }
-    private Integer fireEvent;
     private Boolean tafs_received;
     private Boolean metars_received;
 
@@ -131,6 +129,7 @@ public class WeatherStations extends ArrayList<Station> {
 
     public void getDatabaseWeatherByLocationAndDistance(GeoPoint location, long distance)
     {
+        this.clear();
         DatabaseWeatherServices databaseWeatherServices = new DatabaseWeatherServices(context);
         databaseWeatherServices.GetMetarsByLocationAndRadius(location, distance, weatherResponseEvent);
         databaseWeatherServices.GetTafsByLocationAndRadius(location, distance, weatherResponseEvent);
@@ -138,6 +137,7 @@ public class WeatherStations extends ArrayList<Station> {
 
     public void getDatabaseWeatherByRoute(Geometry route)
     {
+        this.clear();
         DatabaseWeatherServices databaseWeatherServices = new DatabaseWeatherServices(context);
         databaseWeatherServices.GetMetarsByRoute(route, weatherResponseEvent);
         databaseWeatherServices.GetTafsByRoute(route, weatherResponseEvent);
@@ -145,7 +145,6 @@ public class WeatherStations extends ArrayList<Station> {
 
     public void getWeatherData(FspLocation location, Route route, Long distance)
     {
-        fireEvent = 0;
         this.clear();
         GeoPoint pos = new GeoPoint(location.getLatitude(), location.getLongitude());
         this.location = pos;
