@@ -12,7 +12,7 @@ public enum OnlineTileProviders {
     hillshading ("Hillshading Chart","https://tiles.wmflabs.org/hillshading/", "{Z}/{X}/{Y}.png"),
     skylines_airspaces ("Skylines Airspaces","https://skylines.aero/mapproxy/tiles/1.0.0/airspace/", "{Z}/{X}/{Y}.png"),
     //nexrad_weatherradar_5min ("Nexrad NA weather Radar 5mins old.","https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/", "{Z}/{X}/{Y}.png"),
-    rainviewer_radar ("Rainview Global radar", "https://tilecache.rainviewer.com/v2/radar/{TIMESTAMP}/256/", "{Z}/{X}/{Y}.png?color=1");
+    rainviewer_radar ("Rainview Global radar", "https://tilecache.rainviewer.com/v2/radar/{TIMESTAMP}/256/", "{Z}/{X}/{Y}/2/1_1.png");
     //france_icao ("France ICAO Chart", "https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-OACI&style=normal&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&", "TileMatrix={Z}&TileCol={X}&TileRow={Y}");
 
     OnlineTileProviders(String name, String base_url, String tile_path) {
