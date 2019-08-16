@@ -7,8 +7,8 @@ import com.mobileaviationtools.airnavdata.Classes.ChartType;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 
-import org.oscim.android.tiling.Overlay.OverlayTileSource;
-import org.oscim.android.tiling.mbtiles.MBTilesTileSource;
+import com.mobileaviationtools.extras.tiling.Overlay.OverlayTileSource;
+import com.mobileaviationtools.extras.tiling.mbtiles.MBTilesTileSource;
 import org.oscim.core.BoundingBox;
 import org.oscim.layers.GroupLayer;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;

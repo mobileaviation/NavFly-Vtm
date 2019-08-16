@@ -17,8 +17,8 @@ import com.mobileaviationtools.nav_fly.Settings.Overlays.ChartSettingsItemAdapte
 import com.mobileaviationtools.nav_fly.Settings.Overlays.MBTileChart;
 import com.mobileaviationtools.nav_fly.Settings.Providers.OnlineTileProviderSet;
 
-import org.oscim.android.cache.OfflineTileCache;
-import org.oscim.android.cache.OfflineTileDownloadEvent;
+import com.mobileaviationtools.extras.Cache.OfflineTileCache;
+import com.mobileaviationtools.extras.Cache.OfflineTileDownloadEvent;
 import org.oscim.core.BoundingBox;
 import org.oscim.map.Map;
 import org.oscim.tiling.TileSource;

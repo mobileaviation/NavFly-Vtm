@@ -9,15 +9,13 @@ import com.mobileaviationtools.weater_notam_data.notams.NotamResponseEvent;
 import com.mobileaviationtools.weater_notam_data.notams.Notams;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.core.GeoPointConvertion;
+import com.mobileaviationtools.extras.Utils.GeoPointConvertion;
 
 import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Dispatcher;
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;

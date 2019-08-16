@@ -59,21 +59,52 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':airnavdata')
     implementation project(':aircraft')
-    implementation project(':vtm-android')
-    implementation project(':vtm-http')
-//    implementation project(':vtm-jeo')
-    implementation project(':vtm-json')
-    implementation project(':vtm-jts')
-    implementation project(':vtm-mvt')
-    implementation project(':vtm-themes')
+
+    //implementation files('../Libs/vtm-0.11.1.jar')
+//    implementation project(':vtm-android')
+    implementation 'org.mapsforge:vtm:0.11.1'
+    implementation 'org.mapsforge:vtm-themes:0.11.1'
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+
+    implementation 'org.mapsforge:vtm-android:0.11.1'
+    implementation 'org.mapsforge:vtm-android:0.11.1:natives-armeabi-v7a'
+    implementation 'org.mapsforge:vtm-android:0.11.1:natives-arm64-v8a'
+    implementation 'org.mapsforge:vtm-android:0.11.1:natives-x86'
+    implementation 'org.mapsforge:vtm-android:0.11.1:natives-x86_64'
+    implementation 'com.caverock:androidsvg:1.3'
+    //implementation files('../Libs/vtm-android-0.11.1.jar')
+    implementation 'org.mapsforge:vtm-http:0.11.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.8.0'
+    implementation 'com.squareup.okio:okio:1.13.0'
+//    implementation project(':vtm-http')
+    //implementation files('../Libs/vtm-http-0.11.1.jar')
+////    implementation project(':vtm-jeo')
+//    implementation project(':vtm-json')
+//    implementation files('../Libs/vtm-json-0.11.1.jar')
+    implementation 'org.mapsforge:vtm-jts:0.11.1'
+    implementation 'org.locationtech.jts:jts-core:1.15.0'
+//    implementation project(':vtm-jts')
+//    implementation files('../Libs/vtm-jts-0.11.1.jar')
+//    implementation project(':vtm-mvt')
+    //implementation files('../Libs/vtm-mvt-0.11.1.jar')
+    implementation 'org.mapsforge:vtm-mvt:0.11.1'
+    implementation 'com.google.protobuf:protobuf-java:3.5.1'
+    implementation 'com.wdtinc:mapbox-vector-tile:3.0.0'
+
+//    implementation project(':vtm-themes')
+//    implementation files('../Libs/vtm-themes-0.11.1.jar')
+//    implementation files('../Libs/vtm-models-0.11.1.jar')
+    implementation project(':extras')
+
+
     implementation "org.slf4j:slf4j-android:$slf4jVersion"
-    implementation project(':vtm-android-gdx')
-    implementation project(':vtm-gdx')
-    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-    implementation 'org.mapsforge:mapsforge-poi-android:master-SNAPSHOT'
-    implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-armeabi'
-    implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-armeabi-v7a'
-    implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-x86'
+//    implementation project(':vtm-android-gdx')
+//    implementation project(':vtm-gdx')
+//    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+//    implementation 'org.mapsforge:mapsforge-poi-android:master-SNAPSHOT'
+//    implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-armeabi'
+//    implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-armeabi-v7a'
+//    implementation 'org.mapsforge:spatialite-android:master-SNAPSHOT:natives-x86'
     implementation 'android.arch.persistence.room:runtime:1.1.1'
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
     implementation 'com.android.support:multidex:1.0.3'
@@ -84,4 +115,14 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'org.osmdroid:osmdroid-android:6.0.3'
+    //implementation 'com.caverock:androidsvg:1.3'
+
+
+//    implementation files('../Libs/vtm-android-0.11.1-natives-arm64-v8a.jar')
+//    implementation files('../Libs/vtm-android-0.11.1-natives-armeabi.jar')
+//    implementation files('../Libs/vtm-android-0.11.1-natives-armeabi-v7a.jar')
+//    implementation files('../Libs/vtm-android-0.11.1-natives-mips.jar')
+//    implementation files('../Libs/vtm-android-0.11.1-natives-mips64.jar')
+//    implementation files('../Libs/vtm-android-0.11.1-natives-x86.jar')
+//    implementation files('../Libs/vtm-android-0.11.1-natives-x86_64.jar')
 }

@@ -6,7 +6,7 @@ import android.util.Log;
 import com.mobileaviationtools.airnavdata.Classes.OnlineTileProviders;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 
-import org.oscim.android.cache.OfflineTileCache;
+import com.mobileaviationtools.extras.Cache.OfflineTileCache;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.tiling.source.bitmap.BitmapTileSource;
 

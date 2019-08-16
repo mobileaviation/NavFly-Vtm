@@ -1,6 +1,5 @@
 package com.mobileaviationtools.nav_fly.Route.HeightMap;
 
-import com.badlogic.gdx.utils.GdxNativesLoader;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Location.FspLocation;
 import com.mobileaviationtools.nav_fly.Route.HeightMap.Comparators.CompAltitude;

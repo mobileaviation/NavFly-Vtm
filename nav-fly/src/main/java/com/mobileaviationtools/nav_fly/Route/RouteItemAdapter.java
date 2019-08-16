@@ -16,7 +16,7 @@ import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkerItem;
 import com.mobileaviationtools.nav_fly.Markers.Navaids.NavaidMarkerItem;
 import com.mobileaviationtools.nav_fly.R;
 
-import org.oscim.android.Utils.StringFormatter;
+import com.mobileaviationtools.extras.Utils.StringFormatter;
 
 public class RouteItemAdapter extends BaseAdapter {
     private Route route;

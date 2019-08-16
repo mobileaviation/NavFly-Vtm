@@ -18,7 +18,7 @@ import com.mobileaviationtools.nav_fly.R;
 import com.mobileaviationtools.nav_fly.Route.Weather.Station;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.core.GeoPointConvertion;
+import com.mobileaviationtools.extras.Utils.GeoPointConvertion;
 
 import java.util.ArrayList;
 import java.util.List;

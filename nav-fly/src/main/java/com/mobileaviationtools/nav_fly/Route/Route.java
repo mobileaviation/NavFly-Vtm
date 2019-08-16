@@ -2,7 +2,6 @@ package com.mobileaviationtools.nav_fly.Route;
 
 import android.util.Log;
 
-import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.example.aircraft.Aircraft;
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.AirnavRouteDatabase;

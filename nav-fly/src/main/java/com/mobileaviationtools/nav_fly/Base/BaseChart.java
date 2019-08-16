@@ -9,8 +9,8 @@ import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
-import org.oscim.tiling.source.mvt.NextzenMvtTileSource;
-import org.oscim.tiling.source.mvt.OpenMapTilesMvtTileSource;
+import com.mobileaviationtools.extras.tiling.Vector.NextzenMvtTileSource;
+import com.mobileaviationtools.extras.tiling.Vector.OpenMapTilesMvtTileSource;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 
 public class BaseChart {
@@ -73,7 +73,7 @@ public class BaseChart {
     private void setNextZenMap()
     {
         tileSource = NextzenMvtTileSource.builder()
-                .apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
+                //.apiKey("X9Iq4O_GTZeKHy4_w-_q8w") // Put a proper API key
                 .httpFactory(new OkHttpEngine.OkHttpFactory())
                 //.locale("en")
                 .build();

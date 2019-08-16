@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.mobileaviationtools.nav_fly.R;
 
-import org.oscim.android.cache.OfflineTileDownloadEvent;
+import com.mobileaviationtools.extras.Cache.OfflineTileDownloadEvent;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.BoundingBox;
 
