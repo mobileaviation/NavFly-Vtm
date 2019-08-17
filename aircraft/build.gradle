@@ -24,6 +24,10 @@ android {
 
 }
 
+repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -31,11 +35,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    //implementation project(path: ':vtm')
-    //implementation 'org.mapsforge:vtm:0.11.1'
-    //implementation 'org.mapsforge:vtm-themes:0.11.1'
-    //implementation 'org.slf4j:slf4j-api:1.7.25'
-    //implementation project(':vtm-jts')
-    implementation 'org.mapsforge:vtm-jts:0.11.1'
+    implementation 'org.mapsforge:vtm-jts:master-SNAPSHOT'
     implementation 'org.locationtech.jts:jts-core:1.15.0'
 }

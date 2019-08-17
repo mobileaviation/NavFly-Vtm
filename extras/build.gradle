@@ -22,41 +22,20 @@ android {
 
 }
 
+repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-//    implementation 'org.mapsforge:vtm:0.11.1'
-//    implementation 'org.mapsforge:vtm-themes:0.11.1'
-//    implementation 'org.slf4j:slf4j-api:1.7.25'
-
-    //    implementation project(':vtm-android')
-    implementation 'org.mapsforge:vtm-android:0.11.1'
-//    implementation 'org.mapsforge:vtm-android:0.11.1:natives-armeabi-v7a'
-//    implementation 'org.mapsforge:vtm-android:0.11.1:natives-arm64-v8a'
-//    implementation 'org.mapsforge:vtm-android:0.11.1:natives-x86'
-//    implementation 'org.mapsforge:vtm-android:0.11.1:natives-x86_64'
- //   implementation 'com.caverock:androidsvg:1.3'
-//    implementation project(':vtm-http')
-    implementation 'org.mapsforge:vtm-http:0.11.1'
+    implementation 'org.mapsforge:vtm-android:master-SNAPSHOT'
+    implementation 'org.mapsforge:vtm-http:master-SNAPSHOT'
     implementation 'com.squareup.okhttp3:okhttp:3.8.0'
     implementation 'com.squareup.okio:okio:1.13.0'
-////    implementation project(':vtm-jeo')
-//    implementation project(':vtm-json')
-//    implementation files('../Libs/vtm-json-0.11.1.jar')
-//    implementation project(':vtm-jts')
-//    implementation files('../Libs/vtm-jts-0.11.1.jar')
-//    implementation project(':vtm-mvt')
-    implementation 'org.mapsforge:vtm-mvt:0.11.1'
+    implementation 'org.mapsforge:vtm-mvt:master-SNAPSHOT'
     implementation 'com.google.protobuf:protobuf-java:3.5.1'
     implementation 'com.wdtinc:mapbox-vector-tile:3.0.0'
     implementation 'org.locationtech.jts:jts-core:1.15.0'
-//    implementation project(':vtm-themes')
-//    implementation files('../Libs/vtm-themes-0.11.1.jar')
-//    implementation files('../Libs/vtm-models-0.11.1.jar')
-
-
-//    implementation "org.slf4j:slf4j-android:$slf4jVersion"
-
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

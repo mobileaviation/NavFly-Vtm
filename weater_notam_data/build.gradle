@@ -24,18 +24,17 @@ android {
 
 }
 
-dependencies {
-    //implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'org.locationtech.jts:jts-core:1.15.0'
+repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
 
+dependencies {
+    implementation 'org.locationtech.jts:jts-core:1.15.0'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    //implementation project(path: ':vtm')
-    //implementation files('../Libs/vtm-0.11.1.jar')
-    //implementation project(':vtm-jts')
-    implementation 'org.mapsforge:vtm-jts:0.11.1'
+    implementation 'org.mapsforge:vtm-jts:master-SNAPSHOT'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation files('../Libs/simple-xml-2.3.2.jar')
