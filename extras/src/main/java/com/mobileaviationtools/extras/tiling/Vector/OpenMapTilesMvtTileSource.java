@@ -22,7 +22,7 @@ import org.oscim.tiling.ITileDataSource;
 import org.oscim.tiling.OverzoomTileDataSource;
 import org.oscim.tiling.source.UrlTileDataSource;
 import org.oscim.tiling.source.UrlTileSource;
-import org.oscim.tiling.source.mvt.MvtTileDecoder;
+import org.oscim.tiling.source.mvt.TileDecoder;
 
 public class OpenMapTilesMvtTileSource extends UrlTileSource {
 
@@ -85,6 +85,6 @@ public class OpenMapTilesMvtTileSource extends UrlTileSource {
 
     @Override
     public ITileDataSource getDataSource() {
-        return new OverzoomTileDataSource(new UrlTileDataSource(this, new MvtTileDecoder(locale), getHttpEngine()), mOverZoom);
+        return new OverzoomTileDataSource(new UrlTileDataSource(this, new TileDecoder(locale), getHttpEngine()), mOverZoom);
     }
 }

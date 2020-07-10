@@ -52,7 +52,7 @@ import static org.oscim.map.Map.ANIM_END;
 import static org.oscim.map.Map.MOVE_EVENT;
 import static org.oscim.map.Map.POSITION_EVENT;
 
-public class ItemizedExtLayer<Item extends MarkerInterface> extends MarkerLayer<Item>
+public class ItemizedExtLayer<Item extends MarkerInterface> extends MarkerLayer
         implements GestureListener, Map.InputListener, Map.UpdateListener
     {
     private String TAG = "WaypointLayer";

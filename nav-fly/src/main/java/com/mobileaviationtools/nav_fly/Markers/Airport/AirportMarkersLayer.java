@@ -11,6 +11,7 @@ import com.mobileaviationtools.airnavdata.Entities.Airport;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.MapPosition;
 import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.map.Map;
@@ -58,22 +59,22 @@ public class AirportMarkersLayer extends ItemizedLayer{ //} implements Map.Input
     {
         this.airportSelected = airportSelected;
     }
-    private OnItemGestureListener<MarkerItem> onItemGestureListener;
+    private OnItemGestureListener<MarkerInterface> onItemGestureListener;
     private void setOnItemGestureListener()
     {
-        onItemGestureListener = new OnItemGestureListener<MarkerItem>() {
+        onItemGestureListener = new OnItemGestureListener<MarkerInterface>() {
             @Override
-            public boolean onItemSingleTapUp(int index, MarkerItem item) {
+            public boolean onItemSingleTapUp(int index, MarkerInterface item) {
                 if (item instanceof AirportMarkerItem)
                 {
-                    if (airportSelected != null) airportSelected.Selected(((AirportMarkerItem) item).getAirport(), item.geoPoint);
+                    if (airportSelected != null) airportSelected.Selected(((AirportMarkerItem) item).getAirport(), ((AirportMarkerItem) item).geoPoint);
                 }
 
                 return false;
             }
 
             @Override
-            public boolean onItemLongPress(int index, MarkerItem item) {
+            public boolean onItemLongPress(int index, MarkerInterface item) {
                 return false;
             }
         };

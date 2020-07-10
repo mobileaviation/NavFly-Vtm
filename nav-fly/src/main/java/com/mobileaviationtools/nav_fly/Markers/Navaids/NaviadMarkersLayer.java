@@ -6,10 +6,12 @@ import android.util.Log;
 
 import com.mobileaviationtools.airnavdata.AirnavDatabase;
 import com.mobileaviationtools.airnavdata.Entities.Navaid;
+import com.mobileaviationtools.nav_fly.Markers.Airport.AirportMarkerItem;
 
 import org.oscim.core.BoundingBox;
 import org.oscim.core.MapPosition;
 import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.map.Map;
@@ -56,18 +58,18 @@ public class NaviadMarkersLayer extends ItemizedLayer {
         db = AirnavDatabase.getInstance(context);
     }
 
-    private OnItemGestureListener<MarkerItem> onItemGestureListener;
+    private OnItemGestureListener<MarkerInterface> onItemGestureListener;
     private void setOnItemGestureListener()
     {
-        onItemGestureListener = new OnItemGestureListener<MarkerItem>() {
+        onItemGestureListener = new OnItemGestureListener<MarkerInterface>() {
             @Override
-            public boolean onItemSingleTapUp(int index, MarkerItem item) {
-                Log.i(TAG,"Single Tab on : " + item.toString() + " : " + item.title );
+            public boolean onItemSingleTapUp(int index, MarkerInterface item) {
+                Log.i(TAG,"Single Tab on : " + item.toString() + " : " + ((NavaidMarkerItem) item).title );
                 return false;
             }
 
             @Override
-            public boolean onItemLongPress(int index, MarkerItem item) {
+            public boolean onItemLongPress(int index, MarkerInterface item) {
                 return false;
             }
         };
