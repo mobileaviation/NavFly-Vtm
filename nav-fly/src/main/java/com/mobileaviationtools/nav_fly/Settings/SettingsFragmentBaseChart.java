@@ -14,7 +14,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
-import com.mobileaviationtools.nav_fly.Classes.BaseChartType;
+import com.mobileaviationtools.extras.Classes.BaseChartType;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.R;
 
@@ -79,6 +79,11 @@ public class SettingsFragmentBaseChart extends Fragment {
                 r = R.id.openScienceMapsBtn;
                 break;
             }
+            case openflightmaps:
+            {
+                r = R.id.openFlightMapsTilesBtn;
+                break;
+            }
         }
 
         basemapRadioGroup.check(r);
@@ -91,6 +96,7 @@ public class SettingsFragmentBaseChart extends Fragment {
                 BaseChartType type = BaseChartType.opensciencemaps;
                 if (checkedId == R.id.openMapTilesBtn) type = BaseChartType.openmaptiles;
                 if (checkedId == R.id.nextZenMapsBtn) type = BaseChartType.nextzen;
+                if (checkedId == R.id.openFlightMapsTilesBtn) type = BaseChartType.openflightmaps;
                 setSelectedBaseChart(type);
             }
         });

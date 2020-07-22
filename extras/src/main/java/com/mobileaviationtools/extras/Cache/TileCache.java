@@ -27,7 +27,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+import android.util.Log;
 
+import org.oscim.backend.DateTime;
 import org.oscim.core.Tile;
 import org.oscim.tiling.ITileCache;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,7 @@ public class TileCache implements ITileCache {
 
     final static org.slf4j.Logger log = LoggerFactory.getLogger(TileCache.class);
     final static boolean dbg = false;
+    final Date expireDate = new Date( new Date().getTime() - 1000L*60L*60L*24L*30L);
 
     class CacheTileReader implements TileReader {
         final InputStream mInputStream;
@@ -66,7 +69,7 @@ public class TileCache implements ITileCache {
         }
     }
 
-    class CacheTileWriter implements TileWriter {
+    public class CacheTileWriter implements TileWriter {
         final ByteArrayOutputStream mOutputStream;
         final Tile mTile;
 
@@ -98,6 +101,7 @@ public class TileCache implements ITileCache {
     private final SQLiteStatement mStmtPutTile;
     private final SQLiteStatement mStmtDelTile;
     private final SQLiteStatement mStmtDelAllTiles;
+    private final SQLiteStatement mStmtCheckTile;
 
     //private final SQLiteStatement mStmtUpdateTile;
 
@@ -125,6 +129,10 @@ public class TileCache implements ITileCache {
                 " FROM " + TABLE_NAME +
                 " WHERE x=? AND y=? AND z = ?");
 
+        mStmtCheckTile = mDatabase.compileStatement( "" +
+                "SELECT time FROM " + TABLE_NAME +
+                " WHERE x=? AND y=? AND z=?");
+
         mStmtPutTile = mDatabase.compileStatement("" +
                 "INSERT INTO " + TABLE_NAME +
                 " (x, y, z, time, last_access, data)" +
@@ -146,7 +154,7 @@ public class TileCache implements ITileCache {
     }
 
     @Override
-    public TileWriter writeTile(Tile tile) {
+    public ITileCache.TileWriter writeTile(Tile tile) {
         ByteArrayOutputStream os;
 
         synchronized (mCacheBuffers) {
@@ -156,6 +164,11 @@ public class TileCache implements ITileCache {
                 os = mCacheBuffers.remove(mCacheBuffers.size() - 1);
         }
         return new CacheTileWriter(tile, os);
+    }
+
+    public TileWriter writeTile(Tile tile, ByteArrayOutputStream stream )
+    {
+        return new CacheTileWriter(tile, stream);
     }
 
     static final String TABLE_NAME = "tiles";
@@ -233,6 +246,49 @@ public class TileCache implements ITileCache {
             mStmtPutTile.execute();
             mStmtPutTile.clearBindings();
         }
+    }
+
+    public void saveDownloadedTile(Tile tile, ByteArrayOutputStream data) {
+        byte[] bytes = null;
+        bytes = data.toByteArray();
+
+        synchronized (mStmtPutTile) {
+            mStmtPutTile.bindLong(1, tile.tileX);
+            mStmtPutTile.bindLong(2, tile.tileY);
+            mStmtPutTile.bindLong(3, tile.zoomLevel);
+            mStmtPutTile.bindLong(4, new Date().getTime());   // time
+            mStmtPutTile.bindLong(5, 0);    // lastaccess
+            mStmtPutTile.bindBlob(6, bytes);
+
+            mStmtPutTile.execute();
+            mStmtPutTile.clearBindings();
+        }
+    }
+
+    public boolean checkTileNotAvialableOrExpired(Tile tile)
+    {
+        boolean ret = false;
+        synchronized (mStmtCheckTile) {
+            mStmtCheckTile.bindLong(1, tile.tileX);
+            mStmtCheckTile.bindLong(2, tile.tileY);
+            mStmtCheckTile.bindLong(3, tile.zoomLevel);
+            try {
+                long time = mStmtCheckTile.simpleQueryForLong();
+                if (time < expireDate.getTime()) {
+                    log.debug("There is a tile present in thr DB, But seems expire");
+                    ret = false;
+                } else
+                    ret = true;
+            }
+            catch (SQLiteDoneException e) {
+                log.debug("Tile not found: " + e.getMessage());
+                ret = false;
+            }
+            finally {
+                mStmtDelTile.clearBindings();
+            }
+        }
+        return ret;
     }
 
     public void deleteOldTile(Tile tile) {

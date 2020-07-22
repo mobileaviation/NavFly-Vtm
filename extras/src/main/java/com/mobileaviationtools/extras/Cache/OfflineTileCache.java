@@ -1,8 +1,12 @@
 package com.mobileaviationtools.extras.Cache;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.mobileaviationtools.extras.Classes.BaseChartType;
+import com.mobileaviationtools.extras.tiling.openflightmaps.OpenFlightMapsTileDecoder;
 
 import org.oscim.core.BoundingBox;
 import org.oscim.core.Tile;
@@ -18,21 +22,28 @@ import okhttp3.Response;
 
 public class OfflineTileCache extends TileCache {
     private String TAG = "OfflineTileCache";
+    private OkHttpClient client;
+    private OpenFlightMapsTileDecoder openFlightMapsTileDecoder;
+
 
     public OfflineTileCache(Context context, String cacheDirectory, String dbName) {
         super(context, cacheDirectory, dbName);
         tiles = new ArrayList<>();
+        client = GetHttpClient(1);
+        this.openFlightMapsTileDecoder = new OpenFlightMapsTileDecoder();
     }
 
-    public void DownloadTiles(BoundingBox box, String baseUrl)
+    public void DownloadTiles(BoundingBox box, String[] baseUrls, BaseChartType baseChartType)
     {
         this.box = box;
-        this.baseUrl = baseUrl;
+        this.baseUrls = baseUrls;
+        this.baseChartType = baseChartType;
         prepareTiles();
     }
 
     private BoundingBox box;
-    private String baseUrl;
+    private String[] baseUrls;
+    private BaseChartType baseChartType;
 
     private OfflineTileDownloadEvent offlineTileDownloadEvent;
     public void SetOnOfflineTileDownloadEvent(OfflineTileDownloadEvent event)
@@ -44,7 +55,8 @@ public class OfflineTileCache extends TileCache {
     private void prepareTiles()
     {
         OfflineTile tt = new OfflineTile();
-        for (int zoom = 6; zoom <= 13; zoom++) {
+        int max_zoom  = (baseChartType==BaseChartType.openflightmaps) ? 12 : 13;
+        for (int zoom = 6; zoom <= max_zoom; zoom++) {
 
             tt.getTileNumber(box.getMaxLatitude(), box.getMinLongitude(), zoom);
             int xBegin = tt.x;
@@ -65,20 +77,25 @@ public class OfflineTileCache extends TileCache {
 
 
         dt.tiles = tiles;
-        dt.url = baseUrl;
+        dt.urls = baseUrls;
         dt.offlineTileDownloadEvent = offlineTileDownloadEvent;
+        dt.baseChartType = baseChartType;
+        dt.client = this.client;
+        dt.openFlightMapsTileDecoder = this.openFlightMapsTileDecoder;
         dt.execute();
     }
 
     private class downloadTiles extends AsyncTask {
-        public String url;
+        public String[] urls;
         public ArrayList<Tile> tiles;
         public OfflineTileDownloadEvent offlineTileDownloadEvent;
+        public BaseChartType baseChartType;
         private long progress;
-        private OkHttpClient client;
+        public OkHttpClient client;
+        public OpenFlightMapsTileDecoder openFlightMapsTileDecoder;
 
         public downloadTiles() {
-            client = GetHttpClient(1);
+
         }
 
         @Override
@@ -86,31 +103,59 @@ public class OfflineTileCache extends TileCache {
             Log.i(TAG, "Download Tiles Count: " + tiles.size());
             double c = tiles.size();
             double t = 0;
+
             for (Tile tile: tiles)
             {
-                String url = baseUrl.replace("{Z}", Byte.toString(tile.zoomLevel));
-                url = url.replace("{X}", Integer.toString(tile.tileX));
-                url = url.replace("{Y}", Integer.toString(tile.tileY));
+                String url = setupBaseUrl(tile, baseUrls[0]);
+                if (!checkTileNotAvialableOrExpired(tile)) {
+                    try {
+                        if (baseChartType == BaseChartType.openflightmaps) {
+                            String[] urls = new String[2];
+                            urls[0] = setupBaseUrl(tile, baseUrls[0]);
+                            urls[1] = setupBaseUrl(tile, baseUrls[1]);
 
-                Request request = new Request.Builder()
-                        .url(url)
-                        .build();
+                            Bitmap bitmap = openFlightMapsTileDecoder.DownloadAndCombine(urls, client, null);
+                            ByteArrayOutputStream encodedStream = openFlightMapsTileDecoder.EncodeBitmap(bitmap);
+                            writeBytesToCache(encodedStream, tile);
+                            encodedStream.close();
+                        } else {
 
-                try {
-                    doDownload(request, tile);
-                    double p = (t / c) * 100;
-                    publishProgress(Math.round(p), false, request.url().toString());
+                            Request request = new Request.Builder()
+                                    .url(url)
+                                    .build();
+
+                            doDownload(request, tile);
+                        }
+
+                        double p = setProgress(t,c,url);
+                        t++;
+                        Log.i(TAG, "Downloading : " + url + " Progress: " + Math.round(p) + "%");
+
+                    } catch (Exception e) {
+                        log.error("Download error: " + url + " : " + e.getMessage());
+                        publishProgress(0d, true, e.getMessage());
+                        //cancel(true);
+                    }
+                } else {
+                    double p = setProgress(t,c,url);
                     t++;
-                    Log.i(TAG, "Downloading : " + request.url().toString() + " Progress: " + Math.round(p) + "%" );
-                }
-                catch (Exception e)
-                {
-                    log.error("Download error: " + url + " : " + e.getMessage());
-                    publishProgress(0d, true, e.getMessage());
-                    //cancel(true);
+                    Log.i(TAG, "Ignoring : " + url + " Progress: " + Math.round(p) + "%");
                 }
             }
             return null;
+        }
+
+        private double setProgress(double t, double c, String url) {
+            double p = (t / c) * 100;
+            publishProgress(Math.round(p), false, url);
+            return p;
+        }
+
+        private String setupBaseUrl(Tile tile, String url) {
+            String ret = url.replace("{Z}", Byte.toString(tile.zoomLevel));
+            ret = ret.replace("{X}", Integer.toString(tile.tileX));
+            ret = ret.replace("{Y}", Integer.toString(tile.tileY));
+            return ret;
         }
 
         private void doDownload(Request request, Tile tile) throws IOException {
@@ -119,8 +164,13 @@ public class OfflineTileCache extends TileCache {
             byte[] tilebytes = response.body().bytes();
             ByteArrayOutputStream baos = new ByteArrayOutputStream(tilebytes.length);
             baos.write(tilebytes, 0, tilebytes.length);
-            Boolean success = true;
-            saveTile(tile, baos, success );
+            writeBytesToCache(baos, tile);
+        }
+
+        private void writeBytesToCache(ByteArrayOutputStream baos, Tile tile) {
+            //Boolean success = true;
+            saveDownloadedTile(tile, baos);
+            //saveTile(tile, baos, success );
         }
 
         @Override

@@ -29,7 +29,7 @@ import com.mobileaviationtools.airnavdata.Entities.Airspace;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.Database;
 import com.mobileaviationtools.nav_fly.Base.BaseChart;
-import com.mobileaviationtools.nav_fly.Classes.BaseChartType;
+import com.mobileaviationtools.extras.Classes.BaseChartType;
 import com.mobileaviationtools.nav_fly.Classes.CheckMap;
 import com.mobileaviationtools.nav_fly.Classes.ConnectStage;
 import com.mobileaviationtools.nav_fly.Classes.Helpers;
@@ -831,7 +831,7 @@ public class MainActivity extends LocationActivity implements DialogInterface.On
             mapScaleBar.destroy();
 
         vars.settingsObject.dispose();
-        mMapView.onDestroy();
+        //mMapView.onDestroy();
         super.onDestroy();
     }
 }

@@ -1,9 +1,10 @@
 package com.mobileaviationtools.nav_fly.Base;
 
-import com.mobileaviationtools.nav_fly.Classes.BaseChartType;
+import com.mobileaviationtools.extras.tiling.openflightmaps.OpenFlightMapsTileSource;
+import com.mobileaviationtools.extras.Classes.BaseChartType;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 
-import org.oscim.layers.tile.TileLayer;
+import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.theme.VtmThemes;
@@ -21,6 +22,7 @@ public class BaseChart {
 
     public void setBaseCharts(BaseChartType baseChartType)
     {
+        boolean _vector = true;
         switch (baseChartType)
         {
             case nextzen:
@@ -38,13 +40,27 @@ public class BaseChart {
                 setOpenScienceMap();
                 break;
             }
+            case openflightmaps:
+            {
+                setOpenFlightMaps();
+                _vector = false;
+                break;
+            }
         }
 
         vars.baseChartType = baseChartType;
-        baseLayer = vars.map.setBaseMap(tileSource);
-        vars.map.setTheme(defaultTheme);
-        labelLayer = new LabelLayer(vars.map, baseLayer);
-        vars.map.layers().add(labelLayer, vars.BASE_GROUP);
+
+        if (_vector) {
+            baseLayer = vars.map.setBaseMap(tileSource);
+            labelLayer = new LabelLayer(vars.map, baseLayer);
+            vars.map.layers().add(labelLayer, vars.BASE_GROUP);
+            vars.map.setTheme(defaultTheme);
+        } else
+        {
+            bitmapBaseLayer = new BitmapTileLayer(vars.map, tileSource);
+            vars.map.layers().add(bitmapBaseLayer, vars.BASE_GROUP);
+        }
+
     }
 
     public void removeBaseLayers()
@@ -54,7 +70,10 @@ public class BaseChart {
     }
 
     private TileSource tileSource;
+    private TileSource tileAeroSource;
     private VectorTileLayer baseLayer;
+    private BitmapTileLayer bitmapBaseLayer;
+    private BitmapTileLayer bitmapAeroLayer;
     private LabelLayer labelLayer;
     private VtmThemes defaultTheme;
     private GlobalVars vars;
@@ -66,7 +85,8 @@ public class BaseChart {
                 .build();
         defaultTheme = VtmThemes.DEFAULT;
 
-        String url = ((OSciMap4TileSource) tileSource).getUrl().toString();
+        String[] url = new String[1];
+        url[0] = ((OSciMap4TileSource) tileSource).getUrl().toString();
         vars.settingsObject.setBaseCache(tileSource, url, vars.baseChartType);
     }
 
@@ -78,7 +98,8 @@ public class BaseChart {
                 //.locale("en")
                 .build();
 
-        String url = ((NextzenMvtTileSource) tileSource).getNextzenUrl();
+        String[] url = new String[1];
+        url[0] = ((NextzenMvtTileSource) tileSource).getNextzenUrl();
         vars.settingsObject.setBaseCache(tileSource, url, vars.baseChartType);
         defaultTheme = VtmThemes.MAPZEN;
     }
@@ -90,9 +111,19 @@ public class BaseChart {
                 .apiKey(openTilesMapKey)
                 .httpFactory(new OkHttpEngine.OkHttpFactory())
                 .build();
-        String url = ((OpenMapTilesMvtTileSource) tileSource).getOpenTilesMapUrl();
+        String[] url = new String[1];
+        url[0] = ((OpenMapTilesMvtTileSource) tileSource).getOpenTilesMapUrl();
         vars.settingsObject.setBaseCache(tileSource, url, vars.baseChartType);
         defaultTheme = VtmThemes.OPENMAPTILES;
+    }
+
+    private void setOpenFlightMaps() {
+        tileSource = OpenFlightMapsTileSource.builder()
+                .httpFactory(new OkHttpEngine.OkHttpFactory())
+                .build();
+        String[] url = ((OpenFlightMapsTileSource) tileSource).getBaseUrls();
+
+        vars.settingsObject.setBaseCache(tileSource, url, vars.baseChartType);
     }
 
 }

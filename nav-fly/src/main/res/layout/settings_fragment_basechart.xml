@@ -63,6 +63,21 @@
             android:layout_marginLeft="30dp"
             android:layout_weight="1"
             android:text="The OpenMapTiles charts, used by MapBox, slow rendering but up-to-date" />
+
+        <RadioButton
+            android:id="@+id/openFlightMapsTilesBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="OpenFilghtMapsTiles Raster tiles" />
+
+        <TextView
+            android:id="@+id/textView27"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_weight="1"
+            android:text="The rastertiles from the OpenFlightMaps project, accurate but raster" />
     </RadioGroup>
 
     <TextView

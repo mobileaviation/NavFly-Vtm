@@ -10,7 +10,7 @@ import com.mobileaviationtools.airnavdata.Classes.OnlineTileProviders;
 import com.mobileaviationtools.airnavdata.Entities.Chart;
 import com.mobileaviationtools.airnavdata.Entities.MBTile;
 import com.mobileaviationtools.airnavdata.Entities.OnlineTileProvider;
-import com.mobileaviationtools.nav_fly.Classes.BaseChartType;
+import com.mobileaviationtools.extras.Classes.BaseChartType;
 import com.mobileaviationtools.nav_fly.GlobalVars;
 import com.mobileaviationtools.nav_fly.Layers.ChartsOverlayLayers;
 import com.mobileaviationtools.nav_fly.Settings.Overlays.ChartSettingsItemAdapter;
@@ -45,7 +45,7 @@ public class SettingsObject  {
         public void OnSettingsLoaded(SettingsObject object);
     }
 
-    private String tiles_url;
+    private String[] tiles_urls;
     private ArrayList<MBTileChart> mbTileCharts;
     private ArrayList<OnlineTileProviderSet> onlineTileProviders;
     public ChartsOverlayLayers chartsOverlayLayers;
@@ -162,14 +162,16 @@ public class SettingsObject  {
         this.baseCacheEnabled = baseCacheEnabled;
     }
     private OfflineTileCache baseCache;
-    public void setBaseCache(TileSource source, String url, BaseChartType baseChartType)
+    private BaseChartType baseChartType;
+    public void setBaseCache(TileSource source, String[] urls, BaseChartType baseChartType)
     {
+        this.baseChartType = baseChartType;
         baseCache = new OfflineTileCache(vars.context, null, "airnav_" +
                 baseChartType.toString() + "_tiles_cache.db");
         long s = 512 * (1 << 10);
         baseCache.setCacheSize(512 * (1 << 10));
 
-        tiles_url = url;
+        tiles_urls = urls;
 
         if (baseCacheEnabled) {
             source.tileCache = baseCache;
@@ -200,8 +202,9 @@ public class SettingsObject  {
 
     public void DownloadTiles(OfflineTileDownloadEvent callback)
     {
+
         baseCache.SetOnOfflineTileDownloadEvent(callback);
-        baseCache.DownloadTiles(vars.map.getBoundingBox(0) ,tiles_url);
+        baseCache.DownloadTiles(vars.map.getBoundingBox(0) ,tiles_urls, baseChartType);
     }
 
     private Chart[] getChartsFromDB()
